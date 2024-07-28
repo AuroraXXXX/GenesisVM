@@ -133,7 +133,7 @@ namespace os {
 
     bool create_thread(OSThread *thread, bool detach) {
         assert(thread != nullptr, "thread is null");
-
+        assert(thread->_os_state == OSThread::STATE_NEW,"check");
         //初始化线程属性 以及将系统线程声明为分离线程 这样可以防止内存泄露
         pthread_attr_t attr;
         pthread_attr_init(&attr);

@@ -44,7 +44,7 @@ public:
         this->_monitor->lock();
     };
 
-    inline ~MonitorLocker() {
+     inline ~MonitorLocker() {
         this->_monitor->unlock();
     };
     /**

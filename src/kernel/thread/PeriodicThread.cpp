@@ -25,7 +25,12 @@ void PeriodicThread::create() {
     }
 
 }
+void PeriodicThread::start() {
+    MonitorLocker locker(PeriodicTask_lock);
 
+    PeriodicThread::_run_tasks = true;
+    locker.notify();
+}
 void PeriodicThread::run() {
     while (true) {
         assert(this == PeriodicThread::periodic_thread(), "check");
@@ -63,12 +68,7 @@ void PeriodicThread::stop() {
 
 }
 
-void PeriodicThread::start() {
-    MonitorLocker locker(PeriodicTask_lock);
 
-    PeriodicThread::_run_tasks = true;
-    locker.notify();
-}
 
 uint32_t PeriodicThread::calculate_next_task_interval() {
     if (OrderAccess::load(&PeriodicThread::_should_terminate)) {

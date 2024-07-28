@@ -1,4 +1,4 @@
-cmake-build-debug/*
-cmake-build-debug-remote-host/*
-./.idea/*
-/git/*
+cmake-build-debug/
+cmake-build-debug-remote-host/
+.idea/
+.git/

@@ -15,7 +15,7 @@ OSReturn Monitor::wait(ticks_t millis) {
         return OSReturn::OK;
     } else {
         //表示需要限时等待
-        timespec spec{};
+        timespec spec{0,0};
         clock_gettime(CLOCK_REALTIME, &spec);
         // 将时间加上去
         constexpr auto ms_per_sec = TicksPerS / TicksPerMS;
@@ -25,9 +25,14 @@ OSReturn Monitor::wait(ticks_t millis) {
 
         spec.tv_sec += (long) sec;
         spec.tv_nsec += (long) nsec;
+        // 处理 tv_nsec 溢出
+        if (spec.tv_nsec >= TicksPerNS) {
+            spec.tv_sec += spec.tv_nsec / TicksPerNS;
+            spec.tv_nsec %= TicksPerNS;
+        }
         ThreadStatusBlockedTrans blocked;
         int32_t status = pthread_cond_timedwait(&this->_cond, &this->_mutex, &spec);
-        assert(status == 0 || status == ETIMEDOUT, "cond_timewait");
+        assert(status == 0 || status == ETIMEDOUT, "cond_timewait %d",status);
         return status == 0 ? OSReturn::OK : OSReturn::TIMEOUT;
     }
 }

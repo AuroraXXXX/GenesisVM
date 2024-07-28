@@ -21,7 +21,7 @@ add_link_options("-no-pie")
 include_directories(include)
 
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_library(${PROJECT_NAME} INTERFACE)
 add_subdirectory(src)
 option(TEST "是否开启测试" ON)
 if (${TEST})
