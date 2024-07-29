@@ -13,7 +13,7 @@
  */
 class PeriodicThread : public PlatThread {
 private:
-    static PeriodicThread *_periodic_thread;
+    static PeriodicThread * volatile _periodic_thread;
     /**
      * 是否应该中止线程的运行
      */

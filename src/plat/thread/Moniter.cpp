@@ -6,6 +6,7 @@
 #include <ctime>
 #include "plat/constants.hpp"
 #include "plat/thread/ThreadStatusTrans.hpp"
+#include "iostream"
 OSReturn Monitor::wait(ticks_t millis) {
     if (millis == 0) {
         //表示无限期的等待了
@@ -17,6 +18,7 @@ OSReturn Monitor::wait(ticks_t millis) {
         //表示需要限时等待
         timespec spec{0,0};
         clock_gettime(CLOCK_REALTIME, &spec);
+
         // 将时间加上去
         constexpr auto ms_per_sec = TicksPerS / TicksPerMS;
         constexpr auto ns_per_ms = TicksPerMS / TicksPerNS;
@@ -27,6 +29,7 @@ OSReturn Monitor::wait(ticks_t millis) {
         spec.tv_nsec += (long) nsec;
         // 处理 tv_nsec 溢出
         if (spec.tv_nsec >= TicksPerNS) {
+           std:: cout <<  spec.tv_nsec / TicksPerNS<<std::endl;
             spec.tv_sec += spec.tv_nsec / TicksPerNS;
             spec.tv_nsec %= TicksPerNS;
         }

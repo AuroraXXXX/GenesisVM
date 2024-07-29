@@ -8,7 +8,7 @@
 #include "plat/os/cpu.hpp"
 #include "plat/os/time.hpp"
 
-PeriodicThread *PeriodicThread::_periodic_thread = nullptr;
+PeriodicThread * volatile PeriodicThread::_periodic_thread = nullptr;
 volatile bool PeriodicThread::_should_terminate = false;
 bool PeriodicThread::_run_tasks = false;
 
