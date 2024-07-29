@@ -28,10 +28,9 @@ OSReturn Monitor::wait(ticks_t millis) {
         spec.tv_sec += (long) sec;
         spec.tv_nsec += (long) nsec;
         // 处理 tv_nsec 溢出
-        if (spec.tv_nsec >= TicksPerNS) {
-           std:: cout <<  spec.tv_nsec / TicksPerNS<<std::endl;
-            spec.tv_sec += spec.tv_nsec / TicksPerNS;
-            spec.tv_nsec %= TicksPerNS;
+        if (spec.tv_nsec >= TicksPerS) {
+            spec.tv_sec += spec.tv_nsec / TicksPerS;
+            spec.tv_nsec %= TicksPerS;
         }
         ThreadStatusBlockedTrans blocked;
         int32_t status = pthread_cond_timedwait(&this->_cond, &this->_mutex, &spec);
