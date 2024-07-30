@@ -10,7 +10,7 @@
 #include "plat/utils/robust.hpp"
 #include "plat/mem/allocation.hpp"
 #include "plat/macro.hpp"
-
+#include "plat/utils/OrderAccess.hpp"
 
 class OSThread;
 
@@ -25,6 +25,10 @@ protected:
     NONCOPYABLE(Mutex);
 
     OSThread *volatile _owner;
+
+    inline void set_owner(OSThread *thread) {
+        OrderAccess::store<OSThread *>(&this->_owner, thread);
+    };
 public:
     /**
      * @param name 互斥量的名称 但是内部不会拷贝字符串
@@ -54,18 +58,22 @@ public:
      */
     bool try_lock();
 
-    [[nodiscard]] inline bool is_locked() const {
-        return this->_owner != nullptr;
-    };
-
     /**
      * 判断持有该锁线程的是本线程
      * @return
      */
-    bool owned_by_self();
+    [[nodiscard]] bool owned_by_self() const;
 
     [[nodiscard]] inline OSThread *owner() const {
-        return this->_owner;
+        return OrderAccess::load(&this->_owner);
+    };
+
+    /**
+     *
+     * @return
+     */
+    [[nodiscard]] inline bool is_locked() const {
+        return this->owner() != nullptr;
     };
 
     void print_on(CharOStream *stream);

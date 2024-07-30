@@ -6,12 +6,15 @@
 #include <ctime>
 #include "plat/constants.hpp"
 #include "plat/thread/ThreadStatusTrans.hpp"
+#include "plat/thread/OSThread.hpp"
 #include "iostream"
 OSReturn Monitor::wait(ticks_t millis) {
     if (millis == 0) {
         //表示无限期的等待了
         ThreadStatusBlockedTrans blocked;
-        int32_t status = pthread_cond_wait(&this->_cond, &this->_mutex);
+        this->set_owner(nullptr);
+        int32_t status = ::pthread_cond_wait(&this->_cond, &this->_mutex);
+        this->set_owner(OSThread::current());
         assert(status == 0 || status == ETIMEDOUT, "cond_wait");
         return OSReturn::OK;
     } else {
@@ -33,7 +36,9 @@ OSReturn Monitor::wait(ticks_t millis) {
             spec.tv_nsec %= TicksPerS;
         }
         ThreadStatusBlockedTrans blocked;
-        int32_t status = pthread_cond_timedwait(&this->_cond, &this->_mutex, &spec);
+        this->set_owner(nullptr);
+        int32_t status = ::pthread_cond_timedwait(&this->_cond, &this->_mutex, &spec);
+        this->set_owner(OSThread::current());
         assert(status == 0 || status == ETIMEDOUT, "cond_timewait %d",status);
         return status == 0 ? OSReturn::OK : OSReturn::TIMEOUT;
     }

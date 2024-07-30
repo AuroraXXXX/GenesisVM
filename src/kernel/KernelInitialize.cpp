@@ -4,9 +4,12 @@
 #include "kernel/KernelInitialize.hpp"
 #include "PeriodicThread.hpp"
 #include "kernel_mutex.hpp"
+#include "VMThread.hpp"
 void KernelInitialize::daemon_thread_initialize() {
     //1. 创建周期性任务的守护线程
     PeriodicThread::create();
+    VMThread::create();
+
     PeriodicThread::start();
 }
 

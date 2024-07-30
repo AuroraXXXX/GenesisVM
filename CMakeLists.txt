@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.21)
 # 项目名称 起源
 set(PROJECT_NAME GenesisVM)
 # 项目设置

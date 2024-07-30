@@ -25,8 +25,12 @@ void VMThread::run() {
 }
 
 void VMThread::create() {
-    VMThread::_vm_thread = new VMThread();
-    VMThread::_vm_thread->global_initialize();
+    const auto thread = new VMThread();
+    if(os::create_thread(thread)){
+        VMThread::_vm_thread = thread;
+    } else{
+        guarantee(false,"init failed");
+    }
 }
 
 void VMThread::destroy() {
@@ -76,10 +80,10 @@ void VMThread::wait_for_operation() {
     //唤醒其他线程，说明已经
     mo_lock.notify_all();
     while (!this->_should_terminate) {
-        if (this->_next_operation != nullptr)
+        if (OrderAccess::load(&this->_next_operation) != nullptr)
             return;
-        assert(this->_next_operation != nullptr, "must be");
-        assert(this->_cur_operation != nullptr, "must be");
+        assert(this->_next_operation == nullptr, "must be");
+        assert(this->_cur_operation == nullptr, "must be");
         //没有什么可执行的 那么就需要再次唤醒可能等待此的线程
         mo_lock.notify_all();
         //自己再次无限期等待

@@ -68,14 +68,14 @@ PlatThread::PlatThread() :
 
 void PlatThread::pre_run() {
     assert(this->is_daemon_thread() ^ this->is_user_thread(), "Thread类型错误");
-    auto lock = this->is_daemon_thread() ? LangThreadList_lock : NonLangThreadList_lock;
+    auto lock = this->is_user_thread() ? LangThreadList_lock : NonLangThreadList_lock;
     MutexLocker locker(lock);
     this->add_to_list();
 }
 
 void PlatThread::post_run() {
     assert(this->is_daemon_thread() ^ this->is_user_thread(), "Thread类型错误");
-    auto lock = this->is_daemon_thread() ? LangThreadList_lock : NonLangThreadList_lock;
+    auto lock = this->is_user_thread() ? LangThreadList_lock : NonLangThreadList_lock;
     MutexLocker locker(lock);
     this->remove_from_list();
 }

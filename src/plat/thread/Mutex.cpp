@@ -11,56 +11,64 @@ Mutex::Mutex(
         bool recursive) noexcept:
         _name(name),
         _owner(nullptr) {
-    pthread_mutexattr_t attr;
-    pthread_mutexattr_init(&attr);
+    ::pthread_mutexattr_t attr;
+    ::pthread_mutexattr_init(&attr);
     if (recursive) {
-        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+        ::pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
     } else {
-        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
+        ::pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
     }
-    pthread_mutex_init(&this->_mutex, &attr);
-    pthread_mutexattr_destroy(&attr);
+    ::pthread_mutex_init(&this->_mutex, &attr);
+    ::pthread_mutexattr_destroy(&attr);
 }
 
 Mutex::~Mutex() {
-    pthread_mutex_destroy(&this->_mutex);
+    ::pthread_mutex_destroy(&this->_mutex);
 }
 
-bool Mutex::owned_by_self() {
-    return OSThread::current() == this->_owner;
+bool Mutex::owned_by_self() const {
+    return OSThread::current() == this->owner() && this->owner() != nullptr;
 }
 
 bool Mutex::try_lock() {
-    auto thread = OSThread::current();
-    auto status = pthread_mutex_trylock(&this->_mutex);
+    auto status = ::pthread_mutex_trylock(&this->_mutex);
     const auto success = status == 0;
     assert(success || status == EBUSY, "pthread_mutex_trylock");
     if (success) {
-        assert(this->owner() == nullptr, "mutex owner设置错误");
-        this->_owner = thread;
+        assert(!this->is_locked() || this->owned_by_self(), "mutex owner设置错误");
+        //is locked
+        if(!is_locked()){
+            this->set_owner(OSThread::current());
+        }
     }
     return success;
 }
 
 void Mutex::lock() {
     //
-    const auto current = OSThread::current();
     int32_t status ;
     {
         ThreadStatusBlockedTrans blocked;
-        status = pthread_mutex_lock(&this->_mutex);
+        status = ::pthread_mutex_lock(&this->_mutex);
     }
-    assert(this->owner() == nullptr, "mutex owner设置错误");
-
-    this->_owner = current;
     assert(status == 0, "pthread_mutex_lock");
+    OrderAccess::compile_barrier();
+  //  assert(!this->is_locked() || this->owned_by_self(), "mutex owner设置错误 %x %x",this->owner(),OSThread::current());
+    if(!(!this->is_locked() || this->owned_by_self())){
+        guarantee(false,"??");
+    }
+    //is locked
+    if(!is_locked()){
+        this->set_owner(OSThread::current());
+    }
+
 }
 
 void Mutex::unlock() {
-    auto current = OSThread::current();
-    assert(this->_owner == current, "check");
-    this->_owner = nullptr;
-    auto status = pthread_mutex_unlock(&this->_mutex);
+    assert(this->owned_by_self(), "check");
+    this->set_owner(nullptr);
+    OrderAccess::compile_barrier();
+    auto status = ::pthread_mutex_unlock(&this->_mutex);
     assert(status == 0, "pthread_mutex_unlock");
 }
 
@@ -68,7 +76,7 @@ void Mutex::print_on(CharOStream *stream) {
     stream->print("Mutex: [" PTR_FORMAT "] %s - owner: " PTR_FORMAT,
                   this,
                   this->_name,
-                  this->_owner);
+                  this->owner());
 }
 
 
