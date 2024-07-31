@@ -17,12 +17,12 @@ class Monitor;
  */
 class VMThread : public PlatThread {
 private:
-    bool _should_terminate;
-    bool _is_terminate;
+    static volatile bool _should_terminate;
+    static volatile bool _is_terminate;
     static VMThread *_vm_thread;
-    VM_Operation *_cur_operation;
-    VM_Operation *_next_operation;
-    Monitor *_terminate_lock;
+    static VM_Operation *volatile _cur_operation;
+    static VM_Operation *volatile _next_operation;
+    static Monitor *_terminate_lock;
 
     explicit VMThread();
 
@@ -76,7 +76,7 @@ public:
      */
     static void execute(VM_Operation *operation);
 
-    const char *name() override{
+    const char *name() override {
         return "VMThread";
     };
 
@@ -84,11 +84,11 @@ public:
         return true;
     };
 
-    bool is_user_thread() override{
+    bool is_user_thread() override {
         return false;
     };
 
-    bool is_daemon_thread() override{
+    bool is_daemon_thread() override {
         return true;
     };
 

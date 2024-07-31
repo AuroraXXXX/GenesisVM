@@ -7,10 +7,13 @@
 #include "plat/PlatInitialize.hpp"
 #include "kernel/thread/LangThread.hpp"
 #include "kernel/thread/PeriodicTask.hpp"
+#include "kernel/thread/VM_Operation.hpp"
 #include "kernel/KernelInitialize.hpp"
 using namespace std;
 enum {
-    PREFIX_LOG_TAG(os)
+    PREFIX_LOG_TAG(os),
+    PREFIX_LOG_TAG(vmthread),
+    PREFIX_LOG_TAG(safepoint)
 };
 class PeriodicTaskTest :public PeriodicTask{
 protected:
@@ -22,11 +25,23 @@ public:
     inline explicit PeriodicTaskTest(uint32_t interval) : PeriodicTask(interval) {}
 
 };
+class VMOperationTest:public VM_Operation{
+public:
+    void doit() override {
+        cout<<"vm operation test ..."<<endl;
+    }
+
+    const char *name() override {
+        return "VMOperationTest";
+    }
+};
 int main() {
     const auto stamp = os::current_stamp();
 
     const  char *tags_name[] = {
-            "os"
+            "os",
+            "vmthread",
+            "safepoint"
     };
     OSThread *lang_thread = new LangThread();
 
@@ -38,6 +53,9 @@ int main() {
     KernelInitialize::initialize();
     PeriodicTaskTest test(100);
     test.activate();
+    test.inactivate();
+    VMOperationTest vmOperationTest;
+    VMOperationTest::execute(&vmOperationTest);
     while (true) {}
     return 0;
 }

@@ -8,8 +8,11 @@
 #include "safepoint.hpp"
 
 VMThread *VMThread::_vm_thread = nullptr;
-
-
+VM_Operation* volatile VMThread::_cur_operation = nullptr;
+VM_Operation* volatile VMThread::_next_operation = nullptr;
+Monitor* VMThread::_terminate_lock = new Monitor("VMThreadTerminate_lock");
+volatile bool VMThread::_is_terminate = false;
+volatile bool VMThread::_should_terminate = false;
 
 
 void VMThread::run() {
@@ -52,13 +55,7 @@ void VMThread::destroy() {
     VMThread::_vm_thread = nullptr;
 }
 
-VMThread::VMThread() :
-        _cur_operation(nullptr),
-        _next_operation(nullptr),
-        _should_terminate(false),
-        _is_terminate(false),
-        _terminate_lock(nullptr) {
-    _terminate_lock = new Monitor("VMThreadTerminate_lock");
+VMThread::VMThread() {
 }
 
 void VMThread::loop() {

@@ -40,7 +40,9 @@ OSReturn Monitor::wait(ticks_t millis) {
         ThreadStatusBlockedTrans blocked;
         //下面是要进行等待的 内部实际上会释放的锁的 所以此处也需要将持有者设置为空
         this->set_owner(nullptr);
+        OrderAccess::compile_barrier();
         int32_t status = ::pthread_cond_timedwait(&this->_cond, &this->_mutex, &spec);
+        OrderAccess::compile_barrier();
         //说明是被唤醒的 所以说可以认为是持有锁的
         this->set_owner(OSThread::current());
         assert(status == 0 || status == ETIMEDOUT, "cond_timewait %d",status);
@@ -48,7 +50,7 @@ OSReturn Monitor::wait(ticks_t millis) {
     }
 }
 
-Monitor::Monitor(const char *name, bool recursive) :
+Monitor::Monitor(const char *name, bool recursive) noexcept :
         Mutex(name, recursive),
         _cond(PTHREAD_COND_INITIALIZER) {
 }

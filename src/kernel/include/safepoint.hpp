@@ -45,8 +45,8 @@ private:
     /**
      * 开始通知线程同步的时间
      */
-    static TimeStamp _safe_point_beg_time;
-    static TimeStamp _safe_point_end_time;
+    static TimeStamp _beg_time;
+    static TimeStamp _end_time;
 
     static inline auto state() {
         return OrderAccess::load<int32_t>(reinterpret_cast<volatile const int *>(&_state));

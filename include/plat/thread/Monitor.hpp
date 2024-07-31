@@ -14,7 +14,7 @@ class Monitor : public Mutex {
 protected:
     pthread_cond_t _cond;
 public:
-    explicit Monitor(const char *name, bool recursive = true);
+    explicit Monitor(const char *name, bool recursive = true) noexcept;
 
     /**
      * 在这个点进行等待

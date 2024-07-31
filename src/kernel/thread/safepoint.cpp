@@ -14,8 +14,8 @@
 #include "StillRunningThreadClosure.hpp"
 volatile SafepointSynchronize::SynchronizeState SafepointSynchronize::_state =
         SynchronizeState::not_synchronized;
-TimeStamp SafepointSynchronize::_safe_point_beg_time;
-TimeStamp SafepointSynchronize::_safe_point_end_time;
+TimeStamp SafepointSynchronize::_beg_time;
+TimeStamp SafepointSynchronize::_end_time;
 WaitBarrier SafepointSynchronize::_wait_barrier;
 volatile int32_t SafepointSynchronize::_safe_point_check = 0;
 
@@ -24,13 +24,12 @@ void SafepointSynchronize::begin() {
     assert(state() == SynchronizeState::not_synchronized, "应未设置同步才可以开始");
     assert(PlatThread::current()->is_VM_thread(), "仅仅VMThread可以调用");
     //开始记录时间
-    _safe_point_beg_time.update_realtime_ticks();
+    _beg_time.update_realtime_ticks();
     /**
      * 调用 LangThreadList_lock
      * 我们确保从此刻到退出安全点期间没有LangThread被创建和销毁
      */
     LangThreadList_lock->lock();
-    // auto lang_threads = LangThread::threads_num();
     log_debug(safepoint)("正在使用%s wait barrier 初始化安全点(Safepoint)同步器.",
                          WaitBarrier::description());
 
@@ -64,7 +63,7 @@ void SafepointSynchronize::end() {
     assert(_state == SynchronizeState::synchronized, "必须之前是synchronized才可以结束安全点");
     OrderAccess::store(&_state, SynchronizeState::not_synchronized);
     //此处必须是奇数
-    assert((_safe_point_check & 0x01) == 0, "健全");
+    assert((_safe_point_check & 0x01) == 1, "健全");
     OrderAccess::fetch_and_add(&_safe_point_check, 1);
     OrderAccess::fence();
     /**
@@ -74,9 +73,9 @@ void SafepointSynchronize::end() {
 
     //唤醒所有等待在_wait_barrier上的锁
     _wait_barrier.disarm();
-    _safe_point_end_time.update_realtime_ticks();
+    _end_time.update_realtime_ticks();
     log_info(safepoint)("safepoint持续时间:%ld ns.",
-                        _safe_point_end_time.during_ns(_safe_point_beg_time));
+                        _end_time.during_ns(_beg_time));
 }
 
 
