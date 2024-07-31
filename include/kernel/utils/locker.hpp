@@ -53,15 +53,23 @@ public:
      * @return false 表示超时
      */
     inline auto wait(ticks_t millis = 0) {
-        return this->_monitor->wait(millis) == OSReturn::OK;
+        OSReturn osReturn;
+        OrderAccess::fence();
+        osReturn = this->_monitor->wait(millis);
+        OrderAccess::fence();
+        return osReturn == OSReturn::OK;
     };
 
     inline void notify() {
+        OrderAccess::fence();
         this->_monitor->notify();
+        OrderAccess::fence();
     };
 
-    inline void notify_all() {
+    inline void notify_all(){
+        OrderAccess::fence();
         this->_monitor->notify_all();
+        OrderAccess::fence();
     };
 };
 #endif //KERNEL_UTILS_LOCKER_HPP

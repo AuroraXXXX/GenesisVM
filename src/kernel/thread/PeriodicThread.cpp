@@ -33,7 +33,7 @@ void PeriodicThread::start() {
 }
 void PeriodicThread::run() {
     while (true) {
-        assert(this == PeriodicThread::periodic_thread(), "check");
+        assert(this == PeriodicThread::periodic_thread(), "check %x",PeriodicThread::periodic_thread());
         assert(this == PeriodicThread::current(), "check");
         auto delay_interval = PeriodicThread::calculate_next_task_interval();
 

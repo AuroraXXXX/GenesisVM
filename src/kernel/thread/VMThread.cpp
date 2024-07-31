@@ -77,9 +77,8 @@ void VMThread::wait_for_operation() {
     assert(PlatThread::current()->is_VM_thread(), "Must be the VM thread");
     MonitorLocker mo_lock(VMOperation_lock);
     //到这里说明等待的Operation也处理完毕了
-    //this->_next_operation = nullptr;
     OrderAccess::store<VM_Operation*>(&this->_next_operation, nullptr);
-    OrderAccess::fence();
+    //OrderAccess::fence();
     //唤醒其他线程，说明已经
     mo_lock.notify_all();
     while (!this->should_terminate()) {
@@ -156,7 +155,7 @@ void VMThread::wait_until_executed(VM_Operation *operation) {
                 ml.notify_all();
                 break;
             }
-            OrderAccess::fence();
+            //OrderAccess::fence();
             log_trace(vmthread)("A VM operation already set, waiting");
             ml.wait();
         }
@@ -174,10 +173,11 @@ bool VMThread::set_next_operation(VM_Operation *operation) {
     if (this->next_operation() != nullptr) {
         return false;
     }
-    log_debug(vmthread)("Adding VM operation: %s", operation->name());
+
     //this->_next_operation = operation;
     OrderAccess::store(&this->_next_operation,operation);
-    OrderAccess::fence();
+    log_debug(vmthread)("Adding VM operation: %s", this->next_operation()->name());
+    //OrderAccess::fence();
     assert(this->next_operation() != nullptr,"must be");
     return true;
 }
