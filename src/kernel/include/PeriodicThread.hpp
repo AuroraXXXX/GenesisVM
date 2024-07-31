@@ -61,7 +61,7 @@ public:
     };
 
     static inline auto periodic_thread() {
-        return PeriodicThread::_periodic_thread;
+        return OrderAccess::load(&PeriodicThread::_periodic_thread);
     };
 
     const char *name() override {

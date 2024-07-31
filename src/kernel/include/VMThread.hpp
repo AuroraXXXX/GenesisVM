@@ -17,12 +17,15 @@ class Monitor;
  */
 class VMThread : public PlatThread {
 private:
-    static volatile bool _should_terminate;
-    static volatile bool _is_terminate;
+    volatile bool _should_terminate;
+    volatile bool _is_terminate;
     static VMThread *_vm_thread;
-    static VM_Operation *volatile _cur_operation;
-    static VM_Operation *volatile _next_operation;
-    static Monitor *_terminate_lock;
+    VM_Operation *volatile _cur_operation;
+    VM_Operation *volatile _next_operation;
+    /**
+     * 锁定
+     */
+    Monitor *const _terminate_lock;
 
     explicit VMThread();
 
@@ -43,7 +46,7 @@ private:
      * 非VMThread等待VM_Operation被VMThread执行完毕
      * @param operation
      */
-    static void wait_until_executed(VM_Operation *operation);
+     void wait_until_executed(VM_Operation *operation);
 
     /**
      * 将VM_Operation放入到队列上,等待被执行
@@ -53,13 +56,20 @@ private:
     bool set_next_operation(VM_Operation *operation);
 
     [[nodiscard]] inline auto should_terminate() const {
-        return this->_should_terminate;
+        return OrderAccess::load(&this->_should_terminate);
     };
 
     [[nodiscard]] inline auto is_terminate() const {
-        return this->_is_terminate;
+        return OrderAccess::load(&this->_is_terminate);
     };
 
+    [[nodiscard]] inline auto cur_operation() const {
+        return OrderAccess::load(&this->_cur_operation);
+    };
+
+    [[nodiscard]] inline auto next_operation() const {
+        return OrderAccess::load(&this->_next_operation);
+    };
 public:
 
     static inline VMThread *vm_thread() {
