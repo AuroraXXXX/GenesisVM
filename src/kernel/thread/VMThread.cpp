@@ -147,6 +147,7 @@ void VMThread::wait_until_executed(VM_Operation *operation) {
     MonitorLocker ml(VMOperation_lock);
    // const auto vm_thread = VMThread::vm_thread();
     {
+
         log_trace(vmthread)("Installing VM operation,cur timestamp:" SIZE_FORMAT,
                             os::current_stamp());
         while (true) {
@@ -173,9 +174,9 @@ bool VMThread::set_next_operation(VM_Operation *operation) {
     if (this->next_operation() != nullptr) {
         return false;
     }
-
     //this->_next_operation = operation;
     OrderAccess::store(&this->_next_operation,operation);
+    OrderAccess::fence();
     log_debug(vmthread)("Adding VM operation: %s", this->next_operation()->name());
     //OrderAccess::fence();
     assert(this->next_operation() != nullptr,"must be");

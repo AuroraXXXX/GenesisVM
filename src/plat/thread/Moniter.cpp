@@ -7,7 +7,6 @@
 #include "plat/constants.hpp"
 #include "plat/thread/ThreadStatusTrans.hpp"
 #include "plat/thread/OSThread.hpp"
-#include "iostream"
 OSReturn Monitor::wait(ticks_t millis) {
     if (millis == 0) {
         //表示无限期的等待了

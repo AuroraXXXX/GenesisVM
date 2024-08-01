@@ -39,7 +39,7 @@ public:
      * 必须在持有锁锁定的情况下
      */
     void notify_all() {
-        auto status = pthread_cond_broadcast(&this->_cond);
+        auto status = ::pthread_cond_broadcast(&this->_cond);
         assert(status == 0, "pthread_cond_broadcast");
     };
 };

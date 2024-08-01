@@ -9,6 +9,7 @@
 #include "kernel/thread/PeriodicTask.hpp"
 #include "kernel/thread/VM_Operation.hpp"
 #include "kernel/KernelInitialize.hpp"
+#include "unistd.h"
 using namespace std;
 enum {
     PREFIX_LOG_TAG(os),
@@ -55,6 +56,8 @@ int main() {
     test.activate();
     test.inactivate();
     VMOperationTest vmOperationTest;
+    //为了等待内核线程创建完毕
+    sleep(1);
     VMOperationTest::execute(&vmOperationTest);
     while (true) {}
     return 0;
