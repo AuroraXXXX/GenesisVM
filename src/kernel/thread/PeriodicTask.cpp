@@ -5,7 +5,7 @@
 #include "kernel/thread/PeriodicTask.hpp"
 #include "kernel_mutex.hpp"
 #include "kernel/thread/PlatThread.hpp"
-
+#include "kernel/constants.hpp"
 uint16_t PeriodicTask::_num_of_tasks = 0;
 PeriodicTask *PeriodicTask::_tasks[ KernelConstants::PeriodicTaskMaxNum];
 
@@ -57,16 +57,15 @@ void PeriodicTask::activate() {
  * ------------------
  */
 class ArenaChunkPoolCleanTask : public PeriodicTask {
-private:
-    constexpr inline static uint32_t cleaning_interval = 5000;
+protected:
 
-    void task() override {
+    inline void task() override {
         Arena::clean_pool();
     }
 
 public:
-    explicit ArenaChunkPoolCleanTask() :
-            PeriodicTask(cleaning_interval) {
+    inline explicit ArenaChunkPoolCleanTask() :
+            PeriodicTask(KernelConstants::PeriodicTaskArenaClearInterval) {
     }
 };
 /**

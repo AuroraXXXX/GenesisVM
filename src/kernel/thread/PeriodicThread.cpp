@@ -77,7 +77,7 @@ uint32_t PeriodicThread::calculate_next_task_interval() {
     MonitorLocker lock(PeriodicTask_lock);
     if (!PeriodicThread::_run_tasks) {
         //此时还没有执行定时任务 间隔0.1s 检查一次
-        lock.wait(100);
+        lock.wait(PeriodicThread::interval_to_millis(KernelConstants::PeriodicNoRunTaskCheckInterval));
         return 0;
     }
     auto remains = PeriodicThread::min_task_interval();

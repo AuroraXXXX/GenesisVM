@@ -35,14 +35,9 @@ namespace global {
     product(int16_t ,ThreadPriority7,-1,"7对应到底层的线程优先级,-1表示默认")              \
     product(int16_t ,ThreadPriority8,-1,"8对应到底层的线程优先级,-1表示默认")              \
     product(int16_t ,ThreadPriority9,-1,"9对应到底层的线程优先级,-1表示默认")               \
-     product(int16_t ,ThreadPriority10,-1,"10对应到底层的线程优先级,-1表示默认")               \
+    product(int16_t ,ThreadPriority10,-1,"10对应到底层的线程优先级,-1表示默认")               \
 
     PLATFORM_FLAGS(DECLARE_PRODUCT_FLAG, DECLARE_DEVELOP_FLAG, IGNORE_RANGE)
-#ifdef DECLARE_PRODUCT_FLAG
-#undef DECLARE_PRODUCT_FLAG
-#endif
-#ifdef  DECLARE_DEVELOP_FLAG
-#undef  DECLARE_DEVELOP_FLAG
-#endif
+
 }
 #endif //PLAT_GLOBALS_HPP

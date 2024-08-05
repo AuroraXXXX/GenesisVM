@@ -4,7 +4,14 @@
 #include "plat/globals.hpp"
 
 namespace global {
+#ifdef DECLARE_PRODUCT_FLAG
+    #undef DECLARE_PRODUCT_FLAG
+#endif
 #define DECLARE_PRODUCT_FLAG(type, name, value, ...) type name = value;
+
+#ifdef DECLARE_DEVELOP_FLAG
+    #undef DECLARE_DEVELOP_FLAG
+#endif
 
 #ifdef DEVELOP
 #define DECLARE_DEVELOP_FLAG(type,name,value,...)
