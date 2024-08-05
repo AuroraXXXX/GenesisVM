@@ -8,13 +8,12 @@
 #include "stdtype.hpp"
 #include "plat/constants.hpp"
 
-using LogTag = uint16_t;
+
 /**
  * LogNoTag中LogTag中特殊的表示，表示没有LogTag
  */
-#define PREFIX_LOG_TAG(T) LOGTAG_##T
+#define PREFIX_LOG_TAG(T) LogTag::T
 
-constexpr inline LogTag PREFIX_LOG_TAG(no_tag) = UINT16_MAX;
 
 constexpr inline uint16_t LogTagSetMax = 5;
 constexpr inline size_t LOG_MAX_FOLLOWER_SIZE = 256;
@@ -36,5 +35,15 @@ enum class LogLevel : uint8_t {
     default_console_level = trace //一开始输出
 };
 
+#define LOG_TAG_LIST(def) \
+    def(safepoint)        \
+    def(vmthread)
+
+enum class LogTag:uint16_t {
+    no_tag,
+#define LOG_TAG_DEF(name) name,
+    LOG_TAG_LIST(LOG_TAG_DEF)
+#undef LOG_TAG_DEF
+};
 
 #endif //LOGGING_CONSTANTS_HPP

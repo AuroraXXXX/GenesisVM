@@ -6,10 +6,14 @@
 #include "plat/utils/robust.hpp"
 #include "plat/logger/LogTagSet.hpp"
 #include "plat/logger/log.hpp"
-
+#include "plat/logger/constants.hpp"
 const LogTagSet LogTagSet::Default;
-const char **LogTagSet::_tags_name = nullptr;
-LogTag LogTagSet::_tags_max = 0;
+static const char * TAG_NAME_LIST[] ={
+        "",
+#define LOG_TAG_DEF(name) #name,
+        LOG_TAG_LIST(LOG_TAG_DEF)
+#undef LOG_TAG_DEF
+};
 
 LogTagSet::LogTagSet() noexcept:
         _tags{
@@ -55,7 +59,7 @@ int LogTagSet::write_tags(char *buf, size_t buf_len, const char *split) {
                 //输出 分割符，第一个标签之前应该不输出分割符
                 split_str,
                 //输出标签名称
-                _tags_name[tag]);
+                TAG_NAME_LIST[(uint16_t)tag]);
         // 返回值 < 0 表明出现错误了
         assert(writen != -1, "日志的标签编码出现错误");
         if (writen < 0 || writen >= buf_len) {

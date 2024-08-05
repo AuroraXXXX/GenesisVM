@@ -3,7 +3,7 @@
 //
 
 #include "safepoint.hpp"
-#include "kernel/utils/log.hpp"
+#include "plat/logger/log.hpp"
 #include "kernel_mutex.hpp"
 #include "plat/os/time.hpp"
 #include "plat/thread/WaitBarrier.hpp"

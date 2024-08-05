@@ -4,7 +4,7 @@
 
 #include "VMThread.hpp"
 #include "kernel_mutex.hpp"
-#include "kernel/utils/log.hpp"
+#include "plat/logger/log.hpp"
 #include "safepoint.hpp"
 
 VMThread *VMThread::_vm_thread = nullptr;

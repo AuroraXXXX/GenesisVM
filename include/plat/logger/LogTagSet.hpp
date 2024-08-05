@@ -21,11 +21,7 @@ private:
     LogTag _tags[LogTagSetMax];
 
     explicit LogTagSet() noexcept;
-    /**
-     * 前端传入标签名称
-     */
-    static const char **_tags_name;
-    static LogTag _tags_max;
+
 
 public:
     const static LogTagSet Default;

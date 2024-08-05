@@ -4,7 +4,7 @@
 
 #include "kernel/thread/VM_Operation.hpp"
 #include "kernel/thread/PlatThread.hpp"
-#include "kernel/utils/log.hpp"
+#include "plat/logger/log.hpp"
 #include "VMThread.hpp"
 void VM_Operation::evaluate() {
     ResourceArenaMark mark;

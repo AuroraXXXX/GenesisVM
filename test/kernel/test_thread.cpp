@@ -11,11 +11,7 @@
 #include "kernel/KernelInitialize.hpp"
 #include "unistd.h"
 using namespace std;
-enum {
-    PREFIX_LOG_TAG(os),
-    PREFIX_LOG_TAG(vmthread),
-    PREFIX_LOG_TAG(safepoint)
-};
+
 class PeriodicTaskTest :public PeriodicTask{
 protected:
     void task() override {
@@ -39,18 +35,11 @@ public:
 int main() {
     const auto stamp = os::current_stamp();
 
-    const  char *tags_name[] = {
-            "os",
-            "vmthread",
-            "safepoint"
-    };
+
     OSThread *lang_thread = new LangThread();
 
     PlatInitialize::initialize(stamp,
-                               tags_name,
-                               sizeof(tags_name),
                                lang_thread);
-    log_trace(os)("aa");
     KernelInitialize::initialize();
     PeriodicTaskTest test(100);
     test.activate();
