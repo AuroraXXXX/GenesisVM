@@ -7,7 +7,7 @@
 
 #include "stdtype.hpp"
 #include "plat/constants.hpp"
-
+#include "global/LogTag.hpp"
 
 /**
  * LogNoTag中LogTag中特殊的表示，表示没有LogTag
@@ -35,15 +35,5 @@ enum class LogLevel : uint8_t {
     default_console_level = trace //一开始输出
 };
 
-#define LOG_TAG_LIST(def) \
-    def(safepoint)        \
-    def(vmthread)
-
-enum class LogTag:uint16_t {
-    no_tag,
-#define LOG_TAG_DEF(name) name,
-    LOG_TAG_LIST(LOG_TAG_DEF)
-#undef LOG_TAG_DEF
-};
 
 #endif //LOGGING_CONSTANTS_HPP

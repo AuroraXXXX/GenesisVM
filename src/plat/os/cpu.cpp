@@ -12,7 +12,7 @@
 #include "plat/utils/robust.hpp"
 #include "plat/thread/OSThread.hpp"
 #include "plat/constants.hpp"
-#include "plat/globals.hpp"
+#include "global/flag.hpp"
 #include "plat/utils/OrderAccess.hpp"
 
 namespace os {

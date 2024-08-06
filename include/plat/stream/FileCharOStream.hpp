@@ -5,7 +5,7 @@
 #ifndef PLATFORM_FILE_CHAR_OSTREAM_HPP
 #define PLATFORM_FILE_CHAR_OSTREAM_HPP
 
-#include "plat/globals.hpp"
+#include "global/flag.hpp"
 #include "CharOStream.hpp"
 
 class FileCharOStream : public CharOStream {

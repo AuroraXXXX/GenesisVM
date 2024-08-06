@@ -7,7 +7,7 @@
 #include "plat/stream/FileCharOStream.hpp"
 #include "plat/utils/ByteOrder.hpp"
 #include "plat/utils/robust.hpp"
-#include "plat/globals.hpp"
+#include "global/flag.hpp"
 
 std::atomic<uint16_t> DetailLogMemory::_next_order_id = 0;
 OStream* DetailLogMemory::_stream = nullptr;

@@ -16,3 +16,4 @@ include_directories(kernel/include)
 
 generate_dynamic_lib(plat)
 generate_dynamic_lib(kernel)
+generate_dynamic_lib(global)

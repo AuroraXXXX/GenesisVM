@@ -1,7 +1,7 @@
 //
 // Created by aurora on 2024/6/25.
 //
-#include "plat/globals.hpp"
+#include "global/flag.hpp"
 
 namespace global {
 #ifdef DECLARE_PRODUCT_FLAG

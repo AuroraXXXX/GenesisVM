@@ -5,7 +5,7 @@
 #include "MemoryTracer.hpp"
 #include "SummaryMemory.hpp"
 #include "DetailLogMemory.hpp"
-#include "plat/globals.hpp"
+#include "global/flag.hpp"
 #include "plat/utils/robust.hpp"
 
 MemoryTracer::NMT_Level MemoryTracer::_nmt_level = NMT_Level::unknown;
