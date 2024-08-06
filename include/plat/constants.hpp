@@ -109,4 +109,5 @@ constexpr inline int16_t INT32_DEC_BUF_SIZE = 12;
  * 包括所需的正负号
  */
 constexpr inline int16_t UINT64_DEC_BUF_SIZE = 22;
+
 #endif //PLATFORM_CONSTANTS_HPP

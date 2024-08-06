@@ -18,7 +18,7 @@ protected:
     inline Space(void *start, void *end) noexcept:
             _start((uintptr_t) start),
             _end((uintptr_t) end) {
-    }
+    };
 
 public:
     explicit Space() noexcept:

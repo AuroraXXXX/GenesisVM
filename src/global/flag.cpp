@@ -18,6 +18,7 @@ namespace global {
 #else
 #define DECLARE_DEVELOP_FLAG(type, name, value, ...) type name = value;
 #endif
+
     PLATFORM_FLAGS(DECLARE_PRODUCT_FLAG, DECLARE_DEVELOP_FLAG, IGNORE_RANGE)
 
 }

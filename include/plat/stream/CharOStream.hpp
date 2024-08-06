@@ -154,7 +154,11 @@ public:
     inline void stamp_string() {
         this->stamp_string(" ", ":");
     };
-
+    /**
+     * 打印 符合 人阅读的字节
+     * @param bytes
+     */
+    OSReturn print_human_bytes(size_t bytes);
 };
 
 #endif //PLATFORM_CHAR_OSTREAM_HPP

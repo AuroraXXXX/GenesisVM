@@ -2,8 +2,8 @@
 // Created by aurora on 2024/6/25.
 //
 
-#ifndef PLAT_GLOBALS_HPP
-#define PLAT_GLOBALS_HPP
+#ifndef GENESIS_VM_GLOBAL_FLAG_HPP
+#define GENESIS_VM_GLOBAL_FLAG_HPP
 
 #include "stdtype.hpp"
 
@@ -43,4 +43,4 @@ namespace global {
 
     PLATFORM_FLAGS(DECLARE_PRODUCT_FLAG, DECLARE_DEVELOP_FLAG, IGNORE_RANGE)
 }
-#endif //PLAT_GLOBALS_HPP
+#endif //GENESIS_VM_GLOBAL_FLAG_HPP

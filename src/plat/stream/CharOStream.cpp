@@ -159,5 +159,45 @@ void CharOStream::stamp_string(
     this->print_raw(buf);
     this->print_raw(suffix);
 }
+#define HAS_OTHER(value, unit) (((value) &((unit) - 1)) == 0)
+
+static size_t print_human_exact_size(size_t bytes, const char **suffix) {
+    if (bytes >= T) {
+        auto value = bytes >> LogTB;
+        *suffix = "TB";
+        if (HAS_OTHER(bytes, T)) {
+            return value;
+        }
+    }
+    if (bytes >= G) {
+        auto value = bytes >> LogGB;
+        *suffix = "GB";
+        if (HAS_OTHER(bytes, G)) {
+            return value;
+        }
+    }
+    if (bytes >= M) {
+        auto value = bytes >> LogMB;
+        *suffix = "MB";
+        if (HAS_OTHER(bytes, M)) {
+            return value;
+        }
+    }
+    if (bytes >= K) {
+        auto value = bytes >> LogKB;
+        *suffix = "KB";
+        if (HAS_OTHER(bytes, K)) {
+            return value;
+        }
+    }
+    *suffix = "B";
+    return bytes;
+}
+#undef HAS_OTHER
+OSReturn CharOStream::print_human_bytes(size_t bytes) {
+    const char* unit;
+    auto extact = ::print_human_exact_size(bytes,&unit);
+    return this->print(SIZE_FORMAT "%s",extact,unit);
+}
 
 

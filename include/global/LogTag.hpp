@@ -2,13 +2,13 @@
 // Created by aurora on 2024/8/6.
 //
 
-#ifndef GENESIS_VM_LOG_TAG_HPP
-#define GENESIS_VM_LOG_TAG_HPP
+#ifndef GENESIS_VM_GLOBAL_LOG_TAG_HPP
+#define GENESIS_VM_GLOBAL_LOG_TAG_HPP
 #include "stdtype.hpp"
-#define LOG_TAG_LIST(def) \
-    def(safepoint)        \
-    def(vmthread)
-
+#define LOG_TAG_LIST(def)   \
+    def(safepoint)          \
+    def(vmthread)           \
+    def(metaspace)
 
 
 enum class LogTag:uint16_t {
@@ -18,4 +18,4 @@ enum class LogTag:uint16_t {
 #undef LOG_TAG_DEF
 };
 
-#endif //GENESIS_VM_LOG_TAG_HPP
+#endif //GENESIS_VM_GLOBAL_LOG_TAG_HPP
