@@ -6,6 +6,7 @@
 #define KERNEL_METASPACE_CONSTANTS_HPP
 
 #include "plat/constants.hpp"
+
 class CharOStream;
 
 namespace metaspace {

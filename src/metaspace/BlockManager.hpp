@@ -28,7 +28,7 @@ namespace metaspace {
         SmallArray _small_blocks;
         BlockTree _tree;
     public:
-        explicit BlockManager():_small_blocks(),_tree(){};
+        explicit BlockManager() : _small_blocks(), _tree() {};
 
         /**
          * 从当前的管理的细小内存块中非陪内存
@@ -43,7 +43,7 @@ namespace metaspace {
          * @param p 内存块首地址
          * @param bytes 内存块大小 单位字节
          */
-        void deallocate(void * p, size_t bytes);
+        void deallocate(void *p, size_t bytes);
 
         /**
          * 管理的内存是否是空

@@ -5,8 +5,6 @@
 #include <new>
 #include "plat/utils/robust.hpp"
 namespace metaspace {
-
-
     BlockTree::Node *BlockTree::find_closest_node(size_t bytes) {
         auto search_point = this->_root;
         Node *best_match = nullptr;

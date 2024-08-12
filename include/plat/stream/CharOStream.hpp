@@ -131,10 +131,12 @@ public:
         this->print_raw(str);
         this->cr();
     };
-    inline void print_raw_cr(const char *str,size_t str_len) {
-        this->print_raw(str,str_len);
+
+    inline void print_raw_cr(const char *str, size_t str_len) {
+        this->print_raw(str, str_len);
         this->cr();
     };
+
     /**
      * 打印数据
      * @param data 数据开始的首地址
@@ -154,11 +156,30 @@ public:
     inline void stamp_string() {
         this->stamp_string(" ", ":");
     };
+    enum class HumanType {
+        exact,//精确
+        fuzzy,//模糊
+        fuzzy_b,
+        fuzzy_k,
+        fuzzy_m,
+        fuzzy_g,
+        fuzzy_t
+    };
+
     /**
      * 打印 符合 人阅读的字节
      * @param bytes
+     * @param scale 缩放比例 0 表示
      */
-    OSReturn print_human_bytes(size_t bytes);
+    OSReturn print_human_bytes(size_t bytes, HumanType scale = HumanType::exact);
+
+    /**
+     * 打印 符合 人的百分比
+     * @param part 实际的数值
+     * @param total 总共的数值
+     * @return
+     */
+    OSReturn print_human_percent(int32_t part, int32_t total = 100);
 };
 
 #endif //PLATFORM_CHAR_OSTREAM_HPP

@@ -7,6 +7,7 @@
 #include "plat/macro.hpp"
 #include "plat/utils/robust.hpp"
 #include "plat/os/time.hpp"
+#include "plat/utils/align.hpp"
 
 OSReturn CharOStream::do_vsnprintf(
         char *buf,
@@ -159,45 +160,91 @@ void CharOStream::stamp_string(
     this->print_raw(buf);
     this->print_raw(suffix);
 }
-#define HAS_OTHER(value, unit) (((value) &((unit) - 1)) == 0)
 
-static size_t print_human_exact_size(size_t bytes, const char **suffix) {
-    if (bytes >= T) {
-        auto value = bytes >> LogTB;
-        *suffix = "TB";
-        if (HAS_OTHER(bytes, T)) {
-            return value;
+static const char *get_unit_bytes(size_t bytes, CharOStream::HumanType scale, size_t *unit_bytes) {
+    if (scale == CharOStream::HumanType::exact) {
+        if (bytes >= T && is_aligned(bytes, T)) {
+            *unit_bytes = T;
+            return "TB";
+        } else if (bytes >= G && is_aligned(bytes, G)) {
+            *unit_bytes = G;
+            return "GB";
+        } else if (bytes >= M && is_aligned(bytes, M)) {
+            *unit_bytes = M;
+            return "MB";
+        } else if (bytes >= K && is_aligned(bytes, K)) {
+            *unit_bytes = K;
+            return "KB";
+        } else {
+            *unit_bytes = 1;
+            return "B";
+        }
+    } else {
+        if (scale == CharOStream::HumanType::fuzzy) {
+            if (bytes >= T) {
+                scale = CharOStream::HumanType::fuzzy_t;
+            } else if (bytes >= G) {
+                scale = CharOStream::HumanType::fuzzy_g;
+            } else if (bytes >= M) {
+                scale = CharOStream::HumanType::fuzzy_m;
+            } else if (bytes >= K) {
+                scale = CharOStream::HumanType::fuzzy_k;
+            } else {
+                scale = CharOStream::HumanType::fuzzy_b;
+            }
+        }
+        switch (scale) {
+            default:
+                should_not_reach_here();
+            case CharOStream::HumanType::fuzzy_b:
+                *unit_bytes = 1;
+                return "B";
+            case CharOStream::HumanType::fuzzy_k:
+                *unit_bytes = K;
+                return "KB";
+            case CharOStream::HumanType::fuzzy_m:
+                *unit_bytes = M;
+                return "MB";
+            case CharOStream::HumanType::fuzzy_g:
+                *unit_bytes = G;
+                return "GB";
+            case CharOStream::HumanType::fuzzy_t:
+                *unit_bytes = T;
+                return "TB";
         }
     }
-    if (bytes >= G) {
-        auto value = bytes >> LogGB;
-        *suffix = "GB";
-        if (HAS_OTHER(bytes, G)) {
-            return value;
-        }
-    }
-    if (bytes >= M) {
-        auto value = bytes >> LogMB;
-        *suffix = "MB";
-        if (HAS_OTHER(bytes, M)) {
-            return value;
-        }
-    }
-    if (bytes >= K) {
-        auto value = bytes >> LogKB;
-        *suffix = "KB";
-        if (HAS_OTHER(bytes, K)) {
-            return value;
-        }
-    }
-    *suffix = "B";
-    return bytes;
 }
-#undef HAS_OTHER
-OSReturn CharOStream::print_human_bytes(size_t bytes) {
-    const char* unit;
-    auto extact = ::print_human_exact_size(bytes,&unit);
-    return this->print(SIZE_FORMAT "%s",extact,unit);
+
+OSReturn CharOStream::print_human_bytes(size_t bytes, HumanType scale) {
+    size_t unit_bytes;
+    const auto unit_str = get_unit_bytes(bytes, scale, &unit_bytes);
+    if (scale == HumanType::exact) {
+        const auto show = bytes / unit_bytes;
+        return this->print(SIZE_FORMAT "%s", show, unit_str);
+    } else {
+        const auto show = (double) bytes / (double) unit_bytes;
+        return this->print("%.2fs", show, unit_str);
+    }
+}
+
+OSReturn CharOStream::print_human_percent(int32_t part, int32_t total) {
+    if (total == 0) {
+        return this->print("  ?%%");
+    } else if (part == 0) {
+        return this->print("  0%%");
+    } else if (part == total) {
+        return this->print("100%%");
+    } else {
+        // Note: clearly print very-small-but-not-0% and very-large-but-not-100% percentages.
+        float p = ((float) part / (float )total) * 100.0f;
+        if (p < 1.0f) {
+           return  this->print(" <1%%");
+        } else if (p > 99.0f) {
+            return this->print(">99%%");
+        } else {
+            return this->print("%3.0f%%", p);
+        }
+    }
 }
 
 

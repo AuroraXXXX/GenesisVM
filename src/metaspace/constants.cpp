@@ -18,15 +18,15 @@ namespace metaspace {
 
     extern void print_on_using_constants_setting(CharOStream *st) {
         const char *unit;
-        st->print_raw(" - commit_granule_bytes: " );
+        st->print_raw(" - commit_granule_bytes: ");
         st->print_human_bytes(CommitGranuleBytes);
         st->cr();
 
-        st->print_raw(" - meta_align_bytes: " );
+        st->print_raw(" - meta_align_bytes: ");
         st->print_human_bytes(MetaAlignedBytes);
         st->cr();
 
-        st->print_raw(" - volume_default_bytes: " );
+        st->print_raw(" - volume_default_bytes: ");
         st->print_human_bytes(VolumeDefaultBytes);
         st->cr();
 

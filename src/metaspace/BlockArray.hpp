@@ -71,6 +71,7 @@ namespace metaspace {
          *          LIST_LENGTH 表示没找到
          */
         size_t next_non_empty_index(size_t index);
+
     public:
         explicit BlockArray();
 
@@ -79,7 +80,7 @@ namespace metaspace {
          * @param p 内存块的首地址
          * @param bytes 内存块的大小
          */
-        void add_node(void* p, size_t bytes);
+        void add_node(void *p, size_t bytes);
 
         /**
          * 寻找 bytes内存块，
@@ -93,7 +94,7 @@ namespace metaspace {
          * @param exact 是否是精确查找
          * @return 内存块大小 如果找不到则返回nullptr
          */
-        void* remove_node(size_t required_bytes, size_t *real_bytes, bool exact = false) ;
+        void *remove_node(size_t required_bytes, size_t *real_bytes, bool exact = false);
 
         /**
          * 判断是否是空
@@ -133,13 +134,13 @@ namespace metaspace {
         while (next_index < LIST_LENGTH && this->_bin_list[next_index] == nullptr) {
             next_index++;
         }
-        return next_index ;
+        return next_index;
     }
 
     template<size_t MIN_BYTES, size_t MAX_BYTES, size_t ELEM_BYTES>
-    void BlockArray<MIN_BYTES, MAX_BYTES, ELEM_BYTES>::add_node(void *p, size_t bytes)  {
-        bytes = align_up(bytes,ELEM_BYTES);
-        assert(is_clamp(bytes,MIN_BYTES,MAX_BYTES), "内存块大小错误,无法被管理.");
+    void BlockArray<MIN_BYTES, MAX_BYTES, ELEM_BYTES>::add_node(void *p, size_t bytes) {
+        bytes = align_up(bytes, ELEM_BYTES);
+        assert(is_clamp(bytes, MIN_BYTES, MAX_BYTES), "内存块大小错误,无法被管理.");
         assert_is_aligned(bytes, ELEM_BYTES);
         const auto index = this->bytes2index(bytes);
         auto new_head = reinterpret_cast<Node *>(p);
@@ -152,8 +153,8 @@ namespace metaspace {
     void *BlockArray<MIN_BYTES, MAX_BYTES, ELEM_BYTES>::remove_node(
             size_t required_bytes,
             size_t *real_bytes,
-            bool exact){
-        required_bytes = align_up(required_bytes,ELEM_BYTES);
+            bool exact) {
+        required_bytes = align_up(required_bytes, ELEM_BYTES);
         auto index = this->bytes2index(required_bytes);
         if (!exact) {
             index = this->next_non_empty_index(index);

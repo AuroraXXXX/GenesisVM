@@ -46,7 +46,7 @@ namespace metaspace {
          */
         size_t bit_no_for_address(void *p) const {
 
-            auto bit_no = ((uintptr_t)p - this->_base) /
+            auto bit_no = ((uintptr_t) p - this->_base) /
                           CommittedMask::statistics_bytes_per_bit();
             assert(this->is_within(bit_no), "is out of committed mask");
             return bit_no;
@@ -66,7 +66,7 @@ namespace metaspace {
         * @param range_start
         * @param range_length
         */
-        explicit CommittedMask(void* range_start, size_t range_length);
+        explicit CommittedMask(void *range_start, size_t range_length);
 
         inline explicit CommittedMask(Space &space) :
                 CommittedMask(space.start(), space.capacity_bytes()) {

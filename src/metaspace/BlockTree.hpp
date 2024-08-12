@@ -109,7 +109,7 @@ namespace metaspace {
          * @param p 内存的首地址
          * @param bytes 内存的大小 单位字节
          */
-        void add_meta_node(void* p, size_t bytes);
+        void add_meta_node(void *p, size_t bytes);
 
         /**
          * 将删除至少是bytes大小的节点 并返回
@@ -117,7 +117,7 @@ namespace metaspace {
          * @param real_bytes 实际的内存大小
          * @return 内存首地址
          */
-        void* remove_meta_node(size_t bytes, size_t *real_bytes);
+        void *remove_meta_node(size_t bytes, size_t *real_bytes);
 
         inline bool is_empty() { return this->_root == nullptr; };
 
