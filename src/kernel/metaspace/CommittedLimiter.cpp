@@ -17,7 +17,8 @@ namespace metaspace {
             return bytes_below_max;
         }
         //在GC算法下允许的扩展的大小
-        const auto bytes_below_policy = CommittedLimiter::_policy_func(committed_bytes);
+        const auto bytes_below_policy =
+                CommittedLimiter::_policy_func(committed_bytes);
         //取二者的小者
         return MIN2(bytes_below_max, bytes_below_policy);
     }

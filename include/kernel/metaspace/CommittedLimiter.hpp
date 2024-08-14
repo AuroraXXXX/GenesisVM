@@ -10,6 +10,11 @@
 #include "plat/utils/OrderAccess.hpp"
 
 namespace metaspace {
+   /**
+    * 提交内存的限制器
+    * @param bytes 目前已经提交的内存数
+    * @return 允许扩充的字节数
+    */
     using CALCUATE_COMMITTED_BYTES_FUNC = size_t (*)(size_t bytes);
 
     /**
@@ -17,7 +22,11 @@ namespace metaspace {
      */
     class CommittedLimiter : public AllStatic {
     private:
+        /**
+         * 统计元空间所有使用的内存
+         */
         static volatile size_t _global_committed_bytes;
+
         static CALCUATE_COMMITTED_BYTES_FUNC _policy_func;
 
         inline static auto committed_bytes() {
