@@ -1,12 +1,21 @@
 //
 // Created by aurora on 2024/2/1.
 //
-#include "constants.hpp"
+#include "kernel/metaspace/constants.hpp"
 #include "plat/stream/CharOStream.hpp"
 #include "BlockManager.hpp"
-
+#include "plat/utils/align.hpp"
 namespace metaspace {
-
+    extern SegmentLevel bytes_to_level(size_t bytes) {
+        assert(bytes <= metaspace::RegionBytes,
+               "内存块" SIZE_FORMAT "过大，超过允许范围.");
+        if (bytes <= level_to_bytes(SegmentLevel::LV_HIGHEST)) {
+            return SegmentLevel::LV_HIGHEST;
+        }
+        size_t aligned_bytes = round_up_power_of_2(bytes);
+        auto level =  (SegementLevel_t)SegmentLevel::LV_NUM - 1 - log2i_exact<size_t>(aligned_bytes);
+        return (SegmentLevel) level;
+    }
 
     extern size_t get_raw_byte_for_requested(size_t requested_bytes) {
         //首先至少应该大于BlockManager::MIN_BYTES要求的最小值

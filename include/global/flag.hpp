@@ -35,12 +35,17 @@ namespace global {
     product(int16_t ,ThreadPriority7,-1,"7对应到底层的线程优先级,-1表示默认")               \
     product(int16_t ,ThreadPriority8,-1,"8对应到底层的线程优先级,-1表示默认")               \
     product(int16_t ,ThreadPriority9,-1,"9对应到底层的线程优先级,-1表示默认")               \
-    product(int16_t ,ThreadPriority10,-1,"10对应到底层的线程优先级,-1表示默认")
+    product(int16_t ,ThreadPriority10,-1,"10对应到底层的线程优先级,-1表示默认")             \
+    product(bool,AlwaysPreTouch,true,"预先实际获取内存")                                 \
 
+#define METASPACE_FLAGS(product,develop,range) \
+    product(size_t,MaxMetaspaceSize,-1,"元空间最大的内存字节") \
 
 
 
 
     PLATFORM_FLAGS(DECLARE_PRODUCT_FLAG, DECLARE_DEVELOP_FLAG, IGNORE_RANGE)
+
+    METASPACE_FLAGS(DECLARE_PRODUCT_FLAG, DECLARE_DEVELOP_FLAG, IGNORE_RANGE)
 }
 #endif //GENESIS_VM_GLOBAL_FLAG_HPP

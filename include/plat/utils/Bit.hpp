@@ -4,6 +4,7 @@
 
 #ifndef GENESISVM_BIT_HPP
 #define GENESISVM_BIT_HPP
+#include <concepts>
 #include "stdtype.hpp"
 #include "plat/constants.hpp"
 #include "plat/utils/robust.hpp"
@@ -15,13 +16,13 @@ public:
      * @param value
      * @return
      */
-    template<typename T>
+    template<std::integral T>
     requires (sizeof(T) == 4)
     inline static int count_total_ones(T value) {
         return __builtin_popcount(value);
     }
 
-    template<typename T>
+    template<std::integral T>
     requires (sizeof(T) == 8)
     inline static int count_total_ones(T value) {
         return __builtin_popcountll(value);
@@ -34,13 +35,13 @@ public:
      * @param value
      * @return -1 表示未找到
      */
-    template<typename T>
+    template<std::integral T>
     requires (sizeof(T) == 4)
     inline static int offset_right_one(T value) {
         return __builtin_ffs(value) - 1;
     }
 
-    template<typename T>
+    template<std::integral T>
     requires (sizeof(T) == 8)
     inline static int offset_right_one(T value) {
         return __builtin_ffsll(value) - 1;
@@ -52,13 +53,13 @@ public:
      * @param value
      * @return
      */
-    template<typename T>
+    template<std::integral T>
     requires (sizeof(T) == 4)
     inline static int count_left_zero(T value) {
         return __builtin_clz(value);
     }
 
-    template<typename T>
+    template<std::integral T>
     requires (sizeof(T) == 8)
     inline static int count_left_zero(T value) {
         return __builtin_clzll(value);
@@ -70,12 +71,12 @@ public:
      * @param value
      * @return
      */
-    template<typename T>
+    template<std::integral T>
     inline static int count_right_zero(T value) {
         return __builtin_ctz(value);
     }
 
-    template<typename T>
+    template<std::integral T>
     requires (sizeof(T) == 8)
     inline static int count_right_zero(T value) {
         return __builtin_ctzll(value);
@@ -87,7 +88,7 @@ public:
      * @param x
      * @param n
      */
-    template<typename T>
+    template<std::integral T>
     inline static void bits_set_nth(T &x, size_t n) {
         assert(n < sizeof(T) * BitsPerByte, "index is out of boundary");
         x |= (T) 1 << n;
@@ -100,7 +101,7 @@ public:
      * @param x
      * @param n 需要清楚比特位编号
      */
-    template<typename T>
+    template<std::integral T>
     inline static void bit_clear_nth(T &x, size_t n) {
         assert(n < sizeof(T) * BitsPerByte, "index is out of boundary");
         x &= ~((T) 1 << n);
@@ -113,7 +114,7 @@ public:
      * @param n 需要判断比特位编号
      * @return
      */
-    template<typename T>
+    template<std::integral T>
     inline static bool bit_is_set_nth(T x, size_t n) {
         assert(n < sizeof(T) * BitsPerByte, "index is out of boundary");
         return (x & ((T) 1 << n)) != 0;

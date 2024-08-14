@@ -6,12 +6,36 @@
 #define KERNEL_METASPACE_CONSTANTS_HPP
 
 #include "plat/constants.hpp"
-
+#include "plat/utils/robust.hpp"
 class CharOStream;
 
 namespace metaspace {
+    using SegementLevel_t = int8_t;
+    enum class SegmentLevel: SegementLevel_t {
+        LV_INVALID = -1,
+        LV_ROOT = 0,
+        LV_16M = LV_ROOT,
+        LV_8M,
+        LV_4M,
+        LV_2M,
+        LV_1M,
+        LV_512K,
+        LV_256K,
+        LV_128K,
+        LV_64K,
+        LV_32K,
+        LV_16K,
+        LV_8K,
+        LV_4K,
+        LV_2K,
+        LV_1K,
+        LV_NUM,//数量
+        LV_LOWEST = LV_16M,
+        LV_HIGHEST = LV_1K
+    };
     /**
-     *
+     * Region的字节数
+     * 1个Volume是Region的整倍数
      */
     constexpr inline size_t RegionBytes = 16 * M;
     /**
@@ -48,5 +72,25 @@ namespace metaspace {
      * @return 实际的字节数
      */
     extern size_t get_raw_byte_for_requested(size_t requested_bytes);
+    /**
+     * 判断 日志级别是否是合法的
+     * @param level 日志的级别
+     * @return
+     */
+    inline bool level_is_valid(SegmentLevel level) {
+        return level <= SegmentLevel::LV_HIGHEST && level >= SegmentLevel::LV_LOWEST;
+    };
+    #define SEGMENT_LV_FORMAT "lv%.02d"
+
+    inline size_t level_to_bytes(SegmentLevel type) {
+        assert(level_is_valid(type), "segment level is invalid.");
+        return RegionBytes >> (SegementLevel_t)type;
+    };
+    /**
+     * 将字节转换成最接近的Segment级别
+     * @param bytes
+     * @return
+     */
+    extern SegmentLevel bytes_to_level(size_t bytes);
 }
 #endif //KERNEL_METASPACE_CONSTANTS_HPP

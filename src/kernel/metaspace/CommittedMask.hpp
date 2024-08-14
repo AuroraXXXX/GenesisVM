@@ -6,7 +6,7 @@
 #define KERNEL_METASPACE_COMMITTED_MASK_HPP
 
 #include "kernel/utils/BitMap.hpp"
-#include "constants.hpp"
+#include "kernel/metaspace/constants.hpp"
 #include "kernel/utils/Space.hpp"
 
 namespace metaspace {

@@ -5,7 +5,7 @@
 #ifndef KERNEL_METASPACE_BLOCK_MANAGER_HPP
 #define KERNEL_METASPACE_BLOCK_MANAGER_HPP
 
-#include "constants.hpp"
+#include "kernel/metaspace/constants.hpp"
 #include "BlockArray.hpp"
 #include "BlockTree.hpp"
 
