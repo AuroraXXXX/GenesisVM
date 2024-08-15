@@ -7,7 +7,7 @@
 
 #include "plat/mem/allocation.hpp"
 #include "kernel/utils/LinkedList.hpp"
-#include "ArenaGrowthPolicy.hpp"
+#include "kernel/metaspace/ArenaGrowthPolicy.hpp"
 
 class Mutex;
 namespace metaspace {

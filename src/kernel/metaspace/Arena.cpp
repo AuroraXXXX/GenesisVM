@@ -2,8 +2,7 @@
 // Created by aurora on 2022/12/16.
 //
 
-#include "kernel/metaspace/Arena.hpp"
-
+#include "Arena.hpp"
 #include "kernel/metaspace/constants.hpp"
 #include "BlockManager.hpp"
 #include "Segment.hpp"

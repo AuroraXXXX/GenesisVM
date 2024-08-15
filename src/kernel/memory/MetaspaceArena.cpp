@@ -4,7 +4,7 @@
 
 #include <cstring>
 #include "kernel/memory/MetaspaceArena.hpp"
-#include "kernel/metaspace/Arena.hpp"
+#include "Arena.hpp"
 #include "kernel/utils/locker.hpp"
 #include "plat/logger/log.hpp"
 #include "kernel/metaspace/constants.hpp"
@@ -78,7 +78,7 @@ void *MetaspaceArena::allocate(size_t bytes) {
 
 void MetaspaceArena::deallocate(void *ptr, size_t bytes) {
     MutexLocker locker(this->_mutex);
-    this->_arena->deallocate(reinterpret_cast<void *>(ptr), bytes);
+    this->_arena->deallocate(ptr, bytes);
 }
 
 void MetaspaceArena::usage_numbers(

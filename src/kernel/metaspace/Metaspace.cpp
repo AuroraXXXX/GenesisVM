@@ -10,10 +10,6 @@
 #include "MetaspaceGC.hpp"
 #include "global/flag.hpp"
 #include "kernel/metaspace/CommittedLimiter.hpp"
-
-#include "kernel/metaspace/Arena.hpp"
-#include "kernel_mutex.hpp"
-
 /**
  * 参数设置规范
  *
