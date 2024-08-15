@@ -8,8 +8,8 @@
 #define LOG_TAG_LIST(def)   \
     def(safepoint)          \
     def(vmthread)           \
-    def(metaspace)
-
+    def(metaspace)          \
+    def(gc)
 
 enum class LogTag:uint16_t {
     no_tag,

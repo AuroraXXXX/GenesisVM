@@ -33,6 +33,10 @@ namespace metaspace {
             return OrderAccess::load(&_global_committed_bytes);
         };
     public:
+        /**
+         * 可能的扩展的字节数
+         * @return
+         */
         static size_t possible_expand_bytes();
 
         static inline void register_policy(CALCUATE_COMMITTED_BYTES_FUNC policy_func) {

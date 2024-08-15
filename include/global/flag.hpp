@@ -6,7 +6,7 @@
 #define GENESIS_VM_GLOBAL_FLAG_HPP
 
 #include "stdtype.hpp"
-
+#include "plat/constants.hpp"
 namespace global {
 /**
  * 定义区间的
@@ -39,8 +39,14 @@ namespace global {
     product(bool,AlwaysPreTouch,true,"预先实际获取内存")                                 \
 
 #define METASPACE_FLAGS(product,develop,range) \
-    product(size_t,MaxMetaspaceSize,-1,"元空间最大的内存字节") \
-
+    product(size_t,MaxMetaspaceSize,SIZE_MAX,"元空间最大的大小")             \
+    product(size_t,MetaspaceSize,21*M,"初始阈值(以字节为单位),以及最小大小")                  \
+    product(size_t,MinMetaspaceFreeRatio,40,"最小空闲比例")                               \
+    range(0,100)                                    \
+    product(size_t,MaxMetaspaceFreeRatio,70,"最大空闲比例")                                   \
+    range(0,100)                                    \
+    product(size_t,MaxMetaspaceExpansion, 4 * M  ,"GC的情况下,Metaspace的最大扩展(以字节为单位)") \
+    product(size_t,MinMetaspaceExpansion,256 * K ,"Metaspace的最小扩展(以字节为单位)")                  \
 
 
 
