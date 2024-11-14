@@ -2,12 +2,12 @@
 // Created by aurora on 2024/6/25.
 //
 
-#ifndef GENESIS_VM_GLOBAL_FLAG_HPP
-#define GENESIS_VM_GLOBAL_FLAG_HPP
+#ifndef POSEI_INIT_FLAG_HPP
+#define POSEI_INIT_FLAG_HPP
 
 #include "stdtype.hpp"
-#include "plat/constants.hpp"
-namespace global {
+#include "posei/constants.hpp"
+namespace posei {
 /**
  * 定义区间的
  */
@@ -38,20 +38,11 @@ namespace global {
     product(int16_t ,ThreadPriority10,-1,"10对应到底层的线程优先级,-1表示默认")             \
     product(bool,AlwaysPreTouch,true,"预先实际获取内存")                                 \
 
-#define METASPACE_FLAGS(product,develop,range) \
-    product(size_t,MaxMetaspaceSize,SIZE_MAX,"元空间最大的大小")             \
-    product(size_t,MetaspaceSize,21*M,"初始阈值(以字节为单位),以及最小大小")                  \
-    product(size_t,MinMetaspaceFreeRatio,40,"最小空闲比例")                               \
-    range(0,100)                                    \
-    product(size_t,MaxMetaspaceFreeRatio,70,"最大空闲比例")                                   \
-    range(0,100)                                    \
-    product(size_t,MaxMetaspaceExpansion, 4 * M  ,"GC的情况下,Metaspace的最大扩展(以字节为单位)") \
-    product(size_t,MinMetaspaceExpansion,256 * K ,"Metaspace的最小扩展(以字节为单位)")                  \
 
 
 
     PLATFORM_FLAGS(DECLARE_PRODUCT_FLAG, DECLARE_DEVELOP_FLAG, IGNORE_RANGE)
 
-    METASPACE_FLAGS(DECLARE_PRODUCT_FLAG, DECLARE_DEVELOP_FLAG, IGNORE_RANGE)
+  
 }
-#endif //GENESIS_VM_GLOBAL_FLAG_HPP
+#endif //POSEI_INIT_FLAG_HPP

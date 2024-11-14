@@ -1,9 +1,9 @@
 //
 // Created by aurora on 2024/6/25.
 //
-#include "global/flag.hpp"
+#include "posei/init/flag.hpp"
 
-namespace global {
+namespace posei {
 #ifdef DECLARE_PRODUCT_FLAG
     #undef DECLARE_PRODUCT_FLAG
 #endif
@@ -21,5 +21,4 @@ namespace global {
 
     PLATFORM_FLAGS(DECLARE_PRODUCT_FLAG, DECLARE_DEVELOP_FLAG, IGNORE_RANGE)
 
-    METASPACE_FLAGS(DECLARE_PRODUCT_FLAG, DECLARE_DEVELOP_FLAG, IGNORE_RANGE)
 }

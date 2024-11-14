@@ -11,10 +11,8 @@ endfunction()
 
 
 
-include_directories(plat/include)
-include_directories(kernel/include)
+include_directories(posei/include)
 
-generate_dynamic_lib(plat)
-generate_dynamic_lib(kernel)
+generate_dynamic_lib(posei)
 generate_dynamic_lib(global)
 #generate_dynamic_lib(metaspace)
