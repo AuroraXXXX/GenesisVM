@@ -6,12 +6,9 @@
 #define KERNEL_BIT_MAP_HPP
 
 #include "plat/constants.hpp"
-#include "plat/utils/robust.hpp"
 #include "plat/mem/allocation.hpp"
 #include <concepts>
 #include "cstring"
-
-
 
 
 /**
@@ -308,7 +305,7 @@ public:
         return NEW_CHEAP_ARRAY(char, bytes, this->_flag);
     };
 
-    void deallocate(void *ptr) {
+    void free(void *ptr) {
         FREE_CHEAP_ARRAY(ptr, this->_flag);
     };
 };

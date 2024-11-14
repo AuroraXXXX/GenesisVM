@@ -5,7 +5,7 @@
 #ifndef LOGGING_LOG_STREAM_HPP
 #define LOGGING_LOG_STREAM_HPP
 
-#include "plat/stream/CharOStream.hpp"
+#include "posei/stream/CharOStream.hpp"
 #include "plat/logger/LogOutput.hpp"
 #include "constants.hpp"
 #include "LogTagSet.hpp"
@@ -151,11 +151,11 @@ public:
      * @param ... 格式化字符串所需的参数
      */
     template<LogLevel level,
-            LogTag tag0,
-            LogTag tag1,
-            LogTag tag2,
-            LogTag tag3,
-            LogTag tag4>
+            const char* tag0,
+            const char* tag1,
+            const char* tag2,
+            const char* tag3,
+            const char* tag4>
     static void record(const char *format, ...) {
         LogTagSet logTagSet(tag0, tag1, tag2, tag3, tag4);
         va_list args;

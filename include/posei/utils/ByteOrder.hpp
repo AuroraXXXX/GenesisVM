@@ -17,7 +17,7 @@ public:
      */
     template<typename T>
     requires(sizeof(T) <= 8)
-    static inline T network(T value) {
+    static inline T to_network(T value) {
         if constexpr (sizeof(T) == 1) {
             return value;
         } else if constexpr (sizeof(T) == 2) {
@@ -37,7 +37,7 @@ public:
      */
     template<typename T>
     requires(sizeof(T) <= 8)
-    static inline auto host16(uint64_t value) {
+    static inline auto to_host(T value) {
         if constexpr (sizeof(T) == 1) {
             return value;
         } else if constexpr (sizeof(T) == 2) {

@@ -20,19 +20,6 @@
 
 
 
-
-#define LOG_TAGS_EXPANDED(T0, T1, T2, T3, T4, ...)  \
-                                    PREFIX_LOG_TAG(T0), \
-                                    PREFIX_LOG_TAG(T1), \
-                                    PREFIX_LOG_TAG(T2), \
-                                    PREFIX_LOG_TAG(T3), \
-                                    PREFIX_LOG_TAG(T4)
-
-/**
- * , no_tag, no_tag, no_tag, no_tag, no_tag, no_tag
- * 添加5个no_tag，用于自动补充
- */
-#define LOG_TAGS(args...) LOG_TAGS_EXPANDED(args,no_tag, no_tag, no_tag, no_tag, no_tag)
 /**
  * 只有这一条日志的等级大于或者等于 监听的等级 这条日志才会写入到 日志文件中
  * 日志的级别: [trace]<[debug]<[info]<[warn]<[error]<[off]

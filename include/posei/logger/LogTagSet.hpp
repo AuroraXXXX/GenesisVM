@@ -18,7 +18,7 @@ private:
     /**
      * 标签的集合
      */
-    LogTag _tags[LogTagSetMax];
+    const char* _tags[LogTagSetMax];
 
     explicit LogTagSet() noexcept;
 
@@ -36,11 +36,11 @@ public:
      * @param tag4
      */
     explicit LogTagSet(
-            LogTag tag0,
-            LogTag tag1,
-            LogTag tag2,
-            LogTag tag3,
-            LogTag tag4) noexcept;
+            const char*  tag0,
+            const char*  tag1,
+            const char*  tag2,
+            const char*  tag3,
+            const char*  tag4) noexcept;
 
     /**
      * 格式化输出标签集合字符串
