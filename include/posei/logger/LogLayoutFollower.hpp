@@ -5,9 +5,9 @@
 #ifndef LOGGING_LOG_LAYOUT_FOLLOWER_HPP
 #define LOGGING_LOG_LAYOUT_FOLLOWER_HPP
 
-#include "plat/mem/allocation.hpp"
-#include "plat/logger/constants.hpp"
-#include "plat/logger/LogLayout.hpp"
+#include "posei/mem/allocation.hpp"
+#include "posei/logger/constants.hpp"
+#include "posei/logger/LogLayout.hpp"
 
 class LogTagSet;
 
