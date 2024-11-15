@@ -20,6 +20,25 @@ namespace posei {
         return __builtin_return_address(depth);
     }
     /**
+     * 交换字节序
+     * @tparam T 类型
+     * @param value 具体的值
+     * @return 返回的结果
+     */
+    template<typename T>
+    requires(sizeof(T) <= 8)
+    inline T bytes_swap(T value){
+        if constexpr(sizeof(T) == 1){
+            return value;
+        }else if constexpr(sizeof(T) == 2){
+            return __builtin_bswap16(value);
+        }else if constexpr(sizeof(T) == 4){
+            return __builtin_bswap32(value);
+        }else if constexpr(sizeof(T) == 8){
+            return __builtin_bswap64(value);
+        }
+    }
+    /**
      * 计算数据中1的数量
      * @tparam T
      * @param value

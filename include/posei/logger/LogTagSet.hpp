@@ -20,7 +20,7 @@ private:
      */
     const char* _tags[LogTagSetMax];
 
-    explicit LogTagSet() noexcept;
+    explicit LogTagSet() noexcept:LogTagSet(nullptr,nullptr,nullptr,nullptr,nullptr){};
 
 
 public:
