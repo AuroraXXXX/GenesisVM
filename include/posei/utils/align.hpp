@@ -5,7 +5,6 @@
 #ifndef PLATFORM_ALIGN_HPP
 #define PLATFORM_ALIGN_HPP
 
-#include "plat/utils/Bit.hpp"
 #include <concepts>
 #include <limits>
 

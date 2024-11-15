@@ -7,15 +7,8 @@
 
 #include "stdtype.hpp"
 #include "plat/constants.hpp"
-#include "global/LogTag.hpp"
-
-/**
- * LogNoTag中LogTag中特殊的表示，表示没有LogTag
- */
-#define PREFIX_LOG_TAG(T) LogTag::T
 
 
-constexpr inline uint16_t LogTagSetMax = 5;
 constexpr inline size_t LOG_MAX_FOLLOWER_SIZE = 256;
 
 

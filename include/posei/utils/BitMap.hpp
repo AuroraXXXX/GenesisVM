@@ -20,6 +20,9 @@
 class BitMap {
 public:
     using bm_word_t = uint64_t;
+
+private:
+
 private:
     /**
      * 统计区间内有效的比特位的个数

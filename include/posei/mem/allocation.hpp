@@ -2,10 +2,10 @@
 // Created by aurora on 2023/9/10.
 //
 
-#ifndef plat_MEM_ALLOCATION_HPP
-#define plat_MEM_ALLOCATION_HPP
+#ifndef POSEI_MEM_ALLOCATION_HPP
+#define POSEI_MEM_ALLOCATION_HPP
 
-#include "plat/utils/NativeCallStack.hpp"
+#include "posei/utils/NativeCallStack.hpp"
 #include "stdtype.hpp"
 #include <new>
 #include "AllStatic.hpp"
@@ -197,4 +197,4 @@ public:
         return RESOURCE_ARENA_ALLOC(size);
     };
 };
-#endif //plat_MEM_ALLOCATION_HPP
+#endif //POSEI_MEM_ALLOCATION_HPP

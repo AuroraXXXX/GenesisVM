@@ -2,8 +2,8 @@
 // Created by aurora on 2024/11/14.
 //
 
-#ifndef GENESISVM_GCC_BUILTIN_HPP
-#define GENESISVM_GCC_BUILTIN_HPP
+#ifndef POSEI_INIT_GCC_BUILTIN_HPP
+#define POSEI_INIT_GCC_BUILTIN_HPP
 #define ALWAYS_NOT_INLINE __attribute__((noinline))
 
 namespace posei {
@@ -197,4 +197,4 @@ void __sync_lock_release (type *ptr, ...)
      */
 }
 
-#endif //GENESISVM_GCC_BUILTIN_HPP
+#endif //POSEI_INIT_GCC_BUILTIN_HPP

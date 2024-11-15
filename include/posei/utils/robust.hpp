@@ -70,7 +70,7 @@ do{                                                                 \
     if(!(p)){                                                       \
         report_vm_error(__FILE__,                         \
                         __LINE__,                                   \
-                        "断言(" #p ")失败",                          \
+                        "assert(" #p ")failed",                          \
                         msg,                                        \
                         ##args);                                    \
     }                                                               \
@@ -87,7 +87,7 @@ do{                                                                 \
     if(!(p)){                                                       \
         report_vm_error(__FILE__,                                   \
                         __LINE__,                                   \
-                        "担保(" #p ")失败",                          \
+                        "guarantee(" #p ")failed",                          \
                         msg,                                        \
                         ##args);                                    \
     }                                                               \
@@ -96,19 +96,19 @@ do{                                                                 \
 #define should_not_reach_here()                                        \
         report_vm_error(__FILE__,                                      \
                         __LINE__,                                      \
-                        "不应该执行到此处")
+                        "should_not_reach_here")
 
 #define unimplemented(info)                                         \
         report_vm_error(__FILE__,                                   \
                         __LINE__,                                   \
-                        "功能未实现" info)
+                        "unimplemented" info)
 /**
  * 虚拟机启动过程中出现错误
  */
 #define vm_exit_during_initialization(message, args...)              \
         report_vm_error(__FILE__,                                   \
                         __LINE__,                                   \
-                        "虚拟机启动过程中错误退出:",                    \
+                        "vm_exit_during_initialization:",                    \
                         message,                                    \
                         ##args)
 #define vm_exit_out_of_memory(error_type, required_bytes, msg, args...)      \

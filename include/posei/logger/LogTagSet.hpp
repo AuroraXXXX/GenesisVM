@@ -7,13 +7,11 @@
 
 #include "constants.hpp"
 #include <cstdarg>
-#include "plat/utils/robust.hpp"
 
 /**
  * 记录日志的集合
  */
 class LogTagSet {
-    friend class PlatInitialize;
 private:
     /**
      * 标签的集合

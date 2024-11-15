@@ -2,13 +2,13 @@
 // Created by aurora on 2024/7/13.
 //
 
-#include "plat/logger/LogOutput.hpp"
-#include "plat/logger/LogLayout.hpp"
-#include "plat/logger/LogLayoutFollower.hpp"
-#include "plat/utils/robust.hpp"
-#include "plat/logger/LogSingleFileOutput.hpp"
-#include "plat/stream/FileCharOStream.hpp"
-#include "plat/utils/OrderAccess.hpp"
+#include "posei/logger/LogOutput.hpp"
+#include "posei/logger/LogLayout.hpp"
+#include "posei/logger/LogLayoutFollower.hpp"
+#include "posei/utils/robust.hpp"
+#include "posei/logger/LogSingleFileOutput.hpp"
+#include "posei/stream/FileCharOStream.hpp"
+#include "posei/utils/OrderAccess.hpp"
 LogOutput *volatile LogOutput::_stream = nullptr;
 static LogSingleFileOutput DEFAULT(LogLevel::default_console_level,
                                    LogLayout::Default,

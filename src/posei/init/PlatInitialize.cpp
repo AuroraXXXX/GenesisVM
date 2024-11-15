@@ -1,7 +1,7 @@
 //
 // Created by aurora on 2024/6/29.
 //
-#include "plat/PlatInitialize.hpp"
+#include "posei/init/main.hpp"
 #include "inner_os.hpp"
 #include "MemoryTracer.hpp"
 #include "ArenaChunkPool.hpp"

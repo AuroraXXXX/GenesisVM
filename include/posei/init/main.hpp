@@ -2,21 +2,21 @@
 // Created by aurora on 2024/6/29.
 //
 
-#ifndef PLATFORM_OS_INIT_HPP
-#define PLATFORM_OS_INIT_HPP
+#ifndef POSEI_INIT_INIT_HPP
+#define POSEI_INIT_INIT_HPP
 
 #include "stdtype.hpp"
-#include "plat/mem/allocation.hpp"
+#include "posei/mem/AllStatic.hpp"
 
 class OSThread;
 
-class PlatInitialize : public AllStatic {
+class POSEIMain : public AllStatic {
 public:
     /**
      * 初始化函数
      * @param vm_start_time vm起始的时间戳
      */
-    static void initialize(ticks_t vm_start_time,
+    static void init(ticks_t vm_start_time,
                            OSThread *os_thread);
     /**
      * 销毁函数 将缓冲区输出
@@ -24,4 +24,4 @@ public:
     static void destroy();
 };
 
-#endif //PLATFORM_OS_INIT_HPP
+#endif //POSEI_INIT_INIT_HPP
