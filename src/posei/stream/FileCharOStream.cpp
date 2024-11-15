@@ -2,9 +2,8 @@
 // Created by aurora on 2023/11/25.
 //
 
-#include "plat/stream/FileCharOStream.hpp"
+#include "posei/stream/FileCharOStream.hpp"
 #include <cstdio>
-#include "plat/utils/robust.hpp"
 
 FileCharOStream FileCharOStream::_err_stream(stderr);
 FileCharOStream FileCharOStream::_out_stream(stdout);

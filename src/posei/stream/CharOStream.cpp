@@ -2,10 +2,9 @@
 // Created by xu on 2023/8/26.
 //
 
-#include "plat/stream/CharOStream.hpp"
+#include "posei/stream/CharOStream.hpp"
 #include <cstdio>
-#include "plat/macro.hpp"
-#include "plat/utils/robust.hpp"
+#include "posei/macro.hpp"
 #include "plat/os/time.hpp"
 #include "plat/utils/align.hpp"
 

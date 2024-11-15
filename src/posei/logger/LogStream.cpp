@@ -1,14 +1,13 @@
 //
 // Created by aurora on 2024/7/2.
 //
-#include "plat/utils/robust.hpp"
-#include "plat/utils/align.hpp"
-#include "plat/mem/allocation.hpp"
-#include "plat/stream/FileCharOStream.hpp"
-#include "plat/logger/LogLayoutFollower.hpp"
-#include "plat/logger/LogOutput.hpp"
-#include "plat/logger/LogStream.hpp"
-#include "plat/thread/OSThread.hpp"
+#include "posei/utils/align.hpp"
+#include "posei/mem/allocation.hpp"
+#include "posei/stream/FileCharOStream.hpp"
+#include "posei/logger/LogLayoutFollower.hpp"
+#include "posei/logger/LogOutput.hpp"
+#include "posei/logger/LogStream.hpp"
+#include "posei/thread/OSThread.hpp"
 
 
 void LogStream::record(LogLevel level, LogTagSet &tag_set, const char *format, va_list args) {
@@ -29,11 +28,11 @@ void LogStream::write(const void *data, size_t data_len) {
 }
 
 LogStream::LogStream(LogLevel level,
-                     LogTag tag0,
-                     LogTag tag1,
-                     LogTag tag2,
-                     LogTag tag3,
-                     LogTag tag4) :
+                     const char * tag0,
+                     const char * tag1,
+                     const char * tag2,
+                     const char * tag3,
+                     const char * tag4) :
         _line_buffer(),
         _level(level),
         _tag_set(tag0, tag1, tag2, tag3, tag4) {

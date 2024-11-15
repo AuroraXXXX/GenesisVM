@@ -5,7 +5,6 @@
 #ifndef PLATFORM_FILE_CHAR_OSTREAM_HPP
 #define PLATFORM_FILE_CHAR_OSTREAM_HPP
 
-#include "global/flag.hpp"
 #include "CharOStream.hpp"
 
 class FileCharOStream : public CharOStream {
@@ -74,7 +73,7 @@ public:
      * @return
      */
     static inline FileCharOStream *default_stream() {
-        return global::OutputToStderr ?
+        return ::OutputToStderr ?
                &FileCharOStream::_err_stream :
               & FileCharOStream::_out_stream;
     };

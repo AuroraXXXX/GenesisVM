@@ -6,82 +6,9 @@
 #define GENESISVM_BIT_HPP
 #include <concepts>
 #include "stdtype.hpp"
-#include "plat/constants.hpp"
-#include "plat/utils/robust.hpp"
+#include "posei/constants.hpp"
 class Bit {
 public:
-    /**
-     * 计算数据中1的数量
-     * @tparam T
-     * @param value
-     * @return
-     */
-    template<std::integral T>
-    requires (sizeof(T) == 4)
-    inline static int count_total_ones(T value) {
-        return __builtin_popcount(value);
-    }
-
-    template<std::integral T>
-    requires (sizeof(T) == 8)
-    inline static int count_total_ones(T value) {
-        return __builtin_popcountll(value);
-    }
-
-    /**
-     * 从低位开始计算 第一个1 的序号
-     * 从0开始计算
-     * @tparam T
-     * @param value
-     * @return -1 表示未找到
-     */
-    template<std::integral T>
-    requires (sizeof(T) == 4)
-    inline static int offset_right_one(T value) {
-        return __builtin_ffs(value) - 1;
-    }
-
-    template<std::integral T>
-    requires (sizeof(T) == 8)
-    inline static int offset_right_one(T value) {
-        return __builtin_ffsll(value) - 1;
-    }
-
-    /**
-     * 从二进制最高位向最低位 计算连续0的个数
-     * @tparam T 类型
-     * @param value
-     * @return
-     */
-    template<std::integral T>
-    requires (sizeof(T) == 4)
-    inline static int count_left_zero(T value) {
-        return __builtin_clz(value);
-    }
-
-    template<std::integral T>
-    requires (sizeof(T) == 8)
-    inline static int count_left_zero(T value) {
-        return __builtin_clzll(value);
-    }
-
-    /**
-     * 从二进制最低位向最高位 计算连续0的个数
-     * @tparam T 类型
-     * @param value
-     * @return
-     */
-    template<std::integral T>
-    inline static int count_right_zero(T value) {
-        return __builtin_ctz(value);
-    }
-
-    template<std::integral T>
-    requires (sizeof(T) == 8)
-    inline static int count_right_zero(T value) {
-        return __builtin_ctzll(value);
-    }
-
     /**
      * 将第n位置为1
      * @tparam T 必须是基本类型

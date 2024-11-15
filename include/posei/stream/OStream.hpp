@@ -2,8 +2,8 @@
 // Created by aurora on 2023/12/3.
 //
 
-#ifndef PLATFORM_OSTREAM_HPP
-#define PLATFORM_OSTREAM_HPP
+#ifndef POSEI_STREAM_OSTREAM_HPP
+#define POSEI_STREAM_OSTREAM_HPP
 
 #include "stdtype.hpp"
 #include <endian.h>
@@ -116,4 +116,4 @@ public:
 };
 
 
-#endif //PLATFORM_OSTREAM_HPP
+#endif //POSEI_STREAM_OSTREAM_HPP

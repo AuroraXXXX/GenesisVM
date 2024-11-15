@@ -2,30 +2,17 @@
 // Created by aurora on 2023/12/27.
 //
 
-#ifndef PLATFORM_MACRO_HPP
-#define PLATFORM_MACRO_HPP
-#define offset_of(klass, field) (size_t)((int64_t)&(((klass*)16)->field) - 16)
-
-/**
- * 不允许类的对象发生移动 拷贝等
- */
-#define NONCOPYABLE(C) C(C const&) = delete; C& operator=(C const&) = delete
-
-#define ALWAYS_NOT_INLINE __attribute__((noinline))
-#ifndef BUILD_TYPE_TRACE
-#define BUILD_TYPE_TRACE
-#endif
+#ifndef POSEI_MACRO_HPP
+#define POSEI_MACRO_HPP
 /**
  * 这样的设计 用于加速代码的执行 和兼顾开发的效率
  * BUILD_TYPE_TRACE 宏 用于开启debug级别的信息输出
  * BUILD_TYPE_DEBUG 宏 用语开启trace级别的信息输出
  */
-#ifdef BUILD_TYPE_TRACE
+#if BUILD_LEVEL == 0
 #define DEBUG_MODE_ONLY(code) code
 #define TRACE_MODE_ONLY(code) code
-//诊断代码的标志
-#define DIAGNOSE
-#elif BUILD_TYPE_DEBUG
+#elif BUILD_LEVEL == 1
 #define DEBUG_MODE_ONLY(code) code
 #define TRACE_MODE_ONLY(code)
 #else
@@ -33,11 +20,15 @@
 #define TRACE_MODE_ONLY(code)
 #endif
 
-#ifdef DEVELOP
-#define DEVELOP_ONLY(code) code
-#else
-#define DEVELOP_ONLY(code)
-#endif
+
+#define offset_of(klass, field) (size_t)((int64_t)&(((klass*)0)->field) - 0)
+
+/**
+ * 不允许类的对象发生移动 拷贝等
+ */
+#define NONCOPYABLE(C) C(C const&) = delete; C& operator=(C const&) = delete
+
+
 
 
 template<typename T>
@@ -72,24 +63,7 @@ inline bool is_clamp(T value, T min, T max) {
 
 
 
-/**
- * 获取调用者的当前的指令地址
- * @tparam level
- * @return
- */
-inline void *current_thread_pc() {
-    return __builtin_return_address(0);
-}
 
-/**
- * 获取调用者堆栈信息
- * @tparam depth 0-～
- * @return
- */
-template<int depth>
-void *return_thread_pc() {
-    return __builtin_return_address(depth);
-}
 
 /**
  * ---------------------
@@ -104,9 +78,5 @@ void *return_thread_pc() {
 #define UINTX_FORMAT "%lu"
 #define INTX_FORMAT "%ld"
 
-#include "linux/version.h"
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0)
-#error "Linux kernel version must be 3.11.0 or later"
-#endif
-#endif //PLATFORM_MACRO_HPP
+#endif //POSEI_MACRO_HPP

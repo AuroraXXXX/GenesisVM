@@ -2,9 +2,9 @@
 // Created by aurora on 2023/9/27.
 //
 
-#include "plat/utils/NativeCallStack.hpp"
+#include "posei/utils/NativeCallStack.hpp"
 #include <cstring>
-
+#include "posei/init/gcc_builtin.hpp"
 
 NativeCallStack NativeCallStack::_empty_stack;
 
@@ -52,14 +52,14 @@ void *NativeCallStack::top() const {
 void NativeCallStack::record_current_caller() {
     for (auto &i: this->_stack) {
         if (i == nullptr) {
-            i = current_thread_pc();
+            i = posei::current_thread_pc();
         }
     }
 }
 
 NativeCallStack::NativeCallStack(uint16_t depth) {
     depth = MIN2<uint16_t>(depth, MAX_DEPTH);
-#define stack_case(depth) case depth:  _stack[depth] = return_thread_pc<depth>();
+#define stack_case(depth) case depth:  _stack[depth] = posei::return_thread_pc<depth>();
     switch (depth) {
         stack_case(4);
         stack_case(3);

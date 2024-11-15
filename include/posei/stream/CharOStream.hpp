@@ -8,7 +8,7 @@
 #include "OStream.hpp"
 #include <cstring>
 #include <cstdarg>
-#include "plat/constants.hpp"
+#include "posei/constants.hpp"
 
 /**
  * 在二进制输出流基础上实现对字符流的输出

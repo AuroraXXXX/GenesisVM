@@ -6,7 +6,7 @@
 #define KERNEL_NATIVE_CALL_STACK_HPP
 
 #include "stdtype.hpp"
-#include "plat/macro.hpp"
+#include "posei/macro.hpp"
 
 #define CALLER_STACK (NativeCallStack(0))
 
@@ -57,6 +57,7 @@ public:
      * 记录调用者指针
      */
     void record_current_caller();
+
     void copy_from(const NativeCallStack& call_stack);
     /**
      * 返回记录的栈桢个数
