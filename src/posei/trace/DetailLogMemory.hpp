@@ -6,10 +6,9 @@
 #define PLAT_TRACE_DETAIL_LOG_MEMORY_HPP
 
 #include "stdtype.hpp"
-#include "atomic"
-#include "plat/utils/NativeCallStack.hpp"
+#include "posei/utils/NativeCallStack.hpp"
 #include "MemoryTracer.hpp"
-#include "plat/mem/allocation.hpp"
+#include "posei/mem/allocation.hpp"
 class OStream;
 
 class DetailLogMemory {
@@ -24,7 +23,7 @@ private:
         uintptr_t _caller[NativeCallStack::MAX_DEPTH];
     };
     static OStream *_stream;
-    static std::atomic<uint16_t> _next_order_id;
+    static volatile uint16_t _next_order_id;
 public:
     static inline auto stream() {
         return _stream;

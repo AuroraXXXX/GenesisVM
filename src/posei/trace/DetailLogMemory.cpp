@@ -9,7 +9,7 @@
 #include "plat/utils/robust.hpp"
 #include "global/flag.hpp"
 
-std::atomic<uint16_t> DetailLogMemory::_next_order_id = 0;
+volatile uint16_t DetailLogMemory::_next_order_id = 0;
 OStream* DetailLogMemory::_stream = nullptr;
 void DetailLogMemory::global_initialize() {
     static FileCharOStream stream(global::NMTFilePath);

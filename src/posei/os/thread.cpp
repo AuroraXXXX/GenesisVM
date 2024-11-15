@@ -8,15 +8,14 @@
 #include <linux/futex.h>
 #include <cerrno>
 #include <sys/resource.h>
-#include "plat/os/cpu.hpp"
-#include "plat/utils/robust.hpp"
-#include "plat/thread/OSThread.hpp"
-#include "plat/constants.hpp"
-#include "global/flag.hpp"
-#include "plat/utils/OrderAccess.hpp"
+#include "posei/os.hpp"
+#include "posei/utils/robust.hpp"
+#include "posei/thread/OSThread.hpp"
+#include "posei/constants.hpp"
+#include "posei/utils/OrderAccess.hpp"
+#include "posei/init/flag.hpp"
 
-namespace os {
-    static int16_t LANG_TO_OS_PRIO[TotalPriority] = {
+int16_t LANG_TO_OS_PRIO[posei::TotalPriority] = {
             19,             //从不使用
 
             4,              // 1 MinPriority
@@ -38,12 +37,12 @@ namespace os {
      * 返回 可用的cpu的数量
      * @return
      */
-    uint32_t avail_cpu_num() {
+    uint32_t os::avail_cpu_num() {
         static auto num = (uint32_t) ::sysconf(_SC_NPROCESSORS_ONLN);
         return num;
     }
 
-    uint32_t total_cpu_num() {
+    uint32_t os::total_cpu_num() {
         static auto num = (uint32_t) ::sysconf(_SC_NPROCESSORS_CONF);
         return num;
     }
@@ -52,7 +51,7 @@ namespace os {
      * 获取线程在系统中的ID 会缓存
      * @return
      */
-    int32_t current_thread_id() {
+    int32_t os::current_thread_id() {
         thread_local auto tid = ::gettid();
         return tid;
     }
@@ -66,13 +65,13 @@ namespace os {
         return pid;
     }
 
-    uint32_t current_cpu_id() {
+    uint32_t os::current_cpu_id() {
         long cpu;
         auto res = ::syscall(SYS_getcpu, &cpu, nullptr, nullptr);
         return res == 0 ? (uint32_t) cpu : 0;
     }
 
-    OSReturn get_native_prio(int32_t thread_id,
+    OSReturn os::get_native_prio(int32_t thread_id,
                              int16_t *native_prio) {
         if (!global::UseThreadPriority) {
             //如果没有使用
@@ -96,7 +95,7 @@ namespace os {
         return OSReturn::OK;
     }
 
-    OSReturn set_native_prio(int32_t thread_id,
+    OSReturn os::set_native_prio(int32_t thread_id,
                              ThreadPriority lang_prio) {
         if (!is_clamp<int16_t>(lang_prio, ThreadPriority::MinPriority, ThreadPriority::MaxPriority)) {
             assert(false, "Should not happen");
@@ -110,7 +109,7 @@ namespace os {
         return res == 0 ? OSReturn::OK : OSReturn::ERR;
     }
 
-    void native_prio_initialize() {
+    void os::native_prio_initialize() {
         if (!global::UseThreadPriority) {
             return;
         }
@@ -131,7 +130,7 @@ namespace os {
 #undef NATIVE_PRIO_DEFINE
     }
 
-    bool create_thread(OSThread *thread, bool detach) {
+    bool os::create_thread(OSThread *thread, bool detach) {
         assert(thread != nullptr, "thread is null");
         assert(thread->_os_state == OSThread::STATE_NEW,"check");
         //初始化线程属性 以及将系统线程声明为分离线程 这样可以防止内存泄露
@@ -164,7 +163,7 @@ namespace os {
         return true;
     }
 
-    void join_thread(OSThread *thread) {
+    void os::join_thread(OSThread *thread) {
         ::pthread_join(thread->get_pthread_id(), nullptr);
     }
 
@@ -175,7 +174,7 @@ namespace os {
      * @param tag 标志 当此值等于uaddr,则进入睡眠
      * @param nsec 超时等待多少ns 0 表示无限期等待
      */
-    void suspend(const int *uaddr, int tag, uint64_t nsec) {
+    void os::suspend(const int *uaddr, int tag, uint64_t nsec) {
         do {
             struct timespec *spec = nullptr;
             struct timespec spec_val{};
@@ -211,7 +210,7 @@ namespace os {
      * @param num 线程的数量(如果大于实际等待的线程数量，则唤醒全部线程)
      * @return 返回实际被唤醒的线程数
      */
-    int wakeup(int *uaddr, int num) {
+    int os::wakeup(int *uaddr, int num) {
         const auto wake_num = (int) syscall(SYS_futex,
                                             uaddr,
                                             FUTEX_WAKE_PRIVATE,
@@ -221,5 +220,5 @@ namespace os {
         return wake_num;
     }
 
-}
+
 

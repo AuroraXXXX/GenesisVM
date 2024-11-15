@@ -5,8 +5,8 @@
 #include "MemoryTracer.hpp"
 #include "SummaryMemory.hpp"
 #include "DetailLogMemory.hpp"
-#include "global/flag.hpp"
-#include "plat/utils/robust.hpp"
+#include "posei/init/flag.hpp"
+#include "posei/utils/robust.hpp"
 
 MemoryTracer::NMT_Level MemoryTracer::_nmt_level = NMT_Level::unknown;
 
