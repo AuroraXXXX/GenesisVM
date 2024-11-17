@@ -5,11 +5,11 @@
 #ifndef PLATFORM_OS_THREAD_HPP
 #define PLATFORM_OS_THREAD_HPP
 
-#include "plat/constants.hpp"
-#include "plat/utils//OrderAccess.hpp"
-#include "plat/utils/robust.hpp"
-#include "plat/mem/Arena.hpp"
-#include "plat/os/cpu.hpp"
+#include "posei/constants.hpp"
+#include "posei/utils/Atomic.hpp"
+#include "posei/utils/robust.hpp"
+#include "posei/mem/Arena.hpp"
+#include "posei/os.hpp"
 
 /**
  * NAME 表示线程的一个状态
@@ -134,7 +134,7 @@ public:
 
 
     [[nodiscard]] inline auto state() const {
-        return OrderAccess::load<uint8_t>(&_os_state);
+        return Atomic::load<uint8_t>(&_os_state);
     };
 
 

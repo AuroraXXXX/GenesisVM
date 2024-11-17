@@ -1,7 +1,7 @@
 //
 // Created by aurora on 2023/12/21.
 //
-#include "posei/os/time.hpp"
+#include "posei/os.hpp"
 #include <unistd.h>
 #include <sys/times.h>
 #include <cstdio>
@@ -13,7 +13,6 @@
  */
 static char TimeZoneBuf[6] = {0};
 
-ticks_t VMStartStamp = 0;
 
 /**
  * 用于格式化时区信息

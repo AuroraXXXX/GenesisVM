@@ -38,7 +38,7 @@ public:
      * @return
      */
     template<typename T>
-    inline T xchg(T volatile *ptr, T new_val) {
+    static inline T xchg(T volatile *ptr, T new_val) {
         return posei::atomic_xchg(ptr, new_val);
     }
 
@@ -50,14 +50,16 @@ public:
      * @return
      */
     template<typename T>
-    inline T fetch_and_add(volatile T *ptr, T val) {
+    static  inline T fetch_and_add(volatile T *ptr, T val) {
         return posei::atomic_fetch_and_add(ptr, val);
     }
 
     template<typename T>
-    inline T fetch_and_sub(volatile T *ptr, T val) {
+    static  inline T fetch_and_sub(volatile T *ptr, T val) {
         return posei::atomic_fetch_and_sub(ptr, val);
     }
+
+
 };
 
 #endif //GENESISVM_ATOMIC_HPP

@@ -1,6 +1,6 @@
 #ifndef POSEI_OS_HPP
 #define POSEI_OS_HPP
-#include "posei/stdtype.hpp"
+#include "stdtype.hpp"
 #include "posei/mem/AllStatic.hpp"
 #include "posei/init/flag.hpp"
 class OSThread;
@@ -13,6 +13,7 @@ private:
      * VM启动的时间戳
      */
     static ticks_t _vm_start_stamp;
+
     /**
      * 时间模块的初始化
      * vm_start_stamp VM启动得到时间戳
@@ -27,7 +28,7 @@ public:
      * @param process_system_time 内核态运行时间
      * @return
      */
-    bool proc_cpu_time(double &process_real_time,
+    static bool proc_cpu_time(double &process_real_time,
                        double &process_user_time,
                        double &process_system_time);
 
@@ -73,7 +74,7 @@ public:
      * @param utc
      * @return
      */
-    OSReturn time_stamp_str(ticks_t current_stamp,
+    static OSReturn time_stamp_str(ticks_t current_stamp,
                             const char *format,
                             char *buf,
                             size_t buf_len,
@@ -86,8 +87,26 @@ public:
      */
 
 private:
-    void native_prio_initialize();
-
+    /**
+     * 用于初始化内部的VM优先级到OS的优先级的映射
+     * 不论是否修改这个映射关系，都需要调用这个函数
+     * 内部会自行进行判断
+     */
+    static void native_prio_initialize();
+    /**
+     * 当 *uaddr == tag时 挂起线程
+     * @param uaddr
+     * @param tag 标志 当此值等于uaddr,则进入睡眠
+     * @param nsec 超时等待多少ns 0 表示无限期等待
+     */
+     void suspend(const int *uaddr, int tag, uint64_t nsec = 0);
+    /**
+     * 唤醒等待在uaddr上的num个线程线程
+     * @param uaddr int类型变量
+     * @param num 线程的数量(如果大于实际等待的线程数量，则唤醒全部线程)
+     * @return 返回实际被唤醒的线程数
+     */
+     int wakeup(int *uaddr, int num);
 public:
     /**
      * 获取可用的CPU数量

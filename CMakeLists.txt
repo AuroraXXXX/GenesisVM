@@ -20,13 +20,17 @@ add_link_options("-no-pie")
 
 include_directories(include)
 
-
-add_library(${PROJECT_NAME} INTERFACE
-        include/posi/os.hpp
-        include/posei/init/gcc_builtin.hpp
-        include/posei/utils/Atomic.hpp)
-add_subdirectory(src)
+# 编译最终的产物
 option(TEST "是否开启测试" ON)
+if (${TEST})
+    message('TEST OPEN')
+    add_library(${PROJECT_NAME} INTERFACE)
+else ()
+    message('TEST CLOSED')
+    add_executable(${PROJECT_NAME})
+endif ()
+# 添加子模块
+add_subdirectory(src)
 if (${TEST})
     add_subdirectory(test)
 endif ()
