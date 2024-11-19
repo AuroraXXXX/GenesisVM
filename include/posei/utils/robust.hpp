@@ -5,8 +5,8 @@
 #ifndef PLATFORM_UTILS_ROBUST_HPP
 #define PLATFORM_UTILS_ROBUST_HPP
 
-#include "stdtype.hpp"
-#include "plat/macro.hpp"
+#include "posei/macro.hpp"
+
 
 enum class VMErrorType {
     INTERNAL_ERROR, //内部的错误

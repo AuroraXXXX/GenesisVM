@@ -5,13 +5,13 @@
 #ifndef LOGGING_LOG_TAG_SET_HPP
 #define LOGGING_LOG_TAG_SET_HPP
 
-#include "constants.hpp"
 #include <cstdarg>
-
+#include <cstdint>
 /**
  * 记录日志的集合
  */
 class LogTagSet {
+    constexpr static inline uint8_t LogTagSetMax = 5;
 private:
     /**
      * 标签的集合
@@ -22,7 +22,6 @@ private:
 
 
 public:
-    const static LogTagSet Default;
 
     /**
      * 标签集合字符串

@@ -9,7 +9,6 @@
 #include "posei/logger/LogOutput.hpp"
 #include "constants.hpp"
 #include "LogTagSet.hpp"
-
 class LogStream : public CharOStream {
 private:
     /**

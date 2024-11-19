@@ -4,7 +4,7 @@
 
 #ifndef PLATFORM_CONSTANTS_HPP
 #define PLATFORM_CONSTANTS_HPP
-#include "stdtype.hpp"
+#include <cstdint>
 enum class OSReturn {
     OK = 0,
     ERR = -1,//其他的错误

@@ -60,7 +60,7 @@ int16_t LANG_TO_OS_PRIO[posei::TotalPriority] = {
      * 获取当前系统进程的ID 只有第一次会调用系统
      * @return
      */
-    int32_t current_process_id() {
+    int32_t os::current_process_id() {
         static auto pid = ::getpid();
         return pid;
     }

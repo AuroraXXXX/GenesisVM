@@ -27,7 +27,8 @@ if (${TEST})
     add_library(${PROJECT_NAME} INTERFACE)
 else ()
     message('TEST CLOSED')
-    add_executable(${PROJECT_NAME})
+    add_executable(${PROJECT_NAME}
+            src/posei/utils/robust.cpp)
 endif ()
 # 添加子模块
 add_subdirectory(src)

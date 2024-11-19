@@ -4,11 +4,10 @@
 
 #include "posei/logger/LogLayoutFollower.hpp"
 #include <cstdio>
-#include "posei/os/cpu.hpp"
+#include "posei/os.hpp"
 #include "posei/utils/robust.hpp"
-#include "posei/os/time.hpp"
 #include "posei/constants.hpp"
-#include "posei/logger/log.hpp"
+#include "posei/log.hpp"
 #include "posei/macro.hpp"
 
 static const char *LOG_LEVEL_NAMES[] = {

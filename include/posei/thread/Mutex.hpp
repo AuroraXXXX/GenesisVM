@@ -2,16 +2,14 @@
 // Created by aurora on 2023/10/21.
 //
 
-#ifndef PLATFORM_MUTEX_HPP
-#define PLATFORM_MUTEX_HPP
+#ifndef POSEI_THREAD_MUTEX_HPP
+#define POSEI_THREAD_MUTEX_HPP
 
 #include <cerrno>
 #include <pthread.h>
-#include "plat/utils/robust.hpp"
-#include "plat/mem/allocation.hpp"
-#include "plat/macro.hpp"
-#include "plat/utils/OrderAccess.hpp"
-
+#include "posei/mem/allocation.hpp"
+#include "posei/macro.hpp"
+#include <atomic>
 class OSThread;
 
 /**
@@ -24,10 +22,10 @@ protected:
     const char *const _name;
     NONCOPYABLE(Mutex);
 
-    OSThread *volatile _owner;
+    std::atomic<OSThread*> _owner;
 
     inline void set_owner(OSThread *thread) {
-        OrderAccess::store<OSThread *>(&this->_owner, thread);
+       this->_owner.store(thread);
     };
 public:
     /**
@@ -65,7 +63,7 @@ public:
     [[nodiscard]] bool owned_by_self() const;
 
     [[nodiscard]] inline OSThread *owner() const {
-        return OrderAccess::load(&this->_owner);
+        return this->_owner.load();
     };
 
     /**
@@ -80,4 +78,4 @@ public:
 };
 
 
-#endif //PLATFORM_MUTEX_HPP
+#endif //POSEI_THREAD_MUTEX_HPP

@@ -8,8 +8,8 @@
 #include "posei/utils/robust.hpp"
 #include "posei/logger/LogSingleFileOutput.hpp"
 #include "posei/stream/FileCharOStream.hpp"
-#include "posei/utils/OrderAccess.hpp"
-LogOutput *volatile LogOutput::_stream = nullptr;
+#include "posei/log.hpp"
+std::atomic<LogOutput *> LogOutput::_stream = nullptr;
 static LogSingleFileOutput DEFAULT(LogLevel::default_console_level,
                                    LogLayout::Default,
                                    FileCharOStream::default_stream());
@@ -48,17 +48,12 @@ void LogOutput::write_file_format_follow(
 }
 
 LogOutput *LogOutput::output_stream() {
-    const auto stream = OrderAccess::load(&LogOutput::_stream);
+    const auto stream = LogOutput::_stream.load();
     if (stream == nullptr) {
         return &DEFAULT;
     } else {
         return stream;
     }
-
 }
 
-void LogOutput::register_global(LogOutput *stream) {
-
-    OrderAccess::store(&LogOutput::_stream, stream);
-}
 

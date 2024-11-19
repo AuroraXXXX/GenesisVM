@@ -4,10 +4,10 @@
 
 #ifndef POSEI_MEM_ALLOCATION_HPP
 #define POSEI_MEM_ALLOCATION_HPP
+#include <cstdint>
 
-#include "posei/utils/NativeCallStack.hpp"
-#include "stdtype.hpp"
 #include <new>
+#include <cstddef>
 #include "AllStatic.hpp"
 /**
  * CHeapObject内存的标记

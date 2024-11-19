@@ -7,7 +7,11 @@
 
 #include <concepts>
 #include <limits>
-
+#include <cstddef>
+#include <bit>
+#include "posei/constants.hpp"
+#include "posei/macro.hpp"
+#include "posei/utils/robust.hpp"
 /**
  * 判断1个数是否是2^n
  * @tparam T 类型
@@ -37,7 +41,7 @@ template<std::integral T>
 inline int log2i(T value) {
     assert(value > T(0), "value must be > 0");
     constexpr int bits = sizeof(value) * BitsPerByte;
-    return bits - Bit::count_left_zero(value) - 1;
+    return bits -std::countl_zero<T>(value) - 1;
 }
 
 /**
@@ -52,7 +56,7 @@ inline int log2i_graceful(T value) {
         return -1;
     }
     constexpr int bits = sizeof(value) * BitsPerByte;
-    return bits - Bit::count_left_zero<T>(value) - 1;
+    return bits - std::countl_zero<T>(value) - 1;
 }
 
 /**
@@ -67,7 +71,7 @@ inline constexpr int log2i_exact(T value) {
            "value must be a power of 2: "
                    UINTX_FORMAT,
            static_cast<uint64_t>(value));
-    return (int32_t) Bit::count_right_zero(value);
+    return (int32_t) std::countr_zero<T>(value);
 };
 
 /**
@@ -152,16 +156,6 @@ inline constexpr T align_down_bounded(T size, size_t align) {
     return (aligned_size > 0) ? aligned_size : (T) align;
 }
 
-/**
- * 用于 判断是否对齐
- * @tparam T
- * @param bytes
- * @param align
- */
-template<std::integral T>
-inline void assert_is_aligned(T bytes, size_t align) {
-    assert(is_aligned<T>(bytes, align),
-           UINTX_FORMAT " 没有按照 " UINTX_FORMAT "字节对齐",bytes, align);
-}
+
 
 #endif //PLATFORM_ALIGN_HPP

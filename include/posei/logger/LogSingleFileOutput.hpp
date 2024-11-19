@@ -5,7 +5,7 @@
 #ifndef LOGGING_LOG_FILE_OUTPUT_HPP
 #define LOGGING_LOG_FILE_OUTPUT_HPP
 
-#include "plat/logger/LogOutput.hpp"
+#include "posei/logger/LogOutput.hpp"
 /**
  * 文件格式的日志输出流
  * 是单个文件的输出

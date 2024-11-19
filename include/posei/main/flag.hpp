@@ -5,8 +5,9 @@
 #ifndef POSEI_INIT_FLAG_HPP
 #define POSEI_INIT_FLAG_HPP
 
-#include "stdtype.hpp"
+#include <cstdint>
 #include "posei/constants.hpp"
+
 namespace posei {
 /**
  * 定义区间的
@@ -40,9 +41,8 @@ namespace posei {
 
 
 
-
     PLATFORM_FLAGS(DECLARE_PRODUCT_FLAG, DECLARE_DEVELOP_FLAG, IGNORE_RANGE)
 
-  
+
 }
 #endif //POSEI_INIT_FLAG_HPP

@@ -5,16 +5,13 @@
 #include <cstdio>
 #include "posei/utils/robust.hpp"
 #include "posei/logger/LogTagSet.hpp"
-#include "posei/logger/log.hpp"
 
 
-
-
-LogTagSet::LogTagSet(LogTag tag0,
-                     LogTag tag1,
-                     LogTag tag2,
-                     LogTag tag3,
-                     LogTag tag4) noexcept:
+LogTagSet::LogTagSet(const char *tag0,
+                     const char *tag1,
+                     const char *tag2,
+                     const char *tag3,
+                     const char *tag4) noexcept:
         _tags{tag0,
               tag1,
               tag2,
@@ -29,7 +26,7 @@ int LogTagSet::write_tags(char *buf, size_t buf_len, const char *split) {
     //对缓冲区进行清零
     buf[0] = '\0';
     bool is_first = true;
-    for (const char * tag: this->_tags) {
+    for (const char *tag: this->_tags) {
         if (tag == nullptr) {
             //当遇到一个没有标记标签的时候 那么就应该停止输出
             break;

@@ -6,7 +6,7 @@
 #define LOGGING_LOG_LAYOUT_HPP
 
 
-#include "stdtype.hpp"
+#include <cstdint>
 /**
  * 关于日志布局器的参数
  * 1 times 表示输出时间 精确到秒

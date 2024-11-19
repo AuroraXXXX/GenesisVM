@@ -5,13 +5,14 @@
 #ifndef LOGGING_LOG_OUTPUT_CALLBACK_HPP
 #define LOGGING_LOG_OUTPUT_CALLBACK_HPP
 
-#include "constants.hpp"
-#include "plat/logger/LogLayout.hpp"
-
-
+#include "posei/logger/LogLayout.hpp"
+#include <cstddef>
+#include <atomic>
 class LogLayoutFollower;
 
 class LogTagSet;
+
+enum class LogLevel:uint8_t ;
 
 /**
  * 日志输出函数
@@ -20,13 +21,16 @@ class LogOutput {
     friend class LogStream;
 
 private:
-    static LogOutput *volatile _stream;
+    /**
+     * 输出六
+     */
+    static std::atomic<LogOutput*> _stream;
 
     /**
      * 获取日志的输出流
      * @return
      */
-    static  LogOutput *output_stream();
+    static LogOutput *output_stream();
 
 protected:
     /**
@@ -68,7 +72,9 @@ public:
      * 注册全局的日志输出流
      * @param stream 全局的日志输出流
      */
-    static inline void register_global(LogOutput *stream);
+    static inline void register_global(LogOutput *stream){
+        LogOutput::_stream.store(stream);
+    };
 
 };
 
