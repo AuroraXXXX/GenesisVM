@@ -34,15 +34,15 @@ void OSThread::tans_state(uint8_t to) {
      * 首先设置将线程状态设置成过渡态
      * 方便其他部件即时得知线程状态
      */
-    OrderAccess::store<uint8_t>(&this->_os_state, from + 1);
+    this->_os_state.store(from + 1);
     //立刻刷新到内存 禁止重排序 方便其他线程立刻观察到
-    OrderAccess::fence();
+    std::atomic_thread_fence(std::memory_order::seq_cst);
     //调用对应的回调函数
     this->state_transitioning_callback(from, to);
     //整体的执行逻辑顺序必须得到保证
-    OrderAccess::fence();
+    std::atomic_thread_fence(std::memory_order::seq_cst);
     //正式的设置最终的目标状态
-    OrderAccess::store<uint8_t>(&this->_os_state, to);
+    this->_os_state.store(to);
 }
 
 void OSThread::global_initialize() {

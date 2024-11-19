@@ -2,11 +2,12 @@
 // Created by aurora on 2023/10/21.
 //
 
-#include "plat/thread/Monitor.hpp"
+#include "posei/thread/Monitor.hpp"
 #include <ctime>
-#include "plat/constants.hpp"
-#include "plat/thread/ThreadStatusTrans.hpp"
-#include "plat/thread/OSThread.hpp"
+#include "posei/constants.hpp"
+#include "posei/thread/ThreadStatusTrans.hpp"
+#include "posei/thread/OSThread.hpp"
+#include <atomic>
 OSReturn Monitor::wait(ticks_t millis) {
     if (millis == 0) {
         //表示无限期的等待了

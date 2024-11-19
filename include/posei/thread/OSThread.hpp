@@ -6,7 +6,7 @@
 #define PLATFORM_OS_THREAD_HPP
 
 #include "posei/constants.hpp"
-#include "posei/utils/Atomic.hpp"
+#include <atomic>
 #include "posei/utils/robust.hpp"
 #include "posei/mem/Arena.hpp"
 #include "posei/os.hpp"
@@ -64,7 +64,7 @@ private:
     /**
      * 线程的状态
      */
-    volatile uint8_t _os_state;
+    std::atomic<uint8_t> _os_state;
     /**
      * 优先级
      * 1 最低
@@ -134,7 +134,7 @@ public:
 
 
     [[nodiscard]] inline auto state() const {
-        return Atomic::load<uint8_t>(&_os_state);
+        return this->_os_state.load();
     };
 
 
@@ -158,11 +158,11 @@ public:
     };
 
     [[nodiscard]] inline bool is_running_state() const {
-        return OSThread::is_running_state(OrderAccess::load(&this->_os_state));
+        return OSThread::is_running_state(this->state());
     };
 
     [[nodiscard]] inline bool is_tans_state() const {
-        return OSThread::is_tans_state(OrderAccess::load(&this->_os_state));
+        return OSThread::is_tans_state(this->state());
     };
 
     /**
@@ -193,7 +193,7 @@ protected:
      * 用于在state_transitioning_callback
      */
     inline void set_blocked_direct(){
-        OrderAccess::store<uint8_t>(&this->_os_state,OSThread::STATE_BLOCKED);
+        this->_os_state.store(OSThread::STATE_BLOCKED);
     }
 };
 
