@@ -111,6 +111,8 @@ do{                                                                 \
                         "vm_exit_during_initialization:",                    \
                         message,                                    \
                         ##args)
+
+                        
 #define vm_exit_out_of_memory(error_type, required_bytes, msg, args...)      \
         do{                                                         \
              report_vm_out_of_memory(__FILE__,                      \
