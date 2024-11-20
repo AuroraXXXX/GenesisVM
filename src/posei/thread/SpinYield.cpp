@@ -1,11 +1,10 @@
 // Created by aurora on 2023/1/22.
 //
 
-#include "plat/thread/SpinYield.hpp"
-#include "plat/os/cpu.hpp"
-#include "plat/os/time.hpp"
-#include "plat/stream/CharOStream.hpp"
-#include "plat/utils/robust.hpp"
+#include "posei/thread/SpinYield.hpp"
+#include "posei/os.hpp"
+#include "posei/stream/CharOStream.hpp"
+#include "posei/utils/robust.hpp"
 #include <sched.h>
 #include <ctime>
 

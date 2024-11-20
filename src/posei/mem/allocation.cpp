@@ -2,7 +2,7 @@
 // Created by aurora on 2023/9/10.
 //
 
-#include "posei/mem/allocation.hpp"
+#include "posei/allocation.hpp"
 #include <malloc.h>
 #include <cstdlib>
 #include "posei/utils/robust.hpp"

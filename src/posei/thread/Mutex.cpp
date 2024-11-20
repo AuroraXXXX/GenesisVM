@@ -2,10 +2,10 @@
 // Created by aurora on 2023/10/21.
 //
 
-#include "plat/thread/Mutex.hpp"
-#include "plat/thread/OSThread.hpp"
-#include "plat/thread/ThreadStatusTrans.hpp"
-#include "plat/stream/CharOStream.hpp"
+#include "posei/thread/Mutex.hpp"
+#include "posei/thread/OSThread.hpp"
+#include "posei/thread/ThreadStatusTrans.hpp"
+#include "posei/stream/CharOStream.hpp"
 Mutex::Mutex(
         const char *name,
         bool recursive) noexcept:
@@ -52,7 +52,6 @@ void Mutex::lock() {
         status = ::pthread_mutex_lock(&this->_mutex);
     }
     assert(status == 0, "pthread_mutex_lock");
-    OrderAccess::compile_barrier();
   //  assert(!this->is_locked() || this->owned_by_self(), "mutex owner设置错误 %x %x",this->owner(),OSThread::current());
     if(!(!this->is_locked() || this->owned_by_self())){
         guarantee(false,"??");
@@ -67,7 +66,6 @@ void Mutex::lock() {
 void Mutex::unlock() {
     assert(this->owned_by_self(), "check");
     this->set_owner(nullptr);
-    OrderAccess::compile_barrier();
     auto status = ::pthread_mutex_unlock(&this->_mutex);
     assert(status == 0, "pthread_mutex_unlock");
 }

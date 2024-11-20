@@ -8,7 +8,7 @@
 #include "stdtype.hpp"
 #include "posei/utils/NativeCallStack.hpp"
 #include "MemoryTracer.hpp"
-#include "posei/mem/allocation.hpp"
+#include "posei/allocation.hpp"
 class OStream;
 
 class DetailLogMemory {

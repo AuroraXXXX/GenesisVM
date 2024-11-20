@@ -8,7 +8,7 @@
 
 #include <new>
 #include <cstddef>
-#include "AllStatic.hpp"
+#include "posei/mem/AllStatic.hpp"
 /**
  * CHeapObject内存的标记
  * 申请的都是C++对象

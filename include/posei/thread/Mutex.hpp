@@ -7,7 +7,7 @@
 
 #include <cerrno>
 #include <pthread.h>
-#include "posei/mem/allocation.hpp"
+#include "posei/allocation.hpp"
 #include "posei/macro.hpp"
 #include <atomic>
 class OSThread;

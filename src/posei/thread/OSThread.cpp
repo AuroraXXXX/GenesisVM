@@ -94,13 +94,13 @@ void *OSThread::native_call(void *params) {
 //    OrderAccess::store(&osThread->_plib_id, ::pthread_self());
 //    OrderAccess::store(&osThread->_kernel_id, os::current_thread_id());
     osThread->tans_state(OSThread::STATE_RUNNING);
-    OrderAccess::compile_barrier();
+    std::atomic_thread_fence(std::memory_order::seq_cst);
     osThread->pre_run();
-    OrderAccess::compile_barrier();
+    std::atomic_thread_fence(std::memory_order::seq_cst);
     osThread->run();
-    OrderAccess::compile_barrier();
+    std::atomic_thread_fence(std::memory_order::seq_cst);
     osThread->post_run();
-    OrderAccess::compile_barrier();
+    std::atomic_thread_fence(std::memory_order::seq_cst);
     osThread->tans_state(OSThread::STATE_ZOMBIE);
     return nullptr;
 }
@@ -112,8 +112,9 @@ void OSThread::attach_main_thread(OSThread *main_thread) {
 
     //调用函数进行初始化
     main_thread->global_initialize();
-    OrderAccess::compile_barrier();
-    OrderAccess::store<uint8_t>(&main_thread->_os_state, OSThread::STATE_READY);
+//    OrderAccess::compile_barrier();
+//    OrderAccess::store<uint8_t>(&main_thread->_os_state, OSThread::STATE_READY);
+    main_thread->_os_state.store(OSThread::STATE_READY);
     assert(main_thread->state() == OSThread::STATE_READY, "thread state is error.");
     //进行前期的
 //    OrderAccess::store<OSThread *>(&OSThread::_current, main_thread);

@@ -5,7 +5,7 @@
 #ifndef LOGGING_LOG_LAYOUT_FOLLOWER_HPP
 #define LOGGING_LOG_LAYOUT_FOLLOWER_HPP
 
-#include "posei/mem/allocation.hpp"
+#include "posei/allocation.hpp"
 #include "posei/logger/LogLayout.hpp"
 #include "posei/macro.hpp"
 class LogTagSet;

@@ -13,10 +13,10 @@ OSReturn Monitor::wait(ticks_t millis) {
         //表示无限期的等待了
         ThreadStatusBlockedTrans blocked;
         this->set_owner(nullptr);
-        OrderAccess::fence();
+        std::atomic_thread_fence(std::memory_order::seq_cst);
         //下面是要进行等待的 内部实际上会释放的锁的 所以此处也需要将持有者设置为空
         int32_t status = ::pthread_cond_wait(&this->_cond, &this->_mutex);
-        OrderAccess::fence();
+        std::atomic_thread_fence(std::memory_order::seq_cst);
         //说明是被唤醒的 所以说可以认为是持有锁的
         this->set_owner(OSThread::current());
         assert(status == 0 || status == ETIMEDOUT, "cond_wait");

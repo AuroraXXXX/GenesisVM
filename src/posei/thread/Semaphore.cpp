@@ -2,10 +2,10 @@
 // Created by aurora on 2024/1/10.
 //
 
-#include "plat/thread/Semaphore.hpp"
-#include "plat/utils/robust.hpp"
+#include "posei/thread/Semaphore.hpp"
+#include "posei/utils/robust.hpp"
 #include <cerrno>
-#include "plat/thread/ThreadStatusTrans.hpp"
+#include "posei/thread/ThreadStatusTrans.hpp"
 Semaphore::Semaphore(uint32_t value) {
     auto ret = ::sem_init(&this->_semaphore, 0, value);
     guarantee(ret == 0, "sem_init failed");
