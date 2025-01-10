@@ -5,7 +5,7 @@
 #ifndef POSEI_STREAM_OSTREAM_HPP
 #define POSEI_STREAM_OSTREAM_HPP
 
-#include "stdtype.hpp"
+#include "platform/typedef.hpp"
 #include <endian.h>
 
 /**

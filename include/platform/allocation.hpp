@@ -8,7 +8,7 @@
 
 #include <new>
 #include <cstddef>
-#include "posei/mem/AllStatic.hpp"
+#include "platform/mem/AllStatic.hpp"
 /**
  * CHeapObject内存的标记
  * 申请的都是C++对象
@@ -42,7 +42,6 @@ enum class MEMFLAG : uint8_t {
 };
 
 
-class NativeCallStack;
 
 class CharOStream;
 

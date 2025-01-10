@@ -28,7 +28,8 @@ if (${TEST})
 else ()
     message('TEST CLOSED')
     add_executable(${PROJECT_NAME}
-            src/posei/utils/robust.cpp)
+            src/platform/utils/robust.cpp
+            include/platform/typedef.hpp)
 endif ()
 # 添加子模块
 add_subdirectory(src)

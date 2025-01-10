@@ -8,7 +8,7 @@
 #include "OStream.hpp"
 #include <cstring>
 #include <cstdarg>
-#include "posei/constants.hpp"
+#include "platform/constants.hpp"
 
 /**
  * 在二进制输出流基础上实现对字符流的输出
@@ -44,7 +44,11 @@ protected:
 
     virtual void free_internal_buf(void *buf) {};
 public:
-
+    /**
+     * OStream输出缓冲区的字节数
+     * 默认的
+     */
+    constexpr static inline uint32_t FORMAT_BUF_SIZE = 2000;
 
     /**
      * 输出需要格式化的字符串

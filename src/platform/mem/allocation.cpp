@@ -2,13 +2,13 @@
 // Created by aurora on 2023/9/10.
 //
 
-#include "posei/allocation.hpp"
+#include "platform/allocation.hpp"
 #include <malloc.h>
 #include <cstdlib>
-#include "posei/utils/robust.hpp"
+#include "platform/utils/robust.hpp"
 #include "MemoryTracer.hpp"
-#include "posei/mem/Arena.hpp"
-#include "posei/thread/OSThread.hpp"
+#include "platform/mem/Arena.hpp"
+#include "platform/thread/OSThread.hpp"
 /**
  * -----------------------------
  * CHeap 内存申请和分配

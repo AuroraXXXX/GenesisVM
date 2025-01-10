@@ -1,9 +1,8 @@
 #ifndef POSEI_OS_HPP
 #define POSEI_OS_HPP
-
-#include <cstdint>
-#include "posei/mem/AllStatic.hpp"
-#include "posei/main/flag.hpp"
+#include "typedef.hpp"
+#include "platform/mem/AllStatic.hpp"
+#include "platform/main/flag.hpp"
 
 class OSThread;
 

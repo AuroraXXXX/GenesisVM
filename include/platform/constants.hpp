@@ -4,7 +4,7 @@
 
 #ifndef PLATFORM_CONSTANTS_HPP
 #define PLATFORM_CONSTANTS_HPP
-#include <cstdint>
+#include "typedef.hpp"
 enum class OSReturn {
     OK = 0,
     ERR = -1,//其他的错误
@@ -88,11 +88,7 @@ constexpr inline uint32_t SpinDefaultYieldLimit = 64;
  * 超出让出CPU次数后 进行睡眠
  */
 constexpr inline uint32_t SpinDefaultSleepNs = 1000;
-/**
- * OStream输出缓冲区的字节数
- * 默认的
- */
-constexpr inline uint32_t OStreamDefaultBufSize = 2000;
+
 /**
  * iso8601 格式化所需的 最小缓冲区的大小
  * "YYYY-MM-DDThh:mm:ss.mmm+zz:zz"

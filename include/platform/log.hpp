@@ -7,7 +7,7 @@
 
 #include "constants.hpp"
 #include <cstdarg>
-#include "posei/logger/LogStream.hpp"
+#include "platform/logger/LogStream.hpp"
 
 constexpr inline size_t LOG_MAX_FOLLOWER_SIZE = 256;
 

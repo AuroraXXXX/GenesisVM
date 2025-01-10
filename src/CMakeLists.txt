@@ -11,7 +11,7 @@ endfunction()
 
 
 
-include_directories(posei/include)
+include_directories(platform/include)
 
-generate_dynamic_lib(posei)
+generate_dynamic_lib(platform)
 #generate_dynamic_lib(metaspace)

@@ -77,6 +77,5 @@ inline bool is_clamp(T value, T min, T max) {
 #define UINT_FORMAT "%u"
 #define UINTX_FORMAT "%lu"
 #define INTX_FORMAT "%ld"
-using ticks_t = uint64_t;
 
 #endif //POSEI_MACRO_HPP

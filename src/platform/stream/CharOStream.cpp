@@ -2,11 +2,12 @@
 // Created by xu on 2023/8/26.
 //
 
-#include "posei/stream/CharOStream.hpp"
+#include "platform/stream/CharOStream.hpp"
 #include <cstdio>
-#include "posei/macro.hpp"
-#include "plat/os/time.hpp"
-#include "plat/utils/align.hpp"
+#include "platform/macro.hpp"
+#include "platform/os.hpp"
+#include "platform/utils/align.hpp"
+#include "platform/utils/robust.hpp"
 
 OSReturn CharOStream::do_vsnprintf(
         char *buf,
@@ -123,7 +124,7 @@ OSReturn CharOStream::do_vsnprintf_with_buf(
     int32_t avail_len;
     char *internal_buf = nullptr;
     {
-        char buffer[OStreamDefaultBufSize];
+        char buffer[CharOStream::FORMAT_BUF_SIZE];
         //进行格式化
         OSReturn res = CharOStream::do_vsnprintf(buffer, sizeof(buffer), cr, format, ap, &avail_len);
 
