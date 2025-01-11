@@ -2,13 +2,13 @@
 // Created by aurora on 2022/2/27.
 //
 
-#include "posei/logger/LogLayoutFollower.hpp"
+#include "platform/logger/LogLayoutFollower.hpp"
 #include <cstdio>
-#include "posei/os.hpp"
-#include "posei/utils/robust.hpp"
-#include "posei/constants.hpp"
-#include "posei/log.hpp"
-#include "posei/macro.hpp"
+#include "platform/os.hpp"
+#include "platform/utils/robust.hpp"
+#include "platform/constants.hpp"
+#include "platform/log.hpp"
+#include "platform/macro.hpp"
 
 static const char *LOG_LEVEL_NAMES[] = {
 #define LOG_LEVEL(level) #level ,

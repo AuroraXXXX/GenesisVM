@@ -9,9 +9,9 @@
 #include <limits>
 #include <cstddef>
 #include <bit>
-#include "posei/constants.hpp"
-#include "posei/macro.hpp"
-#include "posei/utils/robust.hpp"
+#include "platform/constants.hpp"
+#include "platform/macro.hpp"
+#include "platform/utils/robust.hpp"
 /**
  * 判断1个数是否是2^n
  * @tparam T 类型

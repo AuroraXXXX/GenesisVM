@@ -6,7 +6,7 @@
 #define LOGGING_LOG_TAG_SET_HPP
 
 #include <cstdarg>
-#include <cstdint>
+#include "platform/typedef.hpp"
 /**
  * 记录日志的集合
  */

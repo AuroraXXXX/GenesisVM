@@ -2,9 +2,9 @@
 // Created by aurora on 2024/7/13.
 //
 
-#include "posei/logger/LogSingleFileOutput.hpp"
-#include "posei/utils/robust.hpp"
-#include "posei/stream/CharOStream.hpp"
+#include "platform/logger/LogSingleFileOutput.hpp"
+#include "platform/utils/robust.hpp"
+#include "platform/stream/CharOStream.hpp"
 
 bool LogSingleFileOutput::is_enable(LogLevel level, LogTagSet *tag_set) {
     return (uint8_t) level >= (uint8_t) this->_level;

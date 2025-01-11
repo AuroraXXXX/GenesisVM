@@ -5,7 +5,7 @@
 #ifndef LOGGING_LOG_OUTPUT_CALLBACK_HPP
 #define LOGGING_LOG_OUTPUT_CALLBACK_HPP
 
-#include "posei/logger/LogLayout.hpp"
+#include "platform/logger/LogLayout.hpp"
 #include <cstddef>
 #include <atomic>
 class LogLayoutFollower;

@@ -5,9 +5,9 @@
 #ifndef LOGGING_LOG_STREAM_HPP
 #define LOGGING_LOG_STREAM_HPP
 
-#include "posei/stream/CharOStream.hpp"
-#include "posei/logger/LogOutput.hpp"
-#include "constants.hpp"
+#include "platform/stream/CharOStream.hpp"
+#include "platform/logger/LogOutput.hpp"
+#include "platform/constants.hpp"
 #include "LogTagSet.hpp"
 class LogStream : public CharOStream {
 private:

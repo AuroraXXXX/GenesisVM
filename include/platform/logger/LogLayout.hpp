@@ -2,11 +2,10 @@
 // Created by aurora on 2022/2/18.
 //
 
-#ifndef LOGGING_LOG_LAYOUT_HPP
-#define LOGGING_LOG_LAYOUT_HPP
+#ifndef PLATFORM_LOG_LAYOUT_HPP
+#define PLATFORM_LOG_LAYOUT_HPP
 
-
-#include <cstdint>
+#include "platform/typedef.hpp"
 /**
  * 关于日志布局器的参数
  * 1 times 表示输出时间 精确到秒
@@ -191,4 +190,4 @@ public:
 
 typedef LogLayout::Type LogLayoutType;
 
-#endif //LOGGING_LOG_LAYOUT_HPP
+#endif //PLATFORM_LOG_LAYOUT_HPP

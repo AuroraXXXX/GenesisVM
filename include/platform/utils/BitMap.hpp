@@ -5,11 +5,11 @@
 #ifndef KERNEL_BIT_MAP_HPP
 #define KERNEL_BIT_MAP_HPP
 
-#include "plat/constants.hpp"
-#include "plat/mem/allocation.hpp"
+#include "platform/constants.hpp"
+#include "platform/allocation.hpp"
 #include <concepts>
 #include "cstring"
-
+#include "platform/macro.hpp"
 
 /**
  * 位图

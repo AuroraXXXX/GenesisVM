@@ -2,13 +2,13 @@
 // Created by aurora on 2024/7/13.
 //
 
-#include "posei/logger/LogOutput.hpp"
-#include "posei/logger/LogLayout.hpp"
-#include "posei/logger/LogLayoutFollower.hpp"
-#include "posei/utils/robust.hpp"
-#include "posei/logger/LogSingleFileOutput.hpp"
-#include "posei/stream/FileCharOStream.hpp"
-#include "posei/log.hpp"
+#include "platform/logger/LogOutput.hpp"
+#include "platform/logger/LogLayout.hpp"
+#include "platform/logger/LogLayoutFollower.hpp"
+#include "platform/utils/robust.hpp"
+#include "platform/logger/LogSingleFileOutput.hpp"
+#include "platform/stream/FileCharOStream.hpp"
+#include "platform/log.hpp"
 std::atomic<LogOutput *> LogOutput::_stream = nullptr;
 static LogSingleFileOutput DEFAULT(LogLevel::default_console_level,
                                    LogLayout::Default,

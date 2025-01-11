@@ -2,10 +2,9 @@
 // Created by aurora on 2023/9/10.
 //
 
-#ifndef POSEI_MEM_ALLOCATION_HPP
-#define POSEI_MEM_ALLOCATION_HPP
-#include <cstdint>
-
+#ifndef PLATFORM_ALLOCATION_HPP
+#define PLATFORM_ALLOCATION_HPP
+#include "platform/typedef.hpp"
 #include <new>
 #include <cstddef>
 #include "platform/mem/AllStatic.hpp"
@@ -196,4 +195,4 @@ public:
         return RESOURCE_ARENA_ALLOC(size);
     };
 };
-#endif //POSEI_MEM_ALLOCATION_HPP
+#endif //PLATFORM_ALLOCATION_HPP

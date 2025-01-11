@@ -1,13 +1,13 @@
 //
 // Created by aurora on 2024/7/2.
 //
-#include "posei/utils/align.hpp"
-#include "posei/allocation.hpp"
-#include "posei/stream/FileCharOStream.hpp"
-#include "posei/logger/LogLayoutFollower.hpp"
-#include "posei/logger/LogOutput.hpp"
-#include "posei/logger/LogStream.hpp"
-#include "posei/thread/OSThread.hpp"
+#include "platform/utils/align.hpp"
+#include "platform/allocation.hpp"
+#include "platform/stream/FileCharOStream.hpp"
+#include "platform/logger/LogLayoutFollower.hpp"
+#include "platform/logger/LogOutput.hpp"
+#include "platform/logger/LogStream.hpp"
+#include "platform/thread/OSThread.hpp"
 
 
 void LogStream::record(LogLevel level, LogTagSet &tag_set, const char *format, va_list args) {

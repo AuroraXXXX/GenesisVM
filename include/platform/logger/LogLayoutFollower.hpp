@@ -5,9 +5,9 @@
 #ifndef LOGGING_LOG_LAYOUT_FOLLOWER_HPP
 #define LOGGING_LOG_LAYOUT_FOLLOWER_HPP
 
-#include "posei/allocation.hpp"
-#include "posei/logger/LogLayout.hpp"
-#include "posei/macro.hpp"
+#include "platform/allocation.hpp"
+#include "platform/logger/LogLayout.hpp"
+#include "platform/macro.hpp"
 class LogTagSet;
 enum class LogLevel;
 /**

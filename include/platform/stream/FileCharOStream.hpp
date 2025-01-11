@@ -1,4 +1,4 @@
-p//
+//
 // Created by aurora on 2023/11/25.
 //
 
@@ -73,7 +73,7 @@ public:
      * @return
      */
     static inline FileCharOStream *default_stream() {
-        return ::OutputToStderr ?
+        return global::OutputToStderr ?
                &FileCharOStream::_err_stream :
               & FileCharOStream::_out_stream;
     };

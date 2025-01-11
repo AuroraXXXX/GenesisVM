@@ -2,13 +2,10 @@
 // Created by aurora on 2024/6/25.
 //
 
-#ifndef POSEI_INIT_FLAG_HPP
-#define POSEI_INIT_FLAG_HPP
+#ifndef PLATFORM_GLOBAL_HPP
+#define PLATFORM_GLOBAL_HPP
 
-#include <cstdint>
-#include "posei/constants.hpp"
-
-namespace posei {
+#include "platform/constants.hpp"
 /**
  * 定义区间的
  */
@@ -20,6 +17,9 @@ namespace posei {
 #else
 #define DECLARE_DEVELOP_FLAG(type, name, value, ...) extern "C" type name;
 #endif
+
+namespace global {
+
 
 #define PLATFORM_FLAGS(product, develop, range) \
     product(const char* ,ErrorFilePath,"/tmp/demo.log","致命错误输出到文件") \
@@ -45,4 +45,4 @@ namespace posei {
 
 
 }
-#endif //POSEI_INIT_FLAG_HPP
+#endif //PLATFORM_GLOBAL_HPP

@@ -3,8 +3,8 @@
 //
 
 #include <cstdio>
-#include "posei/utils/robust.hpp"
-#include "posei/logger/LogTagSet.hpp"
+#include "platform/utils/robust.hpp"
+#include "platform/logger/LogTagSet.hpp"
 
 
 LogTagSet::LogTagSet(const char *tag0,

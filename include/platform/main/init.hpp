@@ -2,11 +2,10 @@
 // Created by aurora on 2024/6/29.
 //
 
-#ifndef POSEI_MAIN_INIT_HPP
-#define POSEI_MAIN_INIT_HPP
+#ifndef PLATFORM_MAIN_INIT_HPP
+#define PLATFORM_MAIN_INIT_HPP
 
-#include "stdtype.hpp"
-#include "posei/mem/AllStatic.hpp"
+#include "platform/typedef.hpp"
 
 class OSThread;
 
@@ -14,10 +13,10 @@ class OSThread;
  * 初始化函数
  * @param vm_start_time vm起始的时间戳
  */
-extern void posei_init(ticks_t vm_start_time,
+extern void platform_init(ticks_t vm_start_time,
                   OSThread *os_thread);
 /**
  * 销毁函数 将缓冲区输出
  */
-extern void  posei_destroy();
-#endif // POSEI_MAIN_INIT_HPP
+extern void  platform_destroy();
+#endif // PLATFORM_MAIN_INIT_HPP

@@ -2,7 +2,7 @@
 #define POSEI_OS_HPP
 #include "typedef.hpp"
 #include "platform/mem/AllStatic.hpp"
-#include "platform/main/flag.hpp"
+#include "platform/main/global.hpp"
 
 class OSThread;
 
