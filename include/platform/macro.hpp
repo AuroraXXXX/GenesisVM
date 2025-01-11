@@ -2,8 +2,8 @@
 // Created by aurora on 2023/12/27.
 //
 
-#ifndef POSEI_MACRO_HPP
-#define POSEI_MACRO_HPP
+#ifndef PLATFORM_MACRO_HPP
+#define PLATFORM_MACRO_HPP
 /**
  * 这样的设计 用于加速代码的执行 和兼顾开发的效率
  * BUILD_TYPE_TRACE 宏 用于开启debug级别的信息输出
@@ -77,5 +77,9 @@ inline bool is_clamp(T value, T min, T max) {
 #define UINT_FORMAT "%u"
 #define UINTX_FORMAT "%lu"
 #define INTX_FORMAT "%ld"
-
-#endif //POSEI_MACRO_HPP
+/**
+ * 获取
+ */
+#define caller_address ((void *)__builtin_return_address (0))
+#define ALWAYS_NOT_INLINE __attribute__((noinline))
+#endif //PLATFORM_MACRO_HPP

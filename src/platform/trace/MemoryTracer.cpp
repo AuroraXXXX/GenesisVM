@@ -5,8 +5,8 @@
 #include "MemoryTracer.hpp"
 #include "SummaryMemory.hpp"
 #include "DetailLogMemory.hpp"
-#include "posei/init/flag.hpp"
-#include "posei/utils/robust.hpp"
+#include "platform/main/global.hpp"
+#include "platform/utils/robust.hpp"
 
 MemoryTracer::NMT_Level MemoryTracer::_nmt_level = NMT_Level::unknown;
 
@@ -14,7 +14,7 @@ void MemoryTracer::record(MEMFLAG F,
                           MemoryTracer::OperationType type,
                           void *addr,
                           size_t bytes,
-                          const NativeCallStack &call_stack) {
+                          void * call_stack) {
     switch (MemoryTracer::_nmt_level) {
         case NMT_Level::unknown:
         case NMT_Level::off:

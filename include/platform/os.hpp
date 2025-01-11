@@ -1,13 +1,13 @@
 #ifndef POSEI_OS_HPP
 #define POSEI_OS_HPP
 #include "typedef.hpp"
-#include "platform/mem/AllStatic.hpp"
+#include "platform/allocation.hpp"
 #include "platform/main/global.hpp"
 
 class OSThread;
 
 class os : public AllStatic {
-    friend void posei_init(ticks_t vm_start_time,
+    friend void platform_init(ticks_t vm_start_time,
                            OSThread *os_thread);
 
 private:

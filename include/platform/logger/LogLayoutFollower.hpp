@@ -9,7 +9,7 @@
 #include "platform/logger/LogLayout.hpp"
 #include "platform/macro.hpp"
 class LogTagSet;
-enum class LogLevel;
+enum class LogLevel:uint8_t ;
 /**
  * 日志布局跟随器
  *

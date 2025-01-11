@@ -2,11 +2,9 @@
 // Created by aurora on 2024/6/25.
 //
 #include "SummaryMemory.hpp"
-#include "plat/utils/OrderAccess.hpp"
 #include <malloc.h>
-#include "plat/utils/robust.hpp"
-#include "plat/stream/OStream.hpp"
-#include "plat/mem/allocation.hpp"
+#include "platform/utils/robust.hpp"
+#include "platform/stream/OStream.hpp"
 
 SummaryMemory::Unit SummaryMemory::_unit[];
 
@@ -18,36 +16,36 @@ void SummaryMemory::summary(MEMFLAG F,
     const auto unit = SummaryMemory::_unit + (int32_t)F;
     switch (type) {
         case MemoryTracer::OperationType::reserve:
-            OrderAccess::fetch_and_add(&unit->_virtual_reserved, bytes);
+            unit->_virtual_reserved += bytes;
             break;
         case MemoryTracer::OperationType::commit:
-            OrderAccess::fetch_and_add(&unit->_virtual_committed, bytes);
+            unit->_virtual_committed += bytes;
             break;
         case MemoryTracer::OperationType::uncommit:
-            OrderAccess::fetch_and_sub(&unit->_virtual_committed, bytes);
+            unit->_virtual_committed -= bytes;
             break;
         case MemoryTracer::OperationType::release:
-            OrderAccess::fetch_and_sub(&unit->_virtual_reserved, bytes);
+            unit->_virtual_reserved -= bytes;
             break;
 
         case MemoryTracer::OperationType::native_alloc:
-            OrderAccess::fetch_and_add(&unit->_native_alloc, bytes);
-            OrderAccess::fetch_and_add<size_t>(&unit->_native_count, 1);
+            unit->_native_alloc += bytes;
+            unit->_native_count += 1;
             break;
 
         case MemoryTracer::OperationType::native_free:
-            OrderAccess::fetch_and_sub(&unit->_native_alloc, bytes);
-            OrderAccess::fetch_and_sub<size_t>(&unit->_native_count, 1);
+            unit->_native_alloc -= bytes;
+            unit->_native_count -= 1;
             break;
 
         case MemoryTracer::OperationType::arena_alloc:
-            OrderAccess::fetch_and_add(&unit->_arena_alloc, bytes);
-            OrderAccess::fetch_and_add<size_t>(&unit->_arena_count, 1);
+            unit->_arena_alloc += bytes;
+            unit->_arena_count += 1;
             break;
 
         case MemoryTracer::OperationType::arena_free:
-            OrderAccess::fetch_and_add(&unit->_arena_alloc, bytes);
-            OrderAccess::fetch_and_add<size_t>(&unit->_arena_count, 1);
+            unit->_arena_alloc -= bytes;
+            unit->_arena_count -= 1;
             break;
         case MemoryTracer::OperationType::max:
             should_not_reach_here();

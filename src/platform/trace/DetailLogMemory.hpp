@@ -5,25 +5,28 @@
 #ifndef PLAT_TRACE_DETAIL_LOG_MEMORY_HPP
 #define PLAT_TRACE_DETAIL_LOG_MEMORY_HPP
 
-#include "stdtype.hpp"
-#include "posei/utils/NativeCallStack.hpp"
+#include "platform/typedef.hpp"
 #include "MemoryTracer.hpp"
-#include "posei/allocation.hpp"
+#include "platform/allocation.hpp"
+#include <atomic>
 class OStream;
 
 class DetailLogMemory {
 private:
-    struct Unit {
+    struct LogUnit {
         uint8_t _memory_tag;
         uint8_t _operation_type;
         uint16_t _order_id;
         uint32_t _thread_id;
         uintptr_t _addr;
         size_t _bytes;
-        uintptr_t _caller[NativeCallStack::MAX_DEPTH];
+        uintptr_t _caller;
     };
     static OStream *_stream;
-    static volatile uint16_t _next_order_id;
+    /**
+     * 获取 内存记录顺序
+     */
+    static std::atomic<uint16_t> _next_order_id;
 public:
     static inline auto stream() {
         return _stream;
@@ -45,7 +48,7 @@ public:
                            MemoryTracer::OperationType type,
                            void *addr,
                            size_t bytes,
-                           const NativeCallStack &call_stack);
+                           void * call_stack);
 
     static void flush();
 };

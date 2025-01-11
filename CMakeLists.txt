@@ -27,9 +27,7 @@ if (${TEST})
     add_library(${PROJECT_NAME} INTERFACE)
 else ()
     message('TEST CLOSED')
-    add_executable(${PROJECT_NAME}
-            src/platform/utils/robust.cpp
-            include/platform/typedef.hpp)
+    add_executable(${PROJECT_NAME})
 endif ()
 # 添加子模块
 add_subdirectory(src)

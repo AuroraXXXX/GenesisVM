@@ -5,9 +5,9 @@
 #ifndef PLATFORM_OSTREAM_HPP
 #define PLATFORM_OSTREAM_HPP
 
-#include "platform/typedef.hpp"
+#include "platform/constants.hpp"
 #include <endian.h>
-
+#include <concepts>
 /**
  * 写出到输出流 并自动转换成网络字节序
  */
@@ -106,6 +106,18 @@ public:
         this->write_bytes(&value, sizeof(value));
     };
 
+    template<std::integral T> requires( sizeof(T) <= BytesPerWord)
+  inline   static T  to_network(T  value){
+        if constexpr (sizeof(T) == sizeof(uint8_t)){
+            return  value;
+        }else if constexpr (sizeof(T) == sizeof(uint16_t)){
+            return htobe16(value);
+        }else if constexpr (sizeof(T) == sizeof(uint32_t)){
+            return htobe32(value);
+        } else{
+            return htobe64(value);
+        }
+    }
     /**
      * 外界包括子类写入数据，实际上需要调用这个函数
      * 因为这个函数 会修改统计

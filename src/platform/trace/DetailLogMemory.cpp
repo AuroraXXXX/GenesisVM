@@ -3,13 +3,12 @@
 //
 
 #include "DetailLogMemory.hpp"
-#include "plat/os/cpu.hpp"
-#include "plat/stream/FileCharOStream.hpp"
-#include "plat/utils/ByteOrder.hpp"
-#include "plat/utils/robust.hpp"
-#include "global/flag.hpp"
+#include "platform/os.hpp"
+#include "platform/stream/FileCharOStream.hpp"
+#include "platform/utils/robust.hpp"
+#include "platform/main/global.hpp"
 
-volatile uint16_t DetailLogMemory::_next_order_id = 0;
+std::atomic<uint16_t> DetailLogMemory::_next_order_id = 0;
 OStream* DetailLogMemory::_stream = nullptr;
 void DetailLogMemory::global_initialize() {
     static FileCharOStream stream(global::NMTFilePath);
@@ -24,24 +23,19 @@ void DetailLogMemory::detail_log(MEMFLAG F,
                                  MemoryTracer::OperationType type,
                                  void *addr,
                                  size_t bytes,
-                                 const NativeCallStack &call_stack) {
-    Unit detail;
+                                 void *call_stack) {
+    LogUnit detail;
     detail._memory_tag = (int32_t)F;
     detail._operation_type = (uint8_t) type;
     const auto order_id = DetailLogMemory::_next_order_id.fetch_add(1);
-    detail._order_id = ByteOrder::network(order_id);
-    detail._thread_id = ByteOrder::network(os::current_thread_id());
-    detail._addr = ByteOrder::network((uintptr_t)addr);
-    detail._bytes = ByteOrder::network(bytes);
-    if(!call_stack.is_empty()){
-        void** bottom =  (void **)call_stack.stack();
-        for (int32_t i = 0; i < NativeCallStack::MAX_DEPTH; ++i) {
-           detail._caller[i] = ByteOrder::network((uintptr_t)bottom[i]);
-        }
-    }
+    detail._order_id = OStream::to_network(order_id);
+    detail._thread_id = OStream::to_network(os::current_thread_id());
+    detail._addr = OStream::to_network((uintptr_t)addr);
+    detail._bytes = OStream::to_network(bytes);
+    detail._addr = OStream::to_network<uintptr_t>((uintptr_t)call_stack);
     const auto stream = DetailLogMemory::_stream;
     stream->lock();
-    stream->write_bytes(&detail, sizeof(Unit));
+    stream->write_bytes(&detail, sizeof(LogUnit));
     stream->unlock();
 }
 

@@ -5,9 +5,8 @@
 #ifndef PLAT_MEMORY_TRACER_HPP
 #define PLAT_MEMORY_TRACER_HPP
 
-#include "stdtype.hpp"
-#include "plat/utils/NativeCallStack.hpp"
-#include "plat/mem/allocation.hpp"
+#include "platform/typedef.hpp"
+#include "platform/allocation.hpp"
 
 class MemoryTracer {
 public:
@@ -43,7 +42,7 @@ public:
                        MemoryTracer::OperationType type,
                        void *addr,
                        size_t bytes,
-                       const NativeCallStack &call_stack);
+                       void* call_stack);
 
     static void initialize();
 

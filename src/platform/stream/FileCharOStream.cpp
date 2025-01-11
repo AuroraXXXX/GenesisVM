@@ -2,7 +2,7 @@
 // Created by aurora on 2023/11/25.
 //
 
-#include "posei/stream/FileCharOStream.hpp"
+#include "platform/stream/FileCharOStream.hpp"
 #include <cstdio>
 
 FileCharOStream FileCharOStream::_err_stream(stderr);

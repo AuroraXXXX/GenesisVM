@@ -2,10 +2,10 @@
 // Created by aurora on 2023/10/21.
 //
 
-#include "posei/thread/Mutex.hpp"
-#include "posei/thread/OSThread.hpp"
-#include "posei/thread/ThreadStatusTrans.hpp"
-#include "posei/stream/CharOStream.hpp"
+#include "platform/thread/Mutex.hpp"
+#include "platform/thread/OSThread.hpp"
+#include "platform/thread/ThreadStatusTrans.hpp"
+#include "platform/stream/CharOStream.hpp"
 Mutex::Mutex(
         const char *name,
         bool recursive) noexcept:

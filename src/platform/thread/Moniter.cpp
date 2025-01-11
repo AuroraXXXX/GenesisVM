@@ -2,11 +2,11 @@
 // Created by aurora on 2023/10/21.
 //
 
-#include "posei/thread/Monitor.hpp"
+#include "platform/thread/Monitor.hpp"
 #include <ctime>
-#include "posei/constants.hpp"
-#include "posei/thread/ThreadStatusTrans.hpp"
-#include "posei/thread/OSThread.hpp"
+#include "platform/constants.hpp"
+#include "platform/thread/ThreadStatusTrans.hpp"
+#include "platform/thread/OSThread.hpp"
 #include <atomic>
 OSReturn Monitor::wait(ticks_t millis) {
     if (millis == 0) {

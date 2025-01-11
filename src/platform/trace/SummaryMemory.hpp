@@ -5,19 +5,20 @@
 #ifndef PLAT_SUMMARY_MEMORY_HPP
 #define PLAT_SUMMARY_MEMORY_HPP
 
-#include "stdtype.hpp"
+#include "platform/typedef.hpp"
 #include "MemoryTracer.hpp"
-#include "plat/mem/allocation.hpp"
+#include "platform/allocation.hpp"
+#include <atomic>
 class OStream;
 class SummaryMemory {
 private:
     struct Unit {
-        volatile size_t _virtual_reserved;
-        volatile size_t _virtual_committed;
-        volatile size_t _native_alloc;
-        volatile size_t _native_count;
-        volatile size_t _arena_alloc;
-        volatile size_t _arena_count;
+        std::atomic<size_t> _virtual_reserved;
+        std::atomic<size_t>_virtual_committed;
+        std::atomic<size_t>_native_alloc;
+        std::atomic<size_t> _native_count;
+        std::atomic<size_t> _arena_alloc;
+        std::atomic<size_t> _arena_count;
         explicit Unit()noexcept;
     };
     constexpr static inline auto max_tag = (int32_t)(MEMFLAG::num_of_type);

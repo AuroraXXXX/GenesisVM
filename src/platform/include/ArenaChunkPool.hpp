@@ -5,8 +5,8 @@
 #ifndef PLAT_ARENA_CHUNK_POOL_HPP
 #define PLAT_ARENA_CHUNK_POOL_HPP
 
-#include "plat/mem/allocation.hpp"
-#include "plat/utils/robust.hpp"
+#include "platform/allocation.hpp"
+#include "platform/utils/robust.hpp"
 
 class ArenaChunk;
 
