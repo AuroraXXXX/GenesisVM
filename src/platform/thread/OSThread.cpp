@@ -2,10 +2,10 @@
 // Created by aurora on 2022/12/5.
 //
 
-#include "posei/thread/OSThread.hpp"
-#include "posei/utils/robust.hpp"
-#include "posei/stream/CharOStream.hpp"
-#include "posei/os.hpp"
+#include "platform/thread/OSThread.hpp"
+#include "platform/utils/robust.hpp"
+#include "platform/stream/CharOStream.hpp"
+#include "platform/os.hpp"
 #include <pthread.h>
 
 thread_local OSThread *OSThread::_current = nullptr;

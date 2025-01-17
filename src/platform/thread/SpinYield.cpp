@@ -1,10 +1,10 @@
 // Created by aurora on 2023/1/22.
 //
 
-#include "posei/thread/SpinYield.hpp"
-#include "posei/os.hpp"
-#include "posei/stream/CharOStream.hpp"
-#include "posei/utils/robust.hpp"
+#include "platform/thread/SpinYield.hpp"
+#include "platform/os.hpp"
+#include "platform/stream/CharOStream.hpp"
+#include "platform/utils/robust.hpp"
 #include <sched.h>
 #include <ctime>
 

@@ -2,10 +2,10 @@
 // Created by aurora on 2023/1/13.
 //
 
-#include "posei/thread/WaitBarrier.hpp"
-#include "posei/thread/ThreadStatusTrans.hpp"
-#include "posei/utils/robust.hpp"
-#include "posei/os.hpp"
+#include "platform/thread/WaitBarrier.hpp"
+#include "platform/thread/ThreadStatusTrans.hpp"
+#include "platform/utils/robust.hpp"
+#include "platform/os.hpp"
 WaitBarrier::~WaitBarrier() {
     assert(this->_futex_barrier == 0, "存在线程未唤醒");
 }

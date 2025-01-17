@@ -105,7 +105,7 @@ void *os::reserve_memory(MEMFLAG F, size_t bytes, int32_t fd)
                              MemoryTracer::OperationType::reserve,
                              ptr,
                              bytes,
-                             CALLER_STACK);
+                             caller_address);
     }
     return ptr;
 }
@@ -133,7 +133,7 @@ void *os::reserve_memory_aligned(MEMFLAG F, size_t bytes, size_t align, int32_t 
         // failed
         return nullptr;
     }
-
+    char * aligned_base =(char*) extra_base;
     if(need_chip){
         /**
          * 对于多余的内存块应该进行切割下去 即使
@@ -141,7 +141,7 @@ void *os::reserve_memory_aligned(MEMFLAG F, size_t bytes, size_t align, int32_t 
          * ^    ^ aligned_base        ^ aligned_base + size
          * extra_base                       ^extra_base + extra_size
          */
-        const auto aligned_base = (char *)align_up<size_t>((size_t)extra_base, align);
+        aligned_base = (char *)align_up<size_t>((size_t)extra_base, align);
         assert(is_aligned((size_t)aligned_base, align), "check");
         auto begin_offset = aligned_base - (char *)extra_base;
         auto end_offset = ((char *)extra_base + extra_size) - (aligned_base + bytes);
@@ -158,7 +158,7 @@ void *os::reserve_memory_aligned(MEMFLAG F, size_t bytes, size_t align, int32_t 
                              MemoryTracer::OperationType::reserve,
                              aligned_base,
                              bytes,
-                             CALLER_STACK);
+                             caller_address);
     return aligned_base;
 }
 
@@ -168,8 +168,8 @@ void *os::reserve_memory_aligned(MEMFLAG F, size_t bytes, size_t align, int32_t 
 void *reserve_memory_at(MEMFLAG F, void *addr, size_t bytes, int32_t fd, bool force)
 {
     assert(addr != nullptr, "addr is not allow null");
-    assert_is_aligned(bytes, page_size());
-    assert_is_aligned((size_t)addr, page_size());
+    assert_is_aligned(bytes, os::page_size());
+    assert_is_aligned((size_t)addr, os::page_size());
     auto real_addr = memory_mmap(addr, bytes, fd, true);
     if (force && real_addr != addr)
     {
@@ -182,7 +182,7 @@ void *reserve_memory_at(MEMFLAG F, void *addr, size_t bytes, int32_t fd, bool fo
                          MemoryTracer::OperationType::reserve,
                          real_addr,
                          bytes,
-                         CALLER_STACK);
+                         caller_address);
     }
     return real_addr;
 }
@@ -198,7 +198,7 @@ bool os::release_memory(MEMFLAG F, void *addr, size_t bytes)
                              MemoryTracer::OperationType::release,
                              addr,
                              bytes,
-                             CALLER_STACK);
+                             caller_address);
     }
     return success;
 }
@@ -232,7 +232,7 @@ bool os::commit_memory(MEMFLAG F, void *addr, size_t bytes, CommitType type)
                              MemoryTracer::OperationType::commit,
                              addr,
                              bytes,
-                             CALLER_STACK);
+                             caller_address);
     }
     return success;
 }
@@ -253,7 +253,7 @@ bool os::uncommit_memory(MEMFLAG F, void *addr, size_t bytes)
                              MemoryTracer::OperationType::uncommit,
                              addr,
                              bytes,
-                             CALLER_STACK);
+                             caller_address);
     }
     return success;
 }

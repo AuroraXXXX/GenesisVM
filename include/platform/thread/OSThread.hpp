@@ -5,11 +5,11 @@
 #ifndef PLATFORM_OS_THREAD_HPP
 #define PLATFORM_OS_THREAD_HPP
 
-#include "posei/constants.hpp"
+#include "platform/constants.hpp"
 #include <atomic>
-#include "posei/utils/robust.hpp"
-#include "posei/mem/Arena.hpp"
-#include "posei/os.hpp"
+#include "platform/utils/robust.hpp"
+#include "platform/mem/Arena.hpp"
+#include "platform/os.hpp"
 
 /**
  * NAME 表示线程的一个状态
@@ -43,7 +43,6 @@ private:
     typedef unsigned long thread_id_t;
 
     friend bool os::create_thread(OSThread *thread, bool detach);
-    friend class PlatInitialize;
     /**
      * pthread库调用OSTread中的函数，进行触发OSThread中的run函数
      * @param thread

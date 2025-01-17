@@ -8,12 +8,11 @@
 #include <linux/futex.h>
 #include <cerrno>
 #include <sys/resource.h>
-#include "posei/os.hpp"
-#include "posei/utils/robust.hpp"
-#include "posei/thread/OSThread.hpp"
-#include "posei/constants.hpp"
-#include "posei/utils/OrderAccess.hpp"
-#include "posei/init/flag.hpp"
+#include "platform/os.hpp"
+#include "platform/utils/robust.hpp"
+#include "platform/thread/OSThread.hpp"
+#include "platform/constants.hpp"
+#include "platform/main/global.hpp"
 
 int16_t LANG_TO_OS_PRIO[posei::TotalPriority] = {
             19,             //从不使用

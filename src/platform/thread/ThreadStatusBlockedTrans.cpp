@@ -1,8 +1,8 @@
 //
 // Created by aurora on 2024/6/28.
 //
-#include "posei/thread/ThreadStatusTrans.hpp"
-#include "posei/thread/OSThread.hpp"
+#include "platform/thread/ThreadStatusTrans.hpp"
+#include "platform/thread/OSThread.hpp"
 
 ThreadStatusBlockedTrans::ThreadStatusBlockedTrans() {
     this->_self = OSThread::current();
@@ -12,7 +12,6 @@ ThreadStatusBlockedTrans::ThreadStatusBlockedTrans() {
 }
 
 ThreadStatusBlockedTrans::~ThreadStatusBlockedTrans() {
-
     assert(this->_self->state() == OSThread::STATE_BLOCKED, "check");
     this->_self->tans_state(OSThread::STATE_RUNNING);
 }

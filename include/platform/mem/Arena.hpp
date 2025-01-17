@@ -5,7 +5,8 @@
 #ifndef PLATFORM_ARENA_HPP
 #define PLATFORM_ARENA_HPP
 
-#include "posei/allocation.hpp"
+#include "platform/allocation.hpp"
+#include "platform/utils/SingleLinkedList.hpp"
 class ArenaChunk;
 
 /**
@@ -27,8 +28,7 @@ private:
      * 分别指向Chunk组成的链表头部和尾部
      * 新添加的内存块会放入到链表的尾部
      */
-    ArenaChunk *_head;
-    ArenaChunk *_tail;
+    SingleLinkedList<ArenaChunk> _list;
     /**
      * 在_hwm 到 _max之间的内存是 是没有被分配出去的
      */
@@ -59,7 +59,7 @@ private:
      * @param chunk
      * @return 删除的长度
      */
-    size_t chop_list(ArenaChunk *chunk) const;
+    [[nodiscard]] size_t chop_list(ArenaChunk* chunk) const;
 
 public:
     class ChunkClosure {
@@ -92,7 +92,7 @@ public:
      */
     void iter_chunk(ChunkClosure *closure);
 
-    [[nodiscard]] inline MEMFLAG flag() const { return _flag; };
+    [[nodiscard]] inline MEMFLAG flag()const { return _flag; };
 
     /**
      *

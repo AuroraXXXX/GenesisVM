@@ -156,6 +156,7 @@ inline constexpr T align_down_bounded(T size, size_t align) {
     return (aligned_size > 0) ? aligned_size : (T) align;
 }
 
+#define assert_is_aligned(bytes,align) assert(is_aligned(bytes,align),"is not aligned")
 
 
 #endif //PLATFORM_ALIGN_HPP

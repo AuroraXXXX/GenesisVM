@@ -2,57 +2,41 @@
 // Created by aurora on 2022/4/12.
 //
 
-#include "plat/mem/Arena.hpp"
-#include "plat/constants.hpp"
+#include "platform/mem/Arena.hpp"
+#include "platform/constants.hpp"
 #include "ArenaChunk.hpp"
 #include "MemoryTracer.hpp"
 #include "ArenaChunkPool.hpp"
-#include "plat/utils/robust.hpp"
-#include "plat/utils/align.hpp"
+#include "platform/utils/align.hpp"
 void Arena::new_chunk(size_t chunk_bytes,
                       bool exit_oom) {
     assert_is_aligned(chunk_bytes, BytesPerWord);
     auto chunk = new(chunk_bytes, exit_oom)
             ArenaChunk(chunk_bytes);
-    if (chunk == nullptr) {
-        //申请失败 返回
-        return;
-    }
     MemoryTracer::record( this->flag(),
                          MemoryTracer::OperationType::arena_alloc,
                          chunk,
                          chunk_bytes,
-                         CALLER_STACK);
+                         caller_address);
     this->_total_bytes += chunk_bytes;
     this->_top_literal = chunk->bottom_literal();
     this->_end_literal = chunk->end_literal();
-    if (this->_head == nullptr) {
-        assert(this->_tail == nullptr, "check");
-        this->_tail = this->_head = chunk;
-    } else {
-        //插入到尾部
-        chunk->set_next(this->_tail);
-        this->_tail = chunk;
-    }
-
+    this->_list.add_to_tail(chunk);
 }
 
-size_t Arena::chop_list(ArenaChunk *chunk) const {
-    ArenaChunk *cur = chunk;
-    ArenaChunk *next;
+size_t Arena:: chop_list(ArenaChunk* chunk) const {
     size_t total_free_bytes = 0;
-    while (cur != nullptr) {
+    auto free_func = [&](ArenaChunk* chunk,size_t index)  {
+        total_free_bytes += chunk->length();
         MemoryTracer::record( this->flag(),
-                             MemoryTracer::OperationType::arena_free,
-                             cur,
-                             cur->length(),
-                             CALLER_STACK);
-        next = cur->next();
-        total_free_bytes += cur->length();
-        delete cur;
-        //删除后原本的cur就不可以访问了
-        cur = next;
-    }
+                              MemoryTracer::OperationType::arena_free,
+                              chunk,
+                              chunk->length(),
+                              caller_address);
+        delete chunk;
+        return true;
+    };
+    SingleLinkedList<ArenaChunk>::iter(chunk,free_func);
     return total_free_bytes;
 }
 
@@ -61,8 +45,7 @@ Arena::Arena(MEMFLAG flag, size_t init_bytes) :
         _flag(flag),
         _top_literal(0),
         _end_literal(0),
-        _head(nullptr),
-        _tail(nullptr),
+        _list(),
         _total_bytes(0) {
     //对可使用的长度 进行对齐 应该机器最大的对宽度对齐
     init_bytes = align_up(init_bytes, BytesPerWord);
@@ -125,13 +108,12 @@ bool Arena::free(void *ptr, size_t request) {
 }
 
 Arena::~Arena() {
-    this->_total_bytes = this->chop_list(this->_head);
+    this->_total_bytes = this->chop_list();
     assert(this->_total_bytes == 0, "must be");
     /**
      * 将所持有的数据信息全部清空
      */
-    this->_head = nullptr;
-    this->_tail = nullptr;
+    this->_list.clear();
     this->_top_literal = 0;
     this->_end_literal = 0;
 }
@@ -163,7 +145,7 @@ void Arena::clean_pool() {
 
 
 Arena::SavedData::SavedData(Arena *arena) :
-        _tail(arena->_tail),
+        _tail(arena->_list.tail()),
         _total_bytes(arena->_total_bytes),
         _end_literal(arena->_end_literal),
         _top_literal(arena->_top_literal) {
@@ -174,7 +156,7 @@ void Arena::SavedData::rollback_to(Arena *arena) {
     assert(arena != nullptr, "must be");
     arena->_top_literal = this->_top_literal;
     arena->_end_literal = this->_end_literal;
-    arena->_tail = this->_tail;
+    arena->_list.set_tail(this->_tail);
     arena->_total_bytes = this->_total_bytes;
     this->_tail->set_next(nullptr);
     auto delete_node = this->_tail->next();

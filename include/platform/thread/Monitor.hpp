@@ -7,6 +7,7 @@
 
 #include "Mutex.hpp"
 #include "platform/constants.hpp"
+#include "platform/utils/robust.hpp"
 /**
  * 支持语言层面的Object的唤醒和等待
  */

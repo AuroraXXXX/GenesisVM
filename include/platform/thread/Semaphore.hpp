@@ -6,9 +6,9 @@
 #define PLATFORM_SEMAPHORE_HPP
 
 #include "semaphore.h"
-#include "posei/allocation.hpp"
-#include "posei/constants.hpp"
-#include "posei/macro.hpp"
+#include "platform/allocation.hpp"
+#include "platform/constants.hpp"
+#include "platform/macro.hpp"
 
 
 class Semaphore : public CHeapObject<MEMFLAG::Internal> {

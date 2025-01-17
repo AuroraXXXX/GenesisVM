@@ -5,7 +5,7 @@
 #ifndef PLAT_THREAD_STATUS_TRANS_HPP
 #define PLAT_THREAD_STATUS_TRANS_HPP
 
-#include "posei/allocation.hpp"
+#include "platform/allocation.hpp"
 class OSThread;
 class ThreadStatusBlockedTrans : public StackObject {
 private:

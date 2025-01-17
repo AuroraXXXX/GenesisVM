@@ -6,6 +6,7 @@
 #include "platform/thread/OSThread.hpp"
 #include "platform/thread/ThreadStatusTrans.hpp"
 #include "platform/stream/CharOStream.hpp"
+#include "platform/utils/robust.hpp"
 Mutex::Mutex(
         const char *name,
         bool recursive) noexcept:

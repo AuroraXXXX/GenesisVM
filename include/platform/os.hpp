@@ -102,7 +102,7 @@ private:
      * @param tag 标志 当此值等于uaddr,则进入睡眠
      * @param nsec 超时等待多少ns 0 表示无限期等待
      */
-    void suspend(const int *uaddr, int tag, uint64_t nsec = 0);
+    static void suspend(const int *uaddr, int tag, uint64_t nsec = 0);
 
     /**
      * 唤醒等待在uaddr上的num个线程线程
@@ -110,7 +110,7 @@ private:
      * @param num 线程的数量(如果大于实际等待的线程数量，则唤醒全部线程)
      * @return 返回实际被唤醒的线程数
      */
-    int wakeup(int *uaddr, int num);
+    static int wakeup(int *uaddr, int num);
 
 public:
     /**
@@ -207,7 +207,9 @@ public:
      * @param fd 映射到的文件描述符，-1表示匿名映射
      * @return 保留空间的首地址
      */
-    static void *reserve_memory(MEMFLAG F, size_t bytes, int32_t fd = -1);
+    static void *reserve_memory(MEMFLAG F,
+                                size_t bytes,
+                                int32_t fd = -1);
 
     /**
      * 保留虚拟地址空间

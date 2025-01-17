@@ -11,3 +11,15 @@ void report_vm_error(
         ...){
 
 }
+
+
+ void report_vm_out_of_memory(
+        const char *filename,
+        int lineno,
+        size_t required_bytes,
+        VMErrorType type,
+        const char *msg,
+        ...
+){
+
+}
