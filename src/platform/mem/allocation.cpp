@@ -46,7 +46,7 @@ extern void *CHEAP_ALLOC(MEMFLAG F,
                          MemoryTracer::OperationType::native_alloc,
                          p,
                          size,
-                         CALLER_STACK);
+                         caller_address);
 
     return p;
 }
@@ -77,7 +77,7 @@ extern void *CHEAP_ALLOC_ALIGN(
                          MemoryTracer::OperationType::native_alloc,
                          value,
                          bytes,
-                         CALLER_STACK);
+                          caller_address);
     return value;
 }
 
@@ -87,7 +87,7 @@ extern void CHEAP_FREE(MEMFLAG F, void *p) {
                          MemoryTracer::OperationType::native_free,
                          p,
                          size,
-                         CALLER_STACK);
+                         caller_address);
     ::free(p);
 }
 

@@ -90,9 +90,6 @@ void *OSThread::native_call(void *params) {
     osThread->_kernel_id = os::current_thread_id();
     osThread->_plib_id = ::pthread_self();
 
-//    OrderAccess::store<OSThread *>(&OSThread::_current, osThread);
-//    OrderAccess::store(&osThread->_plib_id, ::pthread_self());
-//    OrderAccess::store(&osThread->_kernel_id, os::current_thread_id());
     osThread->tans_state(OSThread::STATE_RUNNING);
     std::atomic_thread_fence(std::memory_order::seq_cst);
     osThread->pre_run();

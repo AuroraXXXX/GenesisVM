@@ -26,7 +26,7 @@ private:
     const MEMFLAG _flag;
     /**
      * 分别指向Chunk组成的链表头部和尾部
-     * 新添加的内存块会放入到链表的尾部
+     * 新添加的内存块会放入到链表的头部
      */
     SingleLinkedList<ArenaChunk> _list;
     /**
@@ -62,6 +62,9 @@ private:
     [[nodiscard]] size_t chop_list(ArenaChunk* chunk) const;
 
 public:
+    /**
+     * 用于遍历Chunk中的内存
+     */
     class ChunkClosure {
     public:
         /**
@@ -71,10 +74,11 @@ public:
          */
         virtual void do_chunk(void *base, void *top) = 0;
     };
-
+    /**
+     * 用于保存数据
+     */
     class SavedData {
         friend class Arena;
-
     private:
         ArenaChunk *_tail;
         uintptr_t _top_literal;

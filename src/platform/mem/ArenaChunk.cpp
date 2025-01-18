@@ -4,7 +4,8 @@
 
 #include "ArenaChunk.hpp"
 #include "ArenaChunkPool.hpp"
-#include "plat/utils/align.hpp"
+#include "platform/utils/align.hpp"
+
 void *ArenaChunk::operator new(size_t size, size_t len, bool exit_oom) {
     assert(size == sizeof(ArenaChunk), "weird request size");
     // Try to reuse a freed chunk from the pool

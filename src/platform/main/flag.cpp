@@ -1,7 +1,7 @@
 //
 // Created by aurora on 2024/6/25.
 //
-#include "platform/init/flag.hpp"
+#include "platform/main/global.hpp"
 
 namespace posei {
 #ifdef DECLARE_PRODUCT_FLAG

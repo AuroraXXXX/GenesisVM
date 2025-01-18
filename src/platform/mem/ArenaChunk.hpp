@@ -5,8 +5,7 @@
 #ifndef PLAT_ARENA_CHUNK_HPP
 #define PLAT_ARENA_CHUNK_HPP
 
-#include "plat/constants.hpp"
-#include "plat/mem/allocation.hpp"
+#include "platform/constants.hpp"
 
 /**
  * 快速内存的内存块

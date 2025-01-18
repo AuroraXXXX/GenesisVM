@@ -40,6 +40,7 @@ public:
         THREAD_STATE_DECL(BLOCKED)    // 线程对象已经被阻塞 停止运行了
     };
 private:
+    friend void platform_init(ticks_t vm_start_time,OSThread *os_thread);
     typedef unsigned long thread_id_t;
 
     friend bool os::create_thread(OSThread *thread, bool detach);
@@ -70,12 +71,14 @@ private:
      * 10 最高
      */
     int8_t _priority;
+    /**
+     * OS内核线程的ID
+     */
     int32_t _kernel_id;
     /**
      * 线程库中的线程ID
      */
     thread_id_t _plib_id;
-
 
     /**
      * 内部的资源区域

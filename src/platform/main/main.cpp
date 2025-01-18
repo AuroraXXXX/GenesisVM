@@ -1,7 +1,7 @@
 //
 // Created by aurora on 2024/6/29.
 //
-#include "platform/init/main.hpp"
+#include "platform/main/init.hpp"
 #include "platform/os.hpp"
 #include "MemoryTracer.hpp"
 #include "ArenaChunkPool.hpp"
