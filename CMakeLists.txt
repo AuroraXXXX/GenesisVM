@@ -24,6 +24,7 @@ include_directories(include)
 option(TEST "是否开启测试" ON)
 if (${TEST})
     message('TEST OPEN')
+    # 创建一个接口库 用于进行测试 用例进行链接
     add_library(${PROJECT_NAME} INTERFACE)
 else ()
     message('TEST CLOSED')

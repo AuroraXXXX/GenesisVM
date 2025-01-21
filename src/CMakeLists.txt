@@ -10,8 +10,9 @@ endfunction()
 
 
 
-
+# 关于 PLATFORM 模块的配置
 include_directories(platform/include)
 
 generate_dynamic_lib(platform)
+
 #generate_dynamic_lib(metaspace)

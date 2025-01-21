@@ -5,8 +5,8 @@
 #ifndef VMACHINE_WAITBARRIER_HPP
 #define VMACHINE_WAITBARRIER_HPP
 
-#include "posei/allocation.hpp"
-#include "posei/macro.hpp"
+#include "platform/allocation.hpp"
+#include "platform/macro.hpp"
 /**
  * 线程栅栏
  * 内部使用futex

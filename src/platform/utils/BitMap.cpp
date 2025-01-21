@@ -2,11 +2,10 @@
 // Created by aurora on 2023/9/19.
 //
 
-#include "kernel/utils/BitMap.hpp"
+#include "platform/utils/BitMap.hpp"
 #include <cstring>
-#include "plat/stream/CharOStream.hpp"
-#include "plat/utils/OrderAccess.hpp"
-#include "plat/utils/Bit.hpp"
+#include "platform/stream/CharOStream.hpp"
+#include "platform/utils/robust.hpp"
 
 bool BitMap::at(size_t no) const {
     assert(this->is_within(no), "索引序号错误");
