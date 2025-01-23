@@ -10,7 +10,11 @@
 #include <concepts>
 #include "cstring"
 #include "platform/macro.hpp"
+#include "platform/utils/robust.hpp"
+class BitMapBase{
+protected:
 
+};
 /**
  * 位图
  *
