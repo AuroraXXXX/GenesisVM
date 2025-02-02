@@ -18,15 +18,15 @@ bool BitMap::at(size_t no) const {
 
 size_t BitMap::count_range(size_t beg_no, size_t end_no) const {
     assert(::is_clamp(end_no, beg_no, this->_total_bits), "参数值错误");
-    auto beg_full_word_index = BitMap::word_index_align_up(beg_no);
-    auto end_full_word_index = BitMap::word_index_align_down(end_no);
+    auto beg_full_word_index = BitMap::bm_index_align_down(beg_no);
+    auto end_full_word_index = BitMap::bm_index_align_up(end_no);
     size_t sum = 0;
-
     if (beg_full_word_index < end_full_word_index) {
         //超过1个整个word
-        sum += this->count_range_within_word(beg_no, BitMap::word_index_bit_no(beg_full_word_index));
-        sum += this->count_range_full_word(beg_full_word_index, end_full_word_index);
-        sum += this->count_range_within_word(BitMap::word_index_bit_no(end_full_word_index), end_no);
+        auto value = BitView::mask(true,beg_no) & this->_map[beg_full_word_index ++];
+        sum += std::countl_one(value);
+
+
     } else {
         auto boundary = MIN2(BitMap::word_index_bit_no(beg_full_word_index), end_no);
         sum += this->count_range_within_word(beg_no, boundary);
@@ -37,33 +37,32 @@ size_t BitMap::count_range(size_t beg_no, size_t end_no) const {
 
 void BitMap::set_range(size_t beg_no, size_t end_no) {
     assert(::is_clamp(end_no, beg_no, this->_total_bits), "参数值错误");
-    auto beg_full_word_index = BitMap::word_index_align_up(beg_no);
-    auto end_full_word_index = BitMap::word_index_align_down(end_no);
+    auto beg_full_word_index = BitMap::bm_index_align_down(beg_no);
+    auto end_full_word_index = BitMap::bm_index_align_up(end_no);
     if (beg_full_word_index < end_full_word_index) {
         //超过1个整个word
-        this->set_range_within_word(beg_no, BitMap::word_index_bit_no(beg_full_word_index));
-        this->set_range_full_word(beg_full_word_index, end_full_word_index);
-        this->set_range_within_word(BitMap::word_index_bit_no(end_full_word_index), end_no);
+        this->_map[beg_full_word_index++]  |= BitView::mask(true,beg_no);
+        this->_map[end_full_word_index] |= BitView::mask(false,0,end_no);
+        auto total_bytes = (end_full_word_index - beg_full_word_index) * sizeof(bm_t);
+        ::memset(this->_map+beg_full_word_index,0xFF,total_bytes);
     } else {
-        auto boundary = MIN2(BitMap::word_index_bit_no(beg_full_word_index), end_no);
-        this->set_range_within_word(beg_no, boundary);
-        this->set_range_within_word(boundary, end_no);
+        this->_map [beg_full_word_index] |=  BitView::mask(true,beg_no,end_no);
     }
 }
 
 void BitMap::clear_range(size_t beg_no, size_t end_no) {
     assert(::is_clamp(end_no, beg_no, this->_total_bits), "参数值错误");
-    auto beg_full_word_index = BitMap::word_index_align_up(beg_no);
-    auto end_full_word_index = BitMap::word_index_align_down(end_no);
+    auto beg_full_word_index = BitMap::bm_index_align_down(beg_no);
+    auto end_full_word_index = BitMap::bm_index_align_up(end_no);
     if (beg_full_word_index < end_full_word_index) {
         //超过1个整个word
-        this->clear_range_within_word(beg_no, BitMap::word_index_bit_no(beg_full_word_index));
-        this->clear_range_full_word(beg_full_word_index, end_full_word_index);
-        this->clear_range_within_word(BitMap::word_index_bit_no(end_full_word_index), end_no);
+        this->_map[beg_full_word_index++] &= ~BitView::mask(true,beg_no);
+        this->_map[end_full_word_index] &= ~BitView::mask(false,0,end_no);
+        auto total_bytes = (end_full_word_index - beg_full_word_index) * sizeof(bm_t);
+        ::memset(this->_map + beg_full_word_index,0x00,total_bytes);
     } else {
-        auto boundary = MIN2(BitMap::word_index_bit_no(beg_full_word_index), end_no);
-        this->clear_range_within_word(beg_no, boundary);
-        this->clear_range_within_word(boundary, end_no);
+        //没有超过一个bm_t
+        this->_map[beg_full_word_index] &= ~BitView::mask(true,beg_no,end_no);
     }
 }
 
@@ -155,20 +154,6 @@ size_t BitMap::count_range_full_word(size_t beg_index, size_t end_index) const {
     }
 
     return sum;
-}
-
-void BitMap::set_range_within_word(size_t beg_no, size_t end_no) {
-    assert(::is_clamp(end_no, beg_no, this->total_bits()), "index is out of boundary");
-    if (beg_no != end_no) {
-        *this->word_addr(beg_no) |= BitMap::bit_mask(beg_no, end_no);
-    }
-}
-
-void BitMap::clear_range_within_word(size_t beg_no, size_t end_no) {
-    assert(::is_clamp(end_no, beg_no, this->total_bits()), "index is out of boundary");
-    if (beg_no != end_no) {
-        *this->word_addr(beg_no) &= ~BitMap::bit_mask(beg_no, end_no);
-    }
 }
 
 bool BitMap::par_at(size_t bit_no) const {

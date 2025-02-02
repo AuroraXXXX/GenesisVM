@@ -41,7 +41,7 @@ template<std::integral T>
 inline int log2i(T value) {
     assert(value > T(0), "value must be > 0");
     constexpr int bits = sizeof(value) * BitsPerByte;
-    return bits -std::countl_zero<T>(value) - 1;
+    return bits - std::countl_zero<T>(value) - 1;
 }
 
 /**
@@ -155,7 +155,28 @@ inline constexpr T align_down_bounded(T size, size_t align) {
     auto aligned_size = align_down(size, align);
     return (aligned_size > 0) ? aligned_size : (T) align;
 }
-
+/**
+ * 获取value
+ * @tparam T
+ * @param value
+ * @param align
+ * @return
+ */
+template<std::integral T>
+inline constexpr T offset_align(T value,size_t align){
+    return value & (align - 1);
+}
+/**
+ * 生成 mask
+ * @tparam T
+ * @param width 宽度
+ * @param offset 距离起始的偏移量
+ * @return
+ */
+template<std::integral T>
+inline constexpr T generate_mask(size_t width,size_t offset){
+    return ((T(1) << width ) - 1 ) << offset;
+}
 #define assert_is_aligned(bytes,align) assert(is_aligned(bytes,align),"is not aligned")
 
 

@@ -8,22 +8,88 @@
 #include "platform/constants.hpp"
 #include "platform/allocation.hpp"
 #include <concepts>
+#include <bit>
 #include "cstring"
 #include "platform/macro.hpp"
 #include "platform/utils/robust.hpp"
-class BitMapBase{
+#include "platform/utils/align.hpp"
+#include <atomic>
+
+class BitView {
+public:
+    /**
+     * bit map using type
+     */
+    using bm_t = uint64_t;
+private:
+    /**
+     * bit map type total bits's log2
+     */
+    constexpr inline static auto LOG_BITS_PER_T = LogBitsPerByte * sizeof(bm_t);
+    constexpr inline static auto BITS_PER_T = (decltype(LOG_BITS_PER_T)) 1 << LOG_BITS_PER_T;
 protected:
 
+    /**
+     * 获取bit所在字的序号，向下对齐
+     * @param bit_no bit序号
+     * @return
+     */
+    static inline size_t bm_index_align_down(size_t bit_no) {
+        return bit_no >> LOG_BITS_PER_T;
+    };
+
+    /**
+     * 获取bit所在字的序号，向上对齐
+     * @param bit_no bit序号
+     * @return
+     */
+    static inline size_t bm_index_align_up(size_t bit_no) {
+        return bm_index_align_down(bit_no + BITS_PER_T - 1);
+    };
+
+    /**
+     * 获取字起始的bit序号
+     * @param word_index
+     * @return
+     */
+    static inline auto bit_no(size_t word_index) {
+        return word_index << LogBitsPerWord;
+    };
+    /**
+     * 生成 mask
+     * @param start 生成的mask靠近
+     * @param beg_no
+     * @param end_no
+     * @return
+     */
+    static inline size_t mask(bool start,size_t beg_no = 0,size_t end_no = BITS_PER_T){
+        // 获取内部的偏移量
+        beg_no = offset_align<size_t>(beg_no,BITS_PER_T);
+        end_no = offset_align<size_t>(end_no,BITS_PER_T);
+        // 获取mask的宽度
+        const auto width = end_no - beg_no;
+        // 获取 移位 的偏移
+        const auto offset = start ? BITS_PER_T - width : 0;
+        return generate_mask<bm_t>(width,offset);
+    }
+    /**
+     * 将非atomic值转换成atomic类型
+     * @param index
+     * @param map
+     * @return
+     */
+    static inline auto bm_ref(size_t index,bm_t* map){
+        return std::atomic_ref<bm_t>(map[index]);
+    };
 };
+
 /**
  * 位图
  *
  * 用于 统计一段内存情况，这段内存也叫做统计区间
  *
  */
-class BitMap {
-public:
-    using bm_word_t = uint64_t;
+class BitMap: public BitView{
 
 private:
 
@@ -35,7 +101,7 @@ private:
     /**
      * 统计区间的起始位置
      */
-    bm_word_t *_map;
+    bm_t *_map;
     NONCOPYABLE(BitMap);
 
 public:
@@ -47,23 +113,7 @@ public:
         return this->_total_bits;
     };
 private:
-    /**
-     * 获取bit所在字的序号，向下对齐
-     * @param bit_no bit序号
-     * @return
-     */
-    static inline size_t word_index_align_down(size_t bit_no) {
-        return bit_no >> LogBitsPerWord;
-    };
 
-    /**
-     * 获取bit所在字的序号，向上对齐
-     * @param bit_no bit序号
-     * @return
-     */
-    static inline size_t word_index_align_up(size_t bit_no) {
-        return word_index_align_down(bit_no + BitsPerWord - 1);
-    };
 
     /**
      * 获取bit所在字的地址
@@ -74,37 +124,6 @@ private:
         return this->_map + BitMap::word_index_align_down(bit_no);
     };
 
-    /**
-     * 获取bit所在字中的偏移量
-     * @param bit_no bit序号
-     * @return
-     */
-    static inline auto word_offset_in_word(size_t bit_no) {
-        return bit_no & (BitsPerWord - 1);
-    };
-
-    /**
-     * 获取字起始的bit序号
-     * @param word_index
-     * @return
-     */
-    static inline auto word_index_bit_no(size_t word_index) {
-        return word_index << LogBitsPerWord;
-    };
-
-    /**
-     * 生成区间内的mask
-     * @param beg_no 开始的区间，包含
-     * @param end_no 结束的区间 ，不包含
-     * @return
-     */
-    inline static bm_word_t bit_mask(size_t beg_no, size_t end_no) {
-        assert(end_no != 0, "does not work when end == 0");
-        assert(beg_no == end_no || word_index_align_down(beg_no) == word_index_align_down(end_no - 1),
-               "must be a single-word range");
-        auto low_bits = ((bm_word_t) 1 << (end_no - beg_no)) - 1;
-        return low_bits << BitMap::word_offset_in_word(beg_no);
-    };
 
     /**
      * 将x的在[start,end)区间的比特位设置为0
@@ -120,7 +139,7 @@ private:
      * @param end_index 字的结束索引
      */
     inline void clear_range_full_word(size_t beg_index, size_t end_index) {
-        ::memset(this->_map + beg_index, 0X00, (end_index - beg_index) << LogBytesPerWord);
+        ::memset(this->_map + beg_index, 0X00, (end_index - beg_index)* sizeof(bm_t));
     };
 
     /**
@@ -137,7 +156,7 @@ private:
      * @param end_index 字的结束索引
      */
     inline void set_range_full_word(size_t beg_index, size_t end_index) {
-        ::memset(this->_map + beg_index, 0XFF, (end_index - beg_index) << LogBytesPerWord);
+        ::memset(this->_map + beg_index, 0XFF, (end_index - beg_index) * sizeof(bm_t));
     };
 
     /**
@@ -176,7 +195,7 @@ protected:
      */
     inline void update_map(void *map, size_t total_bits) {
         this->_total_bits = total_bits;
-        this->_map = reinterpret_cast<bm_word_t *>(map);
+        this->_map = reinterpret_cast<bm_t *>(map);
     };
 public:
     /**
