@@ -55,6 +55,7 @@ protected:
     static inline auto bit_no(size_t word_index) {
         return word_index << LogBitsPerWord;
     };
+
     /**
      * 生成 mask
      * @param start 生成的mask靠近
@@ -62,25 +63,32 @@ protected:
      * @param end_no
      * @return
      */
-    static inline size_t mask(bool start,size_t beg_no = 0,size_t end_no = BITS_PER_T){
+    static inline auto mask(bool start, size_t beg_no = 0, size_t end_no = BITS_PER_T) {
         // 获取内部的偏移量
-        beg_no = offset_align<size_t>(beg_no,BITS_PER_T);
-        end_no = offset_align<size_t>(end_no,BITS_PER_T);
+        beg_no = offset_align<size_t>(beg_no, BITS_PER_T);
+        end_no = offset_align<size_t>(end_no, BITS_PER_T);
         // 获取mask的宽度
         const auto width = end_no - beg_no;
         // 获取 移位 的偏移
         const auto offset = start ? BITS_PER_T - width : 0;
-        return generate_mask<bm_t>(width,offset);
+        return generate_mask<bm_t>(width, offset);
     }
+    static inline auto mask(size_t bit_no){
+        bit_no = offset_align(bit_no,BITS_PER_T);
+        return (bm_t)1 << bit_no;
+    }
+
     /**
      * 将非atomic值转换成atomic类型
      * @param index
      * @param map
      * @return
      */
-    static inline auto bm_ref(size_t index,bm_t* map){
+    static inline auto bm_ref(size_t bit_no, bm_t *map) {
+        const auto index = bm_index_align_down(bit_no);
         return std::atomic_ref<bm_t>(map[index]);
     };
+
 };
 
 /**
@@ -89,7 +97,7 @@ protected:
  * 用于 统计一段内存情况，这段内存也叫做统计区间
  *
  */
-class BitMap: public BitView{
+class BitMap : public BitView {
 
 private:
 
@@ -112,77 +120,6 @@ public:
     [[nodiscard]] inline auto total_bits() const {
         return this->_total_bits;
     };
-private:
-
-
-    /**
-     * 获取bit所在字的地址
-     * @param bit_no bit序号
-     * @return
-     */
-    [[nodiscard]] inline auto word_addr(size_t bit_no) const {
-        return this->_map + BitMap::word_index_align_down(bit_no);
-    };
-
-
-    /**
-     * 将x的在[start,end)区间的比特位设置为0
-     * 但是要求start，end在统一字上
-     * @param beg_no bit开始的索引 包含
-     * @param end_no bit结束的索引 不包含
-     */
-    void clear_range_within_word(size_t beg_no, size_t end_no);
-
-    /**
-     * 功能与clear_range_within_word相同，但是需要整个字的
-     * @param beg_index 字的起始索引
-     * @param end_index 字的结束索引
-     */
-    inline void clear_range_full_word(size_t beg_index, size_t end_index) {
-        ::memset(this->_map + beg_index, 0X00, (end_index - beg_index)* sizeof(bm_t));
-    };
-
-    /**
-     * 将x的在[start,end)区间的比特位设置为1
-     * 但是要求start，end在统一字上
-     * @param beg_no bit开始的索引 包含
-     * @param end_no bit结束的索引 不包含
-     */
-    void set_range_within_word(size_t beg_no, size_t end_no);
-
-    /**
-     * 功能与set_range_within_word相同，但是需要整个字的
-     * @param beg_index 字的起始索引
-     * @param end_index 字的结束索引
-     */
-    inline void set_range_full_word(size_t beg_index, size_t end_index) {
-        ::memset(this->_map + beg_index, 0XFF, (end_index - beg_index) * sizeof(bm_t));
-    };
-
-    /**
-     * 将x的在[start,end)区间的比特位被设置为1的数量
-     * 但是要求start，end在统一字上
-     * @param beg_no bit开始的索引 包含
-     * @param end_no bit结束的索引 不包含
-     */
-    [[nodiscard]] size_t count_range_within_word(size_t beg_no, size_t end_no) const;
-
-    /**
-     * 功能与count_range_within_word相同，但是需要整个字的
-     * @param beg_index 字的起始索引
-     * @param end_index 字的结束索引
-     */
-    [[nodiscard]] size_t count_range_full_word(size_t beg_index, size_t end_index) const;
-
-    /**
-     * 并发的使用遮罩 修改某个字的值
-     * @param word_addr 这个字的地址
-     * @param mask 遮罩
-     * @return false    表示被其他线程抢先修改了
-     *         true     表示修改成功了
-     */
-    static bool par_change_through_mask(volatile bm_word_t *word_addr, bm_word_t mask);
-
 protected:
     inline auto map() {
         return this->_map;
@@ -270,7 +207,7 @@ public:
      * @param total_bits 上面的内存中有效的比特位个数
      */
     inline explicit BitMap(void *base, size_t total_bits) noexcept:
-            _map(static_cast<bm_word_t *const>(base)),
+            _map(static_cast<bm_t *const>(base)),
             _total_bits(total_bits) {};
 
     inline explicit BitMap() noexcept: _map(nullptr), _total_bits(0) {};
@@ -281,7 +218,7 @@ public:
      * @return
      */
     inline static size_t calc_bytes(size_t bits) {
-        return BitMap::word_index_align_up(bits) << LogBytesPerWord;
+        return BitMap::bm_index_align_up(bits) * sizeof(BitView::bm_t);
     };
 };
 
