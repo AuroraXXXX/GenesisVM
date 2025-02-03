@@ -8,7 +8,7 @@
 #include "platform/constants.hpp"
 #include "platform/allocation.hpp"
 #include <concepts>
-#include <bit>
+
 #include "cstring"
 #include "platform/macro.hpp"
 #include "platform/utils/robust.hpp"
@@ -59,23 +59,20 @@ protected:
     /**
      * 生成 mask
      * @param start 生成的mask靠近
-     * @param beg_no
-     * @param end_no
+     * @param beg_no 开始的位置
+     * @param end_no 结束的位置
      * @return
      */
-    static inline auto mask(bool start, size_t beg_no = 0, size_t end_no = BITS_PER_T) {
-        // 获取内部的偏移量
-        beg_no = offset_align<size_t>(beg_no, BITS_PER_T);
-        end_no = offset_align<size_t>(end_no, BITS_PER_T);
-        // 获取mask的宽度
-        const auto width = end_no - beg_no;
-        // 获取 移位 的偏移
-        const auto offset = start ? BITS_PER_T - width : 0;
-        return generate_mask<bm_t>(width, offset);
-    }
-    static inline auto mask(size_t bit_no){
-        bit_no = offset_align(bit_no,BITS_PER_T);
-        return (bm_t)1 << bit_no;
+    static auto mask(bool start, size_t beg_no = 0, size_t end_no = BITS_PER_T);
+
+    /**
+     * 生成mask
+     * @param bit_no 1的位置
+     * @return
+     */
+    static inline auto mask(size_t bit_no) {
+        bit_no = offset_align(bit_no, BITS_PER_T);
+        return (bm_t) 1 << bit_no;
     }
 
     /**
@@ -225,8 +222,8 @@ public:
 
 /**
  * 支持调整bit map的功能
- * void *allocate(size_t bytes);
- * void deallocate(void *ptr);
+ * void *alloc(size_t bytes);
+ * void free(void *ptr);
  * @tparam T
  */
 template<typename T>
@@ -264,11 +261,11 @@ public:
         this->resize(0);
     }
 
-    void *allocate(size_t bytes) {
+    inline void *alloc(size_t bytes) {
         return NEW_CHEAP_ARRAY(char, bytes, this->_flag);
     };
 
-    void free(void *ptr) {
+    inline void free(void *ptr) {
         FREE_CHEAP_ARRAY(ptr, this->_flag);
     };
 };
@@ -283,9 +280,9 @@ void GrowableBitMap<T>::resize(size_t new_bits, bool clear) {
     auto derived = static_cast<T *>(this);
     if (old_bytes != new_bytes) {
         //需要释放陈旧的内存
-        derived->deallocate(this->map());
+        derived->free(this->map());
         if (new_bytes > 0) {
-            auto map = derived->allocate(new_bytes);
+            auto map = derived->alloc(new_bytes);
             this->update_map(map, new_bits);
         } else {
             this->update_map(nullptr, 0);
