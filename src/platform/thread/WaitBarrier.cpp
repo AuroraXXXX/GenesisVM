@@ -6,6 +6,7 @@
 #include "platform/thread/ThreadStatusTrans.hpp"
 #include "platform/utils/robust.hpp"
 #include "platform/os.hpp"
+#include "pthread.h"
 WaitBarrier::~WaitBarrier() {
     assert(this->_futex_barrier == 0, "存在线程未唤醒");
 }
@@ -21,6 +22,7 @@ void WaitBarrier::disarm() {
     assert(this->_futex_barrier != 0, "不应为0");
     this->_futex_barrier = 0;
 //    OrderAccess::fence();
+
     os::wakeup(const_cast<int *>(&_futex_barrier), INT32_MAX);
 }
 
@@ -32,6 +34,7 @@ void WaitBarrier::wait(int barrier_tag) {
         return;
     }
     ThreadStatusBlockedTrans tans;
+
 //    OrderAccess::compile_barrier();
     os::suspend((int *) &_futex_barrier, barrier_tag);
 }

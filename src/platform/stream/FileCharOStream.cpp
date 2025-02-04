@@ -4,7 +4,7 @@
 
 #include "platform/stream/FileCharOStream.hpp"
 #include <cstdio>
-
+#include "platform/utils/robust.hpp"
 FileCharOStream FileCharOStream::_err_stream(stderr);
 FileCharOStream FileCharOStream::_out_stream(stdout);
 

@@ -82,5 +82,4 @@ inline bool is_clamp(T value, T min, T max) {
  */
 #define caller_address ((void *)__builtin_return_address (0))
 #define ALWAYS_NOT_INLINE __attribute__((noinline))
-#define
 #endif //PLATFORM_MACRO_HPP
