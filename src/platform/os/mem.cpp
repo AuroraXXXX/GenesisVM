@@ -165,7 +165,7 @@ void *os::reserve_memory_aligned(MEMFLAG F, size_t bytes, size_t align, int32_t 
 /**
  * 记录内存的申请 在某个地址
  */
-void *reserve_memory_at(MEMFLAG F, void *addr, size_t bytes, int32_t fd, bool force)
+void *os::reserve_memory_at(MEMFLAG F, void *addr, size_t bytes, int32_t fd, bool force)
 {
     assert(addr != nullptr, "addr is not allow null");
     assert_is_aligned(bytes, os::page_size());
