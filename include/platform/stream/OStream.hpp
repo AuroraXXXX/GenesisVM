@@ -23,7 +23,7 @@ private:
      */
     size_t _statistics_bytes;
 protected:
-
+    constexpr static inline size_t DefaultFormatBufSize = 2000;
 
     [[nodiscard]] inline auto ticks() const {
         return this->_ticks;

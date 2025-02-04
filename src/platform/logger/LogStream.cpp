@@ -87,10 +87,10 @@ void LogStream::LineBuffer::try_ensure_cap(size_t capacity_needed) {
     if (this->_cap >= capacity_needed) {
         return;
     }
-    assert(this->_cap <= OStreamDefaultBufSize, "程序错误");
+    assert(this->_cap <= OStream::DefaultFormatBufSize, "程序错误");
     constexpr size_t addition_expansion = 256;
     size_t new_cap = align_up(capacity_needed + addition_expansion, addition_expansion);
-    new_cap = MIN2<size_t>(OStreamDefaultBufSize, new_cap);
+    new_cap = MIN2<size_t>(OStream::DefaultFormatBufSize, new_cap);
     auto new_buf = (char *) NEW_RESOURCE_ARRAY(char, new_cap);
     if (new_buf == nullptr) {
         return;

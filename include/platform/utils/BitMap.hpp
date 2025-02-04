@@ -63,14 +63,14 @@ protected:
      * @param end_no 结束的位置
      * @return
      */
-    static auto mask(bool start, size_t beg_no = 0, size_t end_no = BITS_PER_T);
+    static bm_t many_bit_mask(bool start, size_t beg_no = 0, size_t end_no = BITS_PER_T);
 
     /**
      * 生成mask
      * @param bit_no 1的位置
      * @return
      */
-    static inline auto mask(size_t bit_no) {
+    static inline auto one_bit_mask(size_t bit_no) {
         bit_no = offset_align(bit_no, BITS_PER_T);
         return (bm_t) 1 << bit_no;
     }

@@ -13,7 +13,7 @@ bool BitMap::at(size_t no) const {
     auto index = BitView::bm_index_align_down(no);
     auto value = this->_map[index];
     //获取bit mask
-    auto mask = BitView::mask(no);
+    auto mask = BitView::one_bit_mask(no);
     return (value & mask) != 0;
 }
 
@@ -24,15 +24,15 @@ size_t BitMap::count_range(size_t beg_no, size_t end_no) const {
     size_t sum = 0;
     if (beg_full_word_index < end_full_word_index) {
         //超过1个整个word
-        auto value = BitView::mask(true, beg_no) & this->_map[beg_full_word_index++];
+        auto value = BitView::many_bit_mask(true, beg_no) & this->_map[beg_full_word_index++];
         sum += std::popcount(value);
-        value = BitView::mask(false, 0, end_no) & this->_map[end_full_word_index];
+        value = BitView::many_bit_mask(false, 0, end_no) & this->_map[end_full_word_index];
         sum += std::popcount(value);
         while (beg_full_word_index < end_full_word_index) {
             sum += std::popcount(this->_map[beg_full_word_index++]);
         }
     } else {
-        auto value = BitView::mask(true, beg_no, end_no) & this->_map[beg_full_word_index];
+        auto value = BitView::many_bit_mask(true, beg_no, end_no) & this->_map[beg_full_word_index];
         sum += std::popcount(value);
     }
     return sum;
@@ -44,12 +44,12 @@ void BitMap::set_range(size_t beg_no, size_t end_no) {
     auto end_full_word_index = BitMap::bm_index_align_up(end_no);
     if (beg_full_word_index < end_full_word_index) {
         //超过1个整个word
-        this->_map[beg_full_word_index++] |= BitView::mask(true, beg_no);
-        this->_map[end_full_word_index] |= BitView::mask(false, 0, end_no);
+        this->_map[beg_full_word_index++] |= BitView::many_bit_mask(true, beg_no);
+        this->_map[end_full_word_index] |= BitView::many_bit_mask(false, 0, end_no);
         auto total_bytes = (end_full_word_index - beg_full_word_index) * sizeof(bm_t);
         ::memset(this->_map + beg_full_word_index, 0xFF, total_bytes);
     } else {
-        this->_map[beg_full_word_index] |= BitView::mask(true, beg_no, end_no);
+        this->_map[beg_full_word_index] |= BitView::many_bit_mask(true, beg_no, end_no);
     }
 }
 
@@ -59,13 +59,13 @@ void BitMap::clear_range(size_t beg_no, size_t end_no) {
     auto end_full_word_index = BitMap::bm_index_align_up(end_no);
     if (beg_full_word_index < end_full_word_index) {
         //超过1个整个word
-        this->_map[beg_full_word_index++] &= ~BitView::mask(true, beg_no);
-        this->_map[end_full_word_index] &= ~BitView::mask(false, 0, end_no);
+        this->_map[beg_full_word_index++] &= ~BitView::many_bit_mask(true, beg_no);
+        this->_map[end_full_word_index] &= ~BitView::many_bit_mask(false, 0, end_no);
         auto total_bytes = (end_full_word_index - beg_full_word_index) * sizeof(bm_t);
         ::memset(this->_map + beg_full_word_index, 0x00, total_bytes);
     } else {
         //没有超过一个bm_t
-        this->_map[beg_full_word_index] &= ~BitView::mask(true, beg_no, end_no);
+        this->_map[beg_full_word_index] &= ~BitView::many_bit_mask(true, beg_no, end_no);
     }
 }
 
@@ -98,7 +98,7 @@ bool BitMap::par_set_bit(size_t bit_no) {
     //先获取所在字的地址 使用volatile表示所指向的值是不确定的 不许使用缓存
     auto ref = BitView::bm_ref(bit_no, this->_map);
     //获取bitno在字上的mask
-    auto mask = BitView::mask(bit_no);
+    auto mask = BitView::one_bit_mask(bit_no);
     auto old_value = ref.fetch_or(mask);
     return (old_value & mask) == 0;
 }
@@ -108,7 +108,7 @@ bool BitMap::par_clear_bit(size_t bit_no) {
     //先获取所在字的地址 使用volatile表示所指向的值是不确定的 不许使用缓存
     auto ref = BitView::bm_ref(bit_no, this->_map);
     //获取bitno在字上的mask
-    auto mask = BitView::mask(bit_no);
+    auto mask = BitView::one_bit_mask(bit_no);
     auto old_value = ref.fetch_and(~mask);
     return (old_value & mask) == 0;
 }
@@ -119,11 +119,11 @@ bool BitMap::par_at(size_t bit_no) const {
     //先获取所在字的地址 使用volatile表示所指向的值是不确定的 不许使用缓存
     auto value = BitView::bm_ref(bit_no, this->_map).load();
     //获取bitno在字上的mask
-    auto mask = BitView::mask(bit_no);
+    auto mask = BitView::one_bit_mask(bit_no);
     return (value & mask) != 0;
 }
 
-auto BitView::mask(bool start, size_t beg_no, size_t end_no) {
+BitView::bm_t BitView::many_bit_mask(bool start, size_t beg_no, size_t end_no) {
 
     // 获取内部的偏移量
     beg_no = offset_align<size_t>(beg_no, BITS_PER_T);

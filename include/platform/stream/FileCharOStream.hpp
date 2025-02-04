@@ -6,7 +6,7 @@
 #define PLATFORM_FILE_CHAR_OSTREAM_HPP
 
 #include "CharOStream.hpp"
-
+#include "platform/main/global.hpp"
 class FileCharOStream : public CharOStream {
 public:
     enum class CacheMode : uint8_t {
