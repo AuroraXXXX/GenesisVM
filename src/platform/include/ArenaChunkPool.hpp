@@ -2,8 +2,8 @@
 // Created by aurora on 2023/10/8.
 //
 
-#ifndef PLAT_ARENA_CHUNK_POOL_HPP
-#define PLAT_ARENA_CHUNK_POOL_HPP
+#ifndef PLATFORM_ARENA_CHUNK_POOL_HPP
+#define PLATFORM_ARENA_CHUNK_POOL_HPP
 
 #include "platform/allocation.hpp"
 #include "platform/utils/robust.hpp"
@@ -88,4 +88,4 @@ public:
 };
 
 
-#endif //PLAT_ARENA_CHUNK_POOL_HPP
+#endif //PLATFORM_ARENA_CHUNK_POOL_HPP

@@ -1,5 +1,5 @@
-#ifndef POSEI_OS_HPP
-#define POSEI_OS_HPP
+#ifndef PLATFORM_OS_HPP
+#define PLATFORM_OS_HPP
 #include "typedef.hpp"
 #include "platform/allocation.hpp"
 #include "platform/main/global.hpp"
@@ -95,21 +95,6 @@ private:
      */
     static void native_prio_initialize();
 
-    /**
-     * 当 *uaddr == tag时 挂起线程
-     * @param uaddr
-     * @param tag 标志 当此值等于uaddr,则进入睡眠
-     * @param nsec 超时等待多少ns 0 表示无限期等待
-     */
-    static void suspend(const int *uaddr, int tag, uint64_t nsec = 0);
-
-    /**
-     * 唤醒等待在uaddr上的num个线程线程
-     * @param uaddr int类型变量
-     * @param num 线程的数量(如果大于实际等待的线程数量，则唤醒全部线程)
-     * @return 返回实际被唤醒的线程数
-     */
-    static int wakeup(int *uaddr, int num);
 
 public:
     /**
@@ -354,4 +339,4 @@ public:
 
 };
 
-#endif // POSEI_OS_HPP
+#endif // PLATFORM_OS_HPP

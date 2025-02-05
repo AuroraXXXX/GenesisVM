@@ -2,8 +2,8 @@
 // Created by aurora on 2023/9/19.
 //
 
-#ifndef KERNEL_BIT_MAP_HPP
-#define KERNEL_BIT_MAP_HPP
+#ifndef PLATFORM_BIT_MAP_HPP
+#define PLATFORM_BIT_MAP_HPP
 
 #include "platform/constants.hpp"
 #include "platform/allocation.hpp"
@@ -292,4 +292,4 @@ void GrowableBitMap<T>::resize(size_t new_bits, bool clear) {
 }
 
 
-#endif //KERNEL_BIT_MAP_HPP
+#endif //PLATFORM_BIT_MAP_HPP

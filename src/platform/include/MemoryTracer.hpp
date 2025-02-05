@@ -2,8 +2,8 @@
 // Created by aurora on 2024/6/25.
 //
 
-#ifndef PLAT_MEMORY_TRACER_HPP
-#define PLAT_MEMORY_TRACER_HPP
+#ifndef PLATFORM_MEMORY_TRACER_HPP
+#define PLATFORM_MEMORY_TRACER_HPP
 
 #include "platform/typedef.hpp"
 #include "platform/allocation.hpp"
@@ -49,4 +49,4 @@ public:
     static void flush();
 };
 
-#endif //PLAT_MEMORY_TRACER_HPP
+#endif //PLATFORM_MEMORY_TRACER_HPP

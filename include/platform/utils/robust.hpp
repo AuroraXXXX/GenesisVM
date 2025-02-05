@@ -2,8 +2,8 @@
 // Created by aurora on 2023/9/9.
 //
 
-#ifndef PLATFORM_UTILS_ROBUST_HPP
-#define PLATFORM_UTILS_ROBUST_HPP
+#ifndef PLATFORM_ROBUST_HPP
+#define PLATFORM_ROBUST_HPP
 
 #include "platform/macro.hpp"
 #include "platform/typedef.hpp"
@@ -124,4 +124,4 @@ do{                                                                 \
         }while(0)
 
 
-#endif //PLATFORM_UTILS_ROBUST_HPP
+#endif //PLATFORM_ROBUST_HPP

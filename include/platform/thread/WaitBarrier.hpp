@@ -2,8 +2,8 @@
 // Created by aurora on 2023/1/13.
 //
 
-#ifndef VMACHINE_WAITBARRIER_HPP
-#define VMACHINE_WAITBARRIER_HPP
+#ifndef PLATFORM_WAIT_BARRIER_HPP
+#define PLATFORM_WAIT_BARRIER_HPP
 
 #include "platform/allocation.hpp"
 #include "platform/macro.hpp"
@@ -50,4 +50,4 @@ public:
 };
 
 
-#endif //VMACHINE_WAITBARRIER_HPP
+#endif //PLATFORM_WAIT_BARRIER_HPP

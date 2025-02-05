@@ -1,9 +1,9 @@
 //
 // Created by aurora on 2024/2/13.
 //
+#ifndef PLATFORM_THREAD_STATUS_TRANS_HPP
+#define PLATFORM_THREAD_STATUS_TRANS_HPP
 
-#ifndef PLAT_THREAD_STATUS_TRANS_HPP
-#define PLAT_THREAD_STATUS_TRANS_HPP
 
 #include "platform/allocation.hpp"
 class OSThread;
@@ -17,4 +17,4 @@ public:
 
 };
 
-#endif //PLAT_THREAD_STATUS_TRANS_HPP
+#endif //PLATFORM_THREAD_STATUS_TRANS_HPP

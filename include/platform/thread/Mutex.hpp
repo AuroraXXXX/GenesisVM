@@ -2,8 +2,8 @@
 // Created by aurora on 2023/10/21.
 //
 
-#ifndef POSEI_THREAD_MUTEX_HPP
-#define POSEI_THREAD_MUTEX_HPP
+#ifndef PLATFORM_MUTEX_HPP
+#define PLATFORM_MUTEX_HPP
 
 #include <cerrno>
 #include <pthread.h>
@@ -92,4 +92,4 @@ public:
         }
     }
 };
-#endif //POSEI_THREAD_MUTEX_HPP
+#endif //PLATFORM_MUTEX_HPP

@@ -2,8 +2,8 @@
 // Created by aurora on 2023/1/22.
 //
 
-#ifndef PLAT_THREAD_SPIN_YIELD_HPP
-#define PLAT_THREAD_SPIN_YIELD_HPP
+#ifndef PLATFORM_SPIN_YIELD_HPP
+#define PLATFORM_SPIN_YIELD_HPP
 
 #include "platform/allocation.hpp"
 #include "platform/constants.hpp"
@@ -83,4 +83,4 @@ public:
 };
 
 
-#endif //PLAT_THREAD_SPIN_YIELD_HPP
+#endif //PLATFORM_SPIN_YIELD_HPP
