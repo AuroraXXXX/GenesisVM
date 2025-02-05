@@ -131,55 +131,59 @@ ResourceArenaMark::~ResourceArenaMark() {
 
 /**
  * ----------------
- * LangThread
+ * UserThread
  * ----------------
  */
-Mutex *LangThread::_lock = new Mutex("langthread-list");
-SingleLinkedList<LangThread> LangThread::_list;
+Mutex *UserThread::_lock = new Mutex("user-thread-list");
+SingleLinkedList<UserThread> UserThread::_list;
 
-void LangThread::pre_run() {
-    MutexLocker locker(LangThread::_lock);
-    LangThread::_list.add_to_head(this);
+void UserThread::pre_run() {
+    MutexLocker locker(UserThread::_lock);
+    UserThread::_list.add_to_head(this);
 }
 
-void LangThread::post_run() {
-    MutexLocker locker(LangThread::_lock);
-    LangThread::_list.remove(this);
+void UserThread::post_run() {
+    MutexLocker locker(UserThread::_lock);
+    UserThread::_list.remove(this);
 }
 
-LangThread::LangThread() : _next(nullptr), OSThread() {
+UserThread::UserThread() : _next(nullptr), OSThread() {
 }
 
-const char *LangThread::name() {
-    return "LangThread";
+const char *UserThread::name() {
+    return "UserThread";
 }
 
 
 /**
  * ----------------
- * NonLangThread
+ * DaemonThread
  * ----------------
  */
-Mutex *NonLangThread::_lock = new Mutex("non-langthread-list");
-SingleLinkedList<NonLangThread> NonLangThread::_list;
+Mutex *DaemonThread::_lock = new Mutex("daemon-thread-list");
+SingleLinkedList<DaemonThread> DaemonThread::_list;
 
-void NonLangThread::pre_run() {
-    MutexLocker locker(NonLangThread::_lock);
-    NonLangThread::_list.add_to_head(this);
+void DaemonThread::pre_run() {
+    MutexLocker locker(DaemonThread::_lock);
+    DaemonThread::_list.add_to_head(this);
 }
 
-void NonLangThread::post_run() {
-    MutexLocker locker(NonLangThread::_lock);
-    NonLangThread::_list.remove(this);
+void DaemonThread::post_run() {
+    MutexLocker locker(DaemonThread::_lock);
+    DaemonThread::_list.remove(this);
 }
 
-NonLangThread::NonLangThread() :
+DaemonThread::DaemonThread() :
         _next(nullptr) {
 
 }
 
-const char *NonLangThread::name() {
-    return "NonLangThread";
+const char *DaemonThread::name() {
+    return "DaemonThread";
 }
 
 
+void MainThread::run() {
+    //表示的main 线程 ，该函数不应该被调用
+    should_not_reach_here();
+}

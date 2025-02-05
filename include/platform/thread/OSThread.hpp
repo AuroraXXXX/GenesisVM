@@ -207,67 +207,75 @@ protected:
 };
 
 /**
- *
+ * 表示用户线程 ，支持放入到用户线程链表中
  */
-class LangThread : public OSThread {
-    friend class SingleLinkedList<LangThread>;
+class UserThread : public OSThread {
+    friend class SingleLinkedList<UserThread>;
 
 private:
     static Mutex *_lock;
-    static SingleLinkedList<LangThread> _list;
-    LangThread *_next;
+    static SingleLinkedList<UserThread> _list;
+    UserThread *_next;
 
-    inline void set_next(LangThread *next) {
+    inline void set_next(UserThread *next) {
         this->_next = next;
     };
 
-    inline LangThread *next() {
+    inline auto next() {
         return this->_next;
     }
 
 protected:
-//    void state_transitioning_callback(uint8_t from_state, uint8_t to_state) override;
     void pre_run() override;
 
-    void run() override {};
 
     void post_run() override;
 
 public:
     const char *name() override;
 
-    explicit LangThread();
+    explicit UserThread();
 };
 
-class NonLangThread : public OSThread {
-    friend class SingleLinkedList<NonLangThread>;
+/**
+ * 表示main线程
+ */
+class MainThread : public UserThread {
+public:
+protected:
+    void run() override;
+};
+
+/**
+ * 守护线程 支持放入到 链表中
+ */
+class DaemonThread : public OSThread {
+    friend class SingleLinkedList<DaemonThread>;
 
 private:
     static Mutex *_lock;
-    static SingleLinkedList<NonLangThread> _list;
-    NonLangThread *_next;
+    static SingleLinkedList<DaemonThread> _list;
+    DaemonThread *_next;
 
-    inline void set_next(NonLangThread *next) {
+    inline void set_next(DaemonThread *next) {
         this->_next = next;
     };
 
-    inline NonLangThread *next() {
+    inline auto next() {
         return this->_next;
     }
 
 protected:
 
-
     void pre_run() override;
 
-    void run() override {};
 
     void post_run() override;
 
 public:
     const char *name() override;
 
-    explicit NonLangThread();
+    explicit DaemonThread();
 };
 
 /**

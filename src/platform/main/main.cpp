@@ -15,7 +15,7 @@ void platform_init(ticks_t vm_start_time) {
     //1. 先进性初始化内存池
     ArenaChunkPool::initialize();
     //2. 创建表示MAIN 的线程
-    auto os_thread = new LangThread();
+    auto os_thread = new MainThread();
     OSThread::attach_main_thread(os_thread);
 }
 
