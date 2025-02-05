@@ -7,15 +7,19 @@
 #include "platform/stream/CharOStream.hpp"
 #include "platform/os.hpp"
 #include <pthread.h>
+#include "platform/thread/Mutex.hpp"
 
 thread_local OSThread *OSThread::_current = nullptr;
-OSThread* OSThread::_main_thread = nullptr;
+OSThread *OSThread::_main_thread = nullptr;
+
 OSThread::OSThread() :
         _plib_id(0),
         _kernel_id(0),
         _priority(0),
         _os_state(STATE_NEW),
         _resource_arena(nullptr) {
+    assert(this->_resource_arena == nullptr, "error");
+    this->_resource_arena = new Arena(MEMFLAG::Thread);
 }
 
 
@@ -25,11 +29,12 @@ OSThread::~OSThread() {
 
 
 void OSThread::tans_state(uint8_t to) {
-    assert(to != OSThread::STATE_NEW,"This status cannot be set");
+    assert(to != OSThread::STATE_NEW, "This status cannot be set");
 
     auto from = this->state();
     //ZOMBIE前置状态必须是BLOCKED
-    assert((to == STATE_ZOMBIE && from == STATE_BLOCKED) || to != STATE_ZOMBIE,"The ZOMBIE prefix status must be BLOCKED");
+    assert((to == STATE_ZOMBIE && from == STATE_BLOCKED) || to != STATE_ZOMBIE,
+           "The ZOMBIE prefix status must be BLOCKED");
     /**
      * 首先设置将线程状态设置成过渡态
      * 方便其他部件即时得知线程状态
@@ -45,10 +50,6 @@ void OSThread::tans_state(uint8_t to) {
     this->_os_state.store(to);
 }
 
-void OSThread::global_initialize() {
-    assert(this->_resource_arena == nullptr, "error");
-    this->_resource_arena = new Arena(MEMFLAG::Thread);
-}
 
 void OSThread::print_on(CharOStream *out) const {
     out->print("nid=%d ", os::current_thread_id());
@@ -108,15 +109,9 @@ void OSThread::attach_main_thread(OSThread *main_thread) {
     OSThread::_main_thread = main_thread;
 
     //调用函数进行初始化
-    main_thread->global_initialize();
-//    OrderAccess::compile_barrier();
-//    OrderAccess::store<uint8_t>(&main_thread->_os_state, OSThread::STATE_READY);
     main_thread->_os_state.store(OSThread::STATE_READY);
     assert(main_thread->state() == OSThread::STATE_READY, "thread state is error.");
     //进行前期的
-//    OrderAccess::store<OSThread *>(&OSThread::_current, main_thread);
-//    OrderAccess::store<pthread_t>(&main_thread->_plib_id, pthread_self());
-//    OrderAccess::store(&main_thread->_kernel_id, OS::current_thread_id());
     OSThread::_current = main_thread;
     main_thread->_kernel_id = os::current_thread_id();
     main_thread->_plib_id = ::pthread_self();
@@ -133,3 +128,58 @@ ResourceArenaMark::ResourceArenaMark() :
 ResourceArenaMark::~ResourceArenaMark() {
     this->_saved.rollback_to(this->_arena);
 }
+
+/**
+ * ----------------
+ * LangThread
+ * ----------------
+ */
+Mutex *LangThread::_lock = new Mutex("langthread-list");
+SingleLinkedList<LangThread> LangThread::_list;
+
+void LangThread::pre_run() {
+    MutexLocker locker(LangThread::_lock);
+    LangThread::_list.add_to_head(this);
+}
+
+void LangThread::post_run() {
+    MutexLocker locker(LangThread::_lock);
+    LangThread::_list.remove(this);
+}
+
+LangThread::LangThread() : _next(nullptr), OSThread() {
+}
+
+const char *LangThread::name() {
+    return "LangThread";
+}
+
+
+/**
+ * ----------------
+ * NonLangThread
+ * ----------------
+ */
+Mutex *NonLangThread::_lock = new Mutex("non-langthread-list");
+SingleLinkedList<NonLangThread> NonLangThread::_list;
+
+void NonLangThread::pre_run() {
+    MutexLocker locker(NonLangThread::_lock);
+    NonLangThread::_list.add_to_head(this);
+}
+
+void NonLangThread::post_run() {
+    MutexLocker locker(NonLangThread::_lock);
+    NonLangThread::_list.remove(this);
+}
+
+NonLangThread::NonLangThread() :
+        _next(nullptr) {
+
+}
+
+const char *NonLangThread::name() {
+    return "NonLangThread";
+}
+
+

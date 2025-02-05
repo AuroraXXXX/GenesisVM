@@ -3,7 +3,7 @@
 //
 #include "platform/main/global.hpp"
 
-namespace posei {
+namespace global {
 #ifdef DECLARE_PRODUCT_FLAG
     #undef DECLARE_PRODUCT_FLAG
 #endif

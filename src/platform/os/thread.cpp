@@ -140,8 +140,6 @@ bool os::create_thread(OSThread *thread, bool detach) {
     } else {
         ::pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
     }
-    //进行初始化
-    thread->global_initialize();
     pthread_t tid;
     //state 状态调整
     thread->_os_state.store(OSThread::STATE_READY);

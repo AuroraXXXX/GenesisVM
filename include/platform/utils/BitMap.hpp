@@ -94,10 +94,7 @@ protected:
  * 用于 统计一段内存情况，这段内存也叫做统计区间
  *
  */
-class BitMap : public BitView {
-
-private:
-
+class BitMap : protected BitView {
 private:
     /**
      * 统计区间内有效的比特位的个数

@@ -10,7 +10,7 @@
 #include "platform/utils/robust.hpp"
 #include "platform/mem/Arena.hpp"
 #include "platform/os.hpp"
-
+#include "platform/utils/SingleLinkedList.hpp"
 /**
  * NAME 表示线程的一个状态
  * NAME##_TRANS 表示线程状态正在从NAME状态迁移到其他状态 一般在进入安全点检查的时候使用
@@ -20,6 +20,8 @@
 
 
 class Arena;
+
+class Mutex;
 
 /**
  * 对应于系统的线程
@@ -40,10 +42,12 @@ public:
         THREAD_STATE_DECL(BLOCKED)    // 线程对象已经被阻塞 停止运行了
     };
 private:
-    friend void platform_init(ticks_t vm_start_time,OSThread *os_thread);
+    friend void platform_init(ticks_t vm_start_time);
+
     typedef unsigned long thread_id_t;
 
-    friend bool os::create_thread(OSThread *thread, bool detach);
+    friend class os;
+
     /**
      * pthread库调用OSTread中的函数，进行触发OSThread中的run函数
      * @param thread
@@ -51,11 +55,13 @@ private:
     static void *native_call(void *params);
 
     static OSThread *_main_thread;
+
     /**
      * 将main对象进行绑定
      * @param main_thread
      */
     static void attach_main_thread(OSThread *main_thread);
+
 public:
     static inline auto main_thread() {
         return OSThread::_main_thread;
@@ -96,11 +102,16 @@ protected:
     virtual void state_transitioning_callback(
             uint8_t from_state,
             uint8_t to_state) {};
+
+
     /**
-     * 初始化函数
-     * 子类如果覆盖的话，需要先调用父类函数
+     * 直接设置是阻止的
+     * 用于在state_transitioning_callback
      */
-    virtual void global_initialize();
+    inline void set_blocked_direct() {
+        this->_os_state.store(OSThread::STATE_BLOCKED);
+    }
+
 public:
     static inline OSThread *current() {
         return OSThread::_current;
@@ -167,6 +178,8 @@ public:
         return OSThread::is_tans_state(this->state());
     };
 
+    virtual const char *name() = 0;
+
     /**
      * 更新线程的状态
      * @param to 目标的状态，但是不能是中间态
@@ -190,13 +203,71 @@ protected:
      * 后执行的方法
      */
     virtual void post_run() = 0;
-    /**
-     * 直接设置是阻止的
-     * 用于在state_transitioning_callback
-     */
-    inline void set_blocked_direct(){
-        this->_os_state.store(OSThread::STATE_BLOCKED);
+
+};
+
+/**
+ *
+ */
+class LangThread : public OSThread {
+    friend class SingleLinkedList<LangThread>;
+
+private:
+    static Mutex *_lock;
+    static SingleLinkedList<LangThread> _list;
+    LangThread *_next;
+
+    inline void set_next(LangThread *next) {
+        this->_next = next;
+    };
+
+    inline LangThread *next() {
+        return this->_next;
     }
+
+protected:
+//    void state_transitioning_callback(uint8_t from_state, uint8_t to_state) override;
+    void pre_run() override;
+
+    void run() override {};
+
+    void post_run() override;
+
+public:
+    const char *name() override;
+
+    explicit LangThread();
+};
+
+class NonLangThread : public OSThread {
+    friend class SingleLinkedList<NonLangThread>;
+
+private:
+    static Mutex *_lock;
+    static SingleLinkedList<NonLangThread> _list;
+    NonLangThread *_next;
+
+    inline void set_next(NonLangThread *next) {
+        this->_next = next;
+    };
+
+    inline NonLangThread *next() {
+        return this->_next;
+    }
+
+protected:
+
+
+    void pre_run() override;
+
+    void run() override {};
+
+    void post_run() override;
+
+public:
+    const char *name() override;
+
+    explicit NonLangThread();
 };
 
 /**

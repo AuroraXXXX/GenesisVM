@@ -77,5 +77,19 @@ public:
     void print_on(CharOStream *stream);
 };
 
-
+class MutexLocker:public StackObject{
+private:
+    Mutex* _mutex;
+public:
+    explicit MutexLocker(Mutex* mutex):_mutex(mutex){
+        if (this->_mutex){
+            this->_mutex->lock();
+        }
+    }
+    ~MutexLocker(){
+        if(this->_mutex){
+            this->_mutex->unlock();
+        }
+    }
+};
 #endif //POSEI_THREAD_MUTEX_HPP

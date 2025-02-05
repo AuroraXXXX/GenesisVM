@@ -64,7 +64,7 @@ os::FileType os::stat(const char *path,
     return res;
 }
 
-int32_t create_temp_mem_fd(const char *debug_name, size_t bytes) {
+int32_t os::create_temp_mem_fd(const char *debug_name, size_t bytes) {
     auto fd = (int32_t) ::memfd_create(debug_name, MFD_CLOEXEC);
     if (fd == -1) {
         return fd;

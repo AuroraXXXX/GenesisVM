@@ -137,7 +137,25 @@ public:
         }
         return nullptr;
     }
-
+    /**
+     * 寻找要删除的节点的前驱节点
+     * @param equal_func 寻找的删除节点的函数，true表示寻找到 需要进行删除
+     * @param total_after 需要删除节点之后的节点也被从链表中删除
+     */
+    T*  remove(T* node,bool total_after = false){
+        T* prev = nullptr;
+        T* cur = this->_head;
+        while (cur != nullptr){
+            if (cur == node){
+                //需要进行删除
+                this->unlink(prev,cur,total_after);
+                return cur;
+            }
+            prev = cur;
+            cur = cur->next();
+        }
+        return nullptr;
+    }
     /**
      * 清空链表
      */

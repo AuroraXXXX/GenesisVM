@@ -7,8 +7,7 @@
 class OSThread;
 
 class os : public AllStatic {
-    friend void platform_init(ticks_t vm_start_time,
-                           OSThread *os_thread);
+    friend void platform_init(ticks_t vm_start_time);
 
 private:
     /**
@@ -327,7 +326,7 @@ public:
      * @param bytes 所需的内存字节数
      * @return
      */
-    int32_t create_temp_mem_fd(const char *debug_name, size_t bytes);
+    static int32_t create_temp_mem_fd(const char *debug_name, size_t bytes);
 
     enum {
         fd_read = 1 << 0,

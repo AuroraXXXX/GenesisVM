@@ -13,7 +13,7 @@
  */
 static char TimeZoneBuf[6] = {0};
 
-
+ticks_t os::_vm_start_stamp = 0;
 /**
  * 用于格式化时区信息
  *
