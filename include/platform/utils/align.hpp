@@ -174,8 +174,21 @@ inline constexpr T offset_align(T value,size_t align){
  * @return
  */
 template<std::integral T>
-inline constexpr T generate_mask(size_t width,size_t offset){
+inline constexpr T generate_mask(size_t width,size_t offset = 0){
     return ((T(1) << width ) - 1 ) << offset;
+}
+
+template<std::integral T>
+constexpr int32_t log_type(){
+    if constexpr (sizeof(T) == 1){
+        return 0;
+    }else if constexpr (sizeof(T) == 2){
+        return 1;
+    } else if constexpr (sizeof(T) == 4){
+        return 2;
+    }else if constexpr (sizeof(T) == 8){
+        return 3;
+    }
 }
 #define assert_is_aligned(bytes,align) assert(is_aligned(bytes,align),"is not aligned")
 

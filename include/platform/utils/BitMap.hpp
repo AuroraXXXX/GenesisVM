@@ -25,7 +25,8 @@ private:
     /**
      * bit map type total bits's log2
      */
-    constexpr inline static auto LOG_BITS_PER_T = LogBitsPerByte * sizeof(bm_t);
+    constexpr inline static auto LOG_BITS_PER_T = LogBitsPerByte +
+            log_type<bm_t>() ;
     constexpr inline static auto BITS_PER_T = (decltype(LOG_BITS_PER_T)) 1 << LOG_BITS_PER_T;
 protected:
 
@@ -56,24 +57,6 @@ protected:
         return word_index << LogBitsPerWord;
     };
 
-    /**
-     * 生成 mask
-     * @param start 生成的mask靠近
-     * @param beg_no 开始的位置
-     * @param end_no 结束的位置
-     * @return
-     */
-    static bm_t many_bit_mask(bool start, size_t beg_no = 0, size_t end_no = BITS_PER_T);
-
-    /**
-     * 生成mask
-     * @param bit_no 1的位置
-     * @return
-     */
-    static inline auto one_bit_mask(size_t bit_no) {
-        bit_no = offset_align(bit_no, BITS_PER_T);
-        return (bm_t) 1 << bit_no;
-    }
 
     /**
      * 将非atomic值转换成atomic类型
@@ -85,7 +68,9 @@ protected:
         const auto index = bm_index_align_down(bit_no);
         return std::atomic_ref<bm_t>(map[index]);
     };
-
+    static inline size_t bm_offset(size_t bit_no){
+        return bit_no & (BITS_PER_T - 1);
+    }
 };
 
 /**
@@ -149,21 +134,21 @@ public:
     /**
      * 统计[beg_no,end_no)区间的标记
      * @param beg_no 比特位开始序号
-     * @param end_no 比特位结束序号
+     * @param end_no 比特位结束序号 不包含
      */
     [[nodiscard]] size_t count_range(size_t beg_no, size_t end_no) const;
 
     /**
      * 设置[beg_no,end_no)区间的标记
      * @param beg_no 比特位开始序号
-     * @param end_no 比特位结束序号
+     * @param end_no 比特位结束序号 不包含
      */
     void set_range(size_t beg, size_t end);
 
     /**
      * 清除[beg_no,end_no)区间的标记
      * @param beg_no 比特位开始序号
-     * @param end_no 比特位结束序号
+     * @param end_no 比特位结束序号 不包含
      */
     void clear_range(size_t beg, size_t end);
 

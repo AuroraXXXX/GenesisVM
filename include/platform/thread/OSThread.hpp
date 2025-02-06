@@ -241,7 +241,6 @@ public:
  * 表示main线程
  */
 class MainThread : public UserThread {
-public:
 protected:
     void run() override;
 };
