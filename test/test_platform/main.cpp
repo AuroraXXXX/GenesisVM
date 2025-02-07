@@ -5,6 +5,7 @@
 #include "platform/utils/BitMap.hpp"
 #include "platform/main/init.hpp"
 #include "platform/stream/FileCharOStream.hpp"
+#include "platform/log.hpp"
 int main() {
     platform_init(0);
     auto map = new CHeapBitMap(MEMFLAG::Internal);
@@ -12,6 +13,9 @@ int main() {
     map->set_range(0,128);
     auto stream = FileCharOStream::default_stream();
     map->print_stat(stream);
+    map->clear_range(0,64);
     std::cout << "hello" << map->count_range(0,256) <<std::endl;
+    map->print_stat(stream);
+
     return 0;
 }

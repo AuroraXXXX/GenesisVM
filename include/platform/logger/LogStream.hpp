@@ -150,11 +150,11 @@ public:
      * @param ... 格式化字符串所需的参数
      */
     template<LogLevel level,
-            const char* tag0,
-            const char* tag1,
-            const char* tag2,
-            const char* tag3,
-            const char* tag4>
+            const char* tag0 = nullptr,
+            const char* tag1 = nullptr,
+            const char* tag2 = nullptr,
+            const char* tag3 = nullptr,
+            const char* tag4 = nullptr>
     static void record(const char *format, ...) {
         LogTagSet logTagSet(tag0, tag1, tag2, tag3, tag4);
         va_list args;
@@ -162,6 +162,7 @@ public:
         LogStream::record(level, logTagSet, format, args);
         va_end(args);
     }
+
 
 };
 

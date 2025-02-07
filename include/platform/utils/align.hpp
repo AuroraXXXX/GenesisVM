@@ -175,7 +175,9 @@ inline constexpr T offset_align(T value,size_t align){
  */
 template<std::integral T>
 inline constexpr T generate_mask(size_t width,size_t offset = 0){
-    return ((T(1) << width ) - 1 ) << offset;
+    // 超过时 全部视为 OXFFF....FF
+    T mask = width >= BitsPerByte * sizeof(T)? ~(T)0:(T(1) << width ) - 1;
+    return mask << offset;
 }
 
 template<std::integral T>
