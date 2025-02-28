@@ -8,7 +8,7 @@
 #include "platform/logger/LogOutput.hpp"
 #include "platform/logger/LogStream.hpp"
 #include "platform/thread/OSThread.hpp"
-
+#include "platform/logger/LogTagSet.hpp"
 
 void LogStream::record(LogLevel level, LogTagSet &tag_set, const char *format, va_list args) {
     ResourceArenaMark mark;
@@ -28,14 +28,13 @@ void LogStream::write(const void *data, size_t data_len) {
 }
 
 LogStream::LogStream(LogLevel level,
-                     const char * tag0,
-                     const char * tag1,
-                     const char * tag2,
-                     const char * tag3,
-                     const char * tag4) :
+                     LogTag tag0,
+                     LogTag tag1,
+                     LogTag tag2,
+                     LogTag tag3) :
         _line_buffer(),
         _level(level),
-        _tag_set(tag0, tag1, tag2, tag3, tag4) {
+        _tag_set(tag0, tag1, tag2, tag3) {
 }
 
 LogStream::LogStream(LogLevel level, LogTagSet &tag_set) :

@@ -8,7 +8,7 @@
 #include "constants.hpp"
 #include <cstdarg>
 #include "platform/logger/LogStream.hpp"
-
+#include "platform/logger/LogTag.hpp"
 constexpr inline size_t LOG_MAX_FOLLOWER_SIZE = 256;
 
 
@@ -42,11 +42,14 @@ enum class LogLevel : uint8_t {
  * 只有这一条日志的等级大于或者等于 监听的等级 这条日志才会写入到 日志文件中
  * 日志的级别: [trace]<[debug]<[info]<[warn]<[error]<[off]
  */
-#define log_trace(ARGS...) LogStream::record<LogLevel::trace,ARGS>
-#define log_debug(ARGS...) LogStream::record<LogLevel::debug,,ARGS>
-#define log_info(ARGS...) LogStream::record<LogLevel::info,ARGS>
-#define log_warn(ARGS...) LogStream::record<LogLevel::warn,ARGS>
-#define log_error(ARGS...) LogStream::record<LogLevel::error,ARGS>
+#define EXPAND_LOG_TAGS(t0,t1,t2,t3,...) t0,t1,t2,t3
+#define LOG_TAGS(ARGS...) EXPAND_LOG_TAGS(ARGS,LogTag::no_tag,LogTag::no_tag,LogTag::no_tag,LogTag::no_tag)
+
+#define log_trace(ARGS...) LogStream::record<LogLevel::trace,LOG_TAGS(ARGS)>
+#define log_debug(ARGS...) LogStream::record<LogLevel::debug,LOG_TAGS(ARGS)>
+#define log_info(ARGS...) LogStream::record<LogLevel::info,LOG_TAGS(ARGS)>
+#define log_warn(ARGS...) LogStream::record<LogLevel::warn,LOG_TAGS(ARGS)>
+#define log_error(ARGS...) LogStream::record<LogLevel::error,LOG_TAGS(ARGS)>
 /**
  * 使用日志输出流
  */

@@ -7,20 +7,17 @@
 
 #include <cstdarg>
 #include "platform/typedef.hpp"
+#include "LogTag.hpp"
 /**
  * 记录日志的集合
  */
 class LogTagSet {
-    constexpr static inline uint8_t LogTagSetMax = 5;
+    constexpr static inline uint8_t LogTagSetMax = 4;
 private:
     /**
      * 标签的集合
      */
-    const char* _tags[LogTagSetMax];
-
-    explicit LogTagSet() noexcept:LogTagSet(nullptr,nullptr,nullptr,nullptr,nullptr){};
-
-
+    LogTag  _tags[LogTagSetMax];
 public:
 
     /**
@@ -33,11 +30,10 @@ public:
      * @param tag4
      */
     explicit LogTagSet(
-            const char*  tag0,
-            const char*  tag1,
-            const char*  tag2,
-            const char*  tag3,
-            const char*  tag4) noexcept;
+            LogTag  tag0,
+            LogTag  tag1,
+            LogTag  tag2,
+            LogTag  tag3) noexcept;
 
     /**
      * 格式化输出标签集合字符串

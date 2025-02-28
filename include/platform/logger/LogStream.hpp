@@ -9,6 +9,7 @@
 #include "platform/logger/LogOutput.hpp"
 #include "platform/constants.hpp"
 #include "LogTagSet.hpp"
+
 class LogStream : public CharOStream {
 private:
     /**
@@ -107,11 +108,10 @@ public:
     void flush() final;
 
     explicit LogStream(LogLevel level,
-                       const char *tag0,
-                       const char * tag1,
-                       const char * tag2,
-                       const char * tag3,
-                       const char * tag4);
+                       LogTag tag0,
+                       LogTag tag1,
+                       LogTag tag2,
+                       LogTag tag3);
 
     explicit LogStream(LogLevel level,
                        LogTagSet &tag_set);
@@ -150,13 +150,12 @@ public:
      * @param ... 格式化字符串所需的参数
      */
     template<LogLevel level,
-            const char* tag0 = nullptr,
-            const char* tag1 = nullptr,
-            const char* tag2 = nullptr,
-            const char* tag3 = nullptr,
-            const char* tag4 = nullptr>
+            LogTag tag0 = LogTag::no_tag,
+            LogTag tag1 = LogTag::no_tag,
+            LogTag tag2 = LogTag::no_tag,
+            LogTag tag3 = LogTag::no_tag>
     static void record(const char *format, ...) {
-        LogTagSet logTagSet(tag0, tag1, tag2, tag3, tag4);
+        LogTagSet logTagSet(tag0, tag1, tag2, tag3);
         va_list args;
         va_start(args, format);
         LogStream::record(level, logTagSet, format, args);

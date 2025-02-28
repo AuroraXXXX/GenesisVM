@@ -5,18 +5,17 @@
 #include <cstdio>
 #include "platform/utils/robust.hpp"
 #include "platform/logger/LogTagSet.hpp"
+extern const char * LOG_TAG_NAMES[];
 
-
-LogTagSet::LogTagSet(const char *tag0,
-                     const char *tag1,
-                     const char *tag2,
-                     const char *tag3,
-                     const char *tag4) noexcept:
+LogTagSet::LogTagSet(LogTag tag0,
+                     LogTag tag1,
+                     LogTag tag2,
+                     LogTag tag3) noexcept:
         _tags{tag0,
               tag1,
               tag2,
-              tag3,
-              tag4} {
+              tag3
+              } {
 
 }
 
@@ -26,8 +25,8 @@ int LogTagSet::write_tags(char *buf, size_t buf_len, const char *split) {
     //对缓冲区进行清零
     buf[0] = '\0';
     bool is_first = true;
-    for (const char *tag: this->_tags) {
-        if (tag == nullptr) {
+    for (auto tag: this->_tags) {
+        if (tag == LogTag::no_tag) {
             //当遇到一个没有标记标签的时候 那么就应该停止输出
             break;
         }
@@ -35,6 +34,7 @@ int LogTagSet::write_tags(char *buf, size_t buf_len, const char *split) {
         if (is_first) {
             is_first = false;
         }
+        const auto tag_name = LOG_TAG_NAMES[(uint16_t)tag];
         //下面开始输出标签
         const auto writen = ::snprintf(
                 //下一次可写的位置应该在上一次之后 所以应该是缓冲区首地址 + 现在已经写入的字节数
@@ -45,7 +45,7 @@ int LogTagSet::write_tags(char *buf, size_t buf_len, const char *split) {
                 //输出 分割符，第一个标签之前应该不输出分割符
                 split_str,
                 //输出标签名称
-                tag);
+                tag_name);
         // 返回值 < 0 表明出现错误了
         assert(writen != -1, "日志的标签编码出现错误");
         if (writen < 0 || writen >= buf_len) {
