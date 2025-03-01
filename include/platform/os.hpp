@@ -7,7 +7,7 @@
 class OSThread;
 
 class os : public AllStatic {
-    friend void platform_init(ticks_t vm_start_time);
+    friend void platform_init();
 
 private:
     /**

@@ -11,7 +11,7 @@
 /**
  * 用于表示时区的
  */
-static char TimeZoneBuf[6] = {0};
+static char TimeZoneBuf[7] = {0};
 
 ticks_t os::_vm_start_stamp = 0;
 /**
@@ -25,18 +25,22 @@ ticks_t os::_vm_start_stamp = 0;
  */
 void os::time_initialize(ticks_t vm_start_stamp)
 {
+   //初始化时区信息
+    ::tzset();
     // 我们仅仅精确到分钟 所以除去60 由于东时区是 + 号，所以还要取反
-    long local_utc = -timezone;
-    TimeZoneBuf[0] = local_utc > 0 ? '+' : '-';
+    long local_utc = -::timezone;
+    char sign = local_utc > 0 ?'+':'-';
     constexpr int seconds_per_hour = SPerMin * MinPerHour;
     const long zone_hours = local_utc / seconds_per_hour;
     local_utc -= zone_hours * seconds_per_hour;
     const long zone_mins = local_utc / SPerMin;
-    ::snprintf(TimeZoneBuf + 1,
-               sizeof(TimeZoneBuf) - 1,
-               "%02d%02d",
+    ::snprintf(TimeZoneBuf ,
+               sizeof(TimeZoneBuf) ,
+               "%c%02d:%02d",
+               sign,
                (int)zone_hours,
                (int)zone_mins);
+
     // 记录虚拟机启动时间
     os::_vm_start_stamp = vm_start_stamp;
 }
@@ -97,9 +101,7 @@ int32_t os::iso8061(
     constexpr auto ns_per_sec = TicksPerS / TicksPerNS;
     const auto seconds_since_19700101 = (long)(current_stamp / ns_per_sec);
     const auto nanos_after_19700101 = (long)(current_stamp - seconds_since_19700101 * ns_per_sec);
-    struct tm time_struct
-    {
-    };
+    struct tm time_struct{};
     if (utc)
     {
         /**
@@ -131,7 +133,7 @@ int32_t os::iso8061(
                                    (double)ns_per_sec +
                                time_struct.tm_sec;
     auto printLen = ::snprintf(buf, buf_len,
-                               "%04d-%02d-%02dT%02d:%02d:%0*.*f%s",
+                               "%04d-%02d-%02d %02d:%02d:%0*.*f %s",
                                1900 + time_struct.tm_year,
                                1 + time_struct.tm_mon,
                                time_struct.tm_mday,

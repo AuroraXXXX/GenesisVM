@@ -6,8 +6,14 @@
 #include "platform/main/init.hpp"
 #include "platform/stream/FileCharOStream.hpp"
 #include "platform/log.hpp"
+
+
+
+
+
+
 int main() {
-    platform_init(0);
+    platform_init();
     log_error(LogTag::platform)("adv");
 
     return 0;

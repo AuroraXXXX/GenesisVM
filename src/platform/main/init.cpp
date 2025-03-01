@@ -8,8 +8,9 @@
 #include "platform/stream/FileCharOStream.hpp"
 #include "platform/thread/OSThread.hpp"
 
-void platform_init(ticks_t vm_start_time) {
-    os::time_initialize(vm_start_time);
+void platform_init() {
+    auto stamp =  os::current_stamp();
+    os::time_initialize(stamp);
     os::native_prio_initialize();
     MemoryTracer::initialize();
     //1. 先进性初始化内存池

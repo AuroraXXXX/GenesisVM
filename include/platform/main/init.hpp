@@ -11,9 +11,8 @@ class OSThread;
 
 /**
  * 初始化函数
- * @param vm_start_time vm起始的时间戳
  */
-extern void platform_init(ticks_t vm_start_time);
+extern void platform_init();
 /**
  * 销毁函数 将缓冲区输出
  */

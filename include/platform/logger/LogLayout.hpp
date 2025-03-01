@@ -77,7 +77,7 @@ private:
     /**
      * 默认的日志布局器的布局情况
      */
-    static const inline uint32_t DefaultMask = (1u << uptimems) | (1u << level) | (1u << tags);
+    static const inline uint32_t DefaultMask = (1u << uptimems) | (1u << level) | (1u << tags) | (1u << time);
 
     /**
      * 获取指定日志布局器参数启用情况的遮罩

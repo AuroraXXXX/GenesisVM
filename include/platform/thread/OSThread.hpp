@@ -42,7 +42,8 @@ public:
         THREAD_STATE_DECL(BLOCKED)    // 线程对象已经被阻塞 停止运行了
     };
 private:
-    friend void platform_init(ticks_t vm_start_time);
+
+    friend void platform_init();
 
     typedef unsigned long thread_id_t;
 

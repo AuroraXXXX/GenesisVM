@@ -91,10 +91,10 @@ constexpr inline uint32_t SpinDefaultSleepNs = 1000;
 
 /**
  * iso8601 格式化所需的 最小缓冲区的大小
- * "YYYY-MM-DDThh:mm:ss.mmm+zz:zz"
- * "YYYY-MM-DDThh:mm:ss.mmmZ" UTC时间
+ * "YYYY-MM-DD hh:mm:ss.mmm +zz:zz"
+ * "YYYY-MM-DD hh:mm:ss.mmm " UTC时间
  */
-constexpr inline int16_t ISO8601_BUF_SIZE = 30;
+constexpr inline int16_t ISO8601_BUF_SIZE = 32;
 /**
  * 32有符号数 10进制 所需的缓冲区
  * 包括所需的正负号
