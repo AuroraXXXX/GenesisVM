@@ -8,7 +8,7 @@
 #include "platform/utils/robust.hpp"
 #include "MemoryTracer.hpp"
 #include "platform/mem/Arena.hpp"
-#include "platform/thread/OSThread.hpp"
+#include "platform/concurrent/OSThread.hpp"
 /**
  * -----------------------------
  * CHeap 内存申请和分配

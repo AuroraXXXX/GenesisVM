@@ -2,11 +2,9 @@
 // Created by aurora on 2023/1/13.
 //
 
-#include "platform/thread/WaitBarrier.hpp"
-#include "platform/thread/ThreadStatusTrans.hpp"
+#include "platform/concurrent/WaitBarrier.hpp"
+#include "platform/concurrent/ThreadStatusTrans.hpp"
 #include "platform/utils/robust.hpp"
-#include "platform/os.hpp"
-#include "pthread.h"
 #include <linux/futex.h>
 #include <unistd.h>
 #include <sys/syscall.h>

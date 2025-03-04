@@ -10,7 +10,7 @@
 #include <sys/resource.h>
 #include "platform/os.hpp"
 #include "platform/utils/robust.hpp"
-#include "platform/thread/OSThread.hpp"
+#include "platform/concurrent/OSThread.hpp"
 #include "platform/constants.hpp"
 #include "platform/main/global.hpp"
 
@@ -130,7 +130,7 @@ void os::native_prio_initialize() {
 }
 
 bool os::create_thread(OSThread *thread, bool detach) {
-    assert(thread != nullptr, "thread is null");
+    assert(thread != nullptr, "concurrent is null");
     assert(thread->_os_state == OSThread::STATE_NEW, "check");
     //初始化线程属性 以及将系统线程声明为分离线程 这样可以防止内存泄露
     pthread_attr_t attr;

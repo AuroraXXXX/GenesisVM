@@ -3,7 +3,7 @@
 //
 
 #include "GlobalLocker.hpp"
-#include "platform/thread/Mutex.hpp"
+#include "platform/concurrent/Mutex.hpp"
 static Mutex Global_lock("global_lock");
 GlobalLocker::GlobalLocker() {
     Global_lock.lock();

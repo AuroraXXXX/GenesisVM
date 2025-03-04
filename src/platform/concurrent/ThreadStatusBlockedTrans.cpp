@@ -1,8 +1,8 @@
 //
 // Created by aurora on 2024/6/28.
 //
-#include "platform/thread/ThreadStatusTrans.hpp"
-#include "platform/thread/OSThread.hpp"
+#include "platform/concurrent/ThreadStatusTrans.hpp"
+#include "platform/concurrent/OSThread.hpp"
 
 ThreadStatusBlockedTrans::ThreadStatusBlockedTrans() {
     this->_self = OSThread::current();

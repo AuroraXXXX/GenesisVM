@@ -2,9 +2,9 @@
 // Created by aurora on 2023/10/21.
 //
 
-#include "platform/thread/Mutex.hpp"
-#include "platform/thread/OSThread.hpp"
-#include "platform/thread/ThreadStatusTrans.hpp"
+#include "platform/concurrent/Mutex.hpp"
+#include "platform/concurrent/OSThread.hpp"
+#include "platform/concurrent/ThreadStatusTrans.hpp"
 #include "platform/stream/CharOStream.hpp"
 #include "platform/utils/robust.hpp"
 Mutex::Mutex(

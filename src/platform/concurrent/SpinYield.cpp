@@ -1,7 +1,7 @@
 // Created by aurora on 2023/1/22.
 //
 
-#include "platform/thread/SpinYield.hpp"
+#include "platform/concurrent/SpinYield.hpp"
 #include "platform/os.hpp"
 #include "platform/stream/CharOStream.hpp"
 #include "platform/utils/robust.hpp"

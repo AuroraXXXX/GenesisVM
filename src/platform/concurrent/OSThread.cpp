@@ -2,12 +2,12 @@
 // Created by aurora on 2022/12/5.
 //
 
-#include "platform/thread/OSThread.hpp"
+#include "platform/concurrent/OSThread.hpp"
 #include "platform/utils/robust.hpp"
 #include "platform/stream/CharOStream.hpp"
 #include "platform/os.hpp"
 #include <pthread.h>
-#include "platform/thread/Mutex.hpp"
+#include "platform/concurrent/Mutex.hpp"
 
 thread_local OSThread *OSThread::_current = nullptr;
 OSThread *OSThread::_main_thread = nullptr;
@@ -85,7 +85,7 @@ void OSThread::print_on(CharOStream *out) const {
 void *OSThread::native_call(void *params) {
     assert(params != nullptr, "check");
     auto osThread = reinterpret_cast<OSThread *>(params);
-    assert(osThread->state() == OSThread::STATE_READY, "thread state is error.");
+    assert(osThread->state() == OSThread::STATE_READY, "concurrent state is error.");
     //进行前期的
     OSThread::_current = osThread;
     osThread->_kernel_id = os::current_thread_id();
@@ -105,12 +105,12 @@ void *OSThread::native_call(void *params) {
 
 void OSThread::attach_main_thread(OSThread *main_thread) {
     assert(main_thread != nullptr, "not null");
-    assert(main_thread->state() == OSThread::STATE_NEW, "thread state is error.");
+    assert(main_thread->state() == OSThread::STATE_NEW, "concurrent state is error.");
     OSThread::_main_thread = main_thread;
 
     //调用函数进行初始化
     main_thread->_os_state.store(OSThread::STATE_READY);
-    assert(main_thread->state() == OSThread::STATE_READY, "thread state is error.");
+    assert(main_thread->state() == OSThread::STATE_READY, "concurrent state is error.");
     //进行前期的
     OSThread::_current = main_thread;
     main_thread->_kernel_id = os::current_thread_id();
@@ -134,7 +134,7 @@ ResourceArenaMark::~ResourceArenaMark() {
  * UserThread
  * ----------------
  */
-Mutex *UserThread::_lock = new Mutex("user-thread-list");
+Mutex *UserThread::_lock = new Mutex("user-concurrent-list");
 SingleLinkedList<UserThread> UserThread::_list;
 
 void UserThread::pre_run() {
@@ -160,7 +160,7 @@ const char *UserThread::name() {
  * DaemonThread
  * ----------------
  */
-Mutex *DaemonThread::_lock = new Mutex("daemon-thread-list");
+Mutex *DaemonThread::_lock = new Mutex("daemon-concurrent-list");
 SingleLinkedList<DaemonThread> DaemonThread::_list;
 
 void DaemonThread::pre_run() {

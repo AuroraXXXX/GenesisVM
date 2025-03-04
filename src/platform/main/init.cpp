@@ -6,7 +6,7 @@
 #include "MemoryTracer.hpp"
 #include "ArenaChunkPool.hpp"
 #include "platform/stream/FileCharOStream.hpp"
-#include "platform/thread/OSThread.hpp"
+#include "platform/concurrent/OSThread.hpp"
 
 void platform_init() {
     auto stamp =  os::current_stamp();

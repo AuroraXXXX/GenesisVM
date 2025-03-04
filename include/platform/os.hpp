@@ -8,7 +8,11 @@ class OSThread;
 
 class os : public AllStatic {
     friend void platform_init();
-
+    /**
+     * ---------------
+     * 时间类型
+     * ---------------
+     */
 private:
     /**
      * VM启动的时间戳
@@ -83,7 +87,7 @@ public:
 
     /**
      * ---------------------
-     * thread 相关
+     * concurrent 相关
      * ---------------------
      */
 
