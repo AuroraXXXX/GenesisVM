@@ -134,16 +134,16 @@ ResourceArenaMark::~ResourceArenaMark() {
  * UserThread
  * ----------------
  */
-Mutex *UserThread::_lock = new Mutex("user-concurrent-list");
+Mutex *UserThread::_locker = new Mutex("user-concurrent-list");
 SingleLinkedList<UserThread> UserThread::_list;
 
 void UserThread::pre_run() {
-    MutexLocker locker(UserThread::_lock);
+    MutexLocker locker(UserThread::_locker);
     UserThread::_list.add_to_head(this);
 }
 
 void UserThread::post_run() {
-    MutexLocker locker(UserThread::_lock);
+    MutexLocker locker(UserThread::_locker);
     UserThread::_list.remove(this);
 }
 
@@ -155,21 +155,23 @@ const char *UserThread::name() {
 }
 
 
+
+
 /**
  * ----------------
  * DaemonThread
  * ----------------
  */
-Mutex *DaemonThread::_lock = new Mutex("daemon-concurrent-list");
+Mutex *DaemonThread::_locker = new Mutex("daemon-concurrent-list");
 SingleLinkedList<DaemonThread> DaemonThread::_list;
 
 void DaemonThread::pre_run() {
-    MutexLocker locker(DaemonThread::_lock);
+    MutexLocker locker(DaemonThread::_locker);
     DaemonThread::_list.add_to_head(this);
 }
 
 void DaemonThread::post_run() {
-    MutexLocker locker(DaemonThread::_lock);
+    MutexLocker locker(DaemonThread::_locker);
     DaemonThread::_list.remove(this);
 }
 

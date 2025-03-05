@@ -18,7 +18,7 @@ public:
 
 int main() {
     platform_init();
-    log_error(LogTag::platform)("adv");
+    log_error(platform)("adv");
     auto thread =new TestThread();
     os::create_thread(thread);
 

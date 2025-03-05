@@ -6,7 +6,6 @@
 #define PLATFORM_SINGLE_LINKED_LIST_HPP
 
 #include "platform/utils/robust.hpp"
-
 /**
  * 单链表
  * @tparam T 类型
@@ -31,7 +30,7 @@ private:
      * @param total_after 需要删除节点的之后的所有节点 是不是也从链表上删除
      */
     void unlink(T* prev,T* cur,bool total_after){
-        const auto next = cur->next();
+        T* next = cur->next();
         if(prev == nullptr){
             //删除的是头节点
             this->_head = next;
@@ -55,11 +54,11 @@ public:
             _head(nullptr),
             _tail(nullptr) {};
 
-    inline auto head() const {
+    inline T* head() const {
         return this->_head;
     };
 
-    inline auto tail() const {
+    inline T* tail() const {
         return this->_tail;
     };
      inline void set_head(T* head){
@@ -117,7 +116,6 @@ public:
     void iter(F func){
         SingleLinkedList<T>::iter(this->_head,func);
     };
-
     /**
      * 寻找要删除的节点的前驱节点
      * @param equal_func 寻找的删除节点的函数，true表示寻找到 需要进行删除

@@ -146,11 +146,13 @@ public:
         return this->_priority;
     };
 
-
+    /**
+     * 获取线程的状态
+     * @return
+     */
     [[nodiscard]] inline auto state() const {
         return this->_os_state.load();
     };
-
 
     /**
      * 是否是线程的过度状态
@@ -179,7 +181,23 @@ public:
         return OSThread::is_tans_state(this->state());
     };
 
+    /**
+     * 所属的类型名
+     * @return
+     */
     virtual const char *name() = 0;
+
+    /**
+     * 该对象是不是 用户线程
+     * @return
+     */
+    virtual bool is_user_thread() = 0;
+
+    /**
+     * 该对象是不是 守护线程
+     * @return
+     */
+    virtual bool is_daemon_thread() = 0;
 
     /**
      * 更新线程的状态
@@ -207,6 +225,8 @@ protected:
 
 };
 
+class OSThreadClosure;
+
 /**
  * 表示用户线程 ，支持放入到用户线程链表中
  */
@@ -214,15 +234,19 @@ class UserThread : public OSThread {
     friend class SingleLinkedList<UserThread>;
 
 private:
-    static Mutex *_lock;
+    static Mutex *_locker;
     static SingleLinkedList<UserThread> _list;
-    UserThread *_next;
+    std::atomic<UserThread *> _next;
+    /**
+     * 用于检测用户线程是否存活（在检测进入安全点的时候使用）
+     */
+    UserThread *_stilling_next;
 
     inline void set_next(UserThread *next) {
         this->_next = next;
     };
 
-    inline auto next() {
+    inline UserThread *next() {
         return this->_next;
     }
 
@@ -233,9 +257,52 @@ protected:
     void post_run() override;
 
 public:
+    /**
+     * 表示用户线程
+     * @return
+     */
+    bool is_user_thread() override {
+        return true;
+    };
+
+    /***
+     * 表示不是守护线程
+     * @return
+     */
+    bool is_daemon_thread() override {
+        return false;
+    };
+
+    /**
+     * 锁定链表，不允许新创建的线程对象添加到链表，那么就不会执行用户的run函数中的代码
+     */
+    static inline Mutex *locker() {
+        return UserThread::_locker;
+    };
+
+    /**
+     * 获取链表
+     * @return
+     */
+    static inline auto &list() {
+        return UserThread::_list;
+    };
+
+    /**
+     * 对象类型名
+     * @return
+     */
     const char *name() override;
 
     explicit UserThread();
+
+    inline void set_stilling_next(UserThread *next) {
+        this->_stilling_next = next;
+    };
+
+    inline auto stilling_next() {
+        return this->_stilling_next;
+    };
 };
 
 /**
@@ -253,16 +320,19 @@ class DaemonThread : public OSThread {
     friend class SingleLinkedList<DaemonThread>;
 
 private:
-    static Mutex *_lock;
+    /**
+     * 保证线程安全的锁
+     */
+    static Mutex *_locker;
     static SingleLinkedList<DaemonThread> _list;
-    DaemonThread *_next;
+    std::atomic<DaemonThread *> _next;
 
     inline void set_next(DaemonThread *next) {
-        this->_next = next;
+        this->_next.store(next);
     };
 
     inline auto next() {
-        return this->_next;
+        return this->_next.load();
     }
 
 protected:
@@ -273,9 +343,18 @@ protected:
     void post_run() override;
 
 public:
+    bool is_user_thread() override {
+        return false;
+    };
+
+    bool is_daemon_thread() override {
+        return true;
+    };
+
     const char *name() override;
 
     explicit DaemonThread();
+
 };
 
 /**

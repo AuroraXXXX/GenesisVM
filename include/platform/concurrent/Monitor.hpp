@@ -45,5 +45,36 @@ public:
     };
 };
 
+class MonitorLocker : public StackObject {
+private:
+    Monitor *const _monitor;
+    NONCOPYABLE(MonitorLocker);
 
+public:
+    inline  explicit MonitorLocker(Monitor *monitor) : _monitor(monitor) {
+        assert(monitor != nullptr, "mutex 对象不为空");
+        this->_monitor->lock();
+    };
+
+    inline ~MonitorLocker() {
+        this->_monitor->unlock();
+    };
+    /**
+     * 等待
+     * @param millis 0表示永久等待
+     * @return false 表示超时
+     */
+    inline auto wait(ticks_t millis = 0) {
+        OSReturn osReturn = this->_monitor->wait(millis);
+        return osReturn == OSReturn::OK;
+    };
+
+    inline void notify() {
+        this->_monitor->notify();
+    };
+
+    inline void notify_all(){
+        this->_monitor->notify_all();
+    };
+};
 #endif //PLATFORM_MONITOR_HPP

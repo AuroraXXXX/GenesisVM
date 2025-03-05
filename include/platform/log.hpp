@@ -42,8 +42,8 @@ enum class LogLevel : uint8_t {
  * 只有这一条日志的等级大于或者等于 监听的等级 这条日志才会写入到 日志文件中
  * 日志的级别: [trace]<[debug]<[info]<[warn]<[error]<[off]
  */
-#define EXPAND_LOG_TAGS(t0,t1,t2,t3,...) t0,t1,t2,t3
-#define LOG_TAGS(ARGS...) EXPAND_LOG_TAGS(ARGS,LogTag::no_tag,LogTag::no_tag,LogTag::no_tag,LogTag::no_tag)
+#define EXPAND_LOG_TAGS(t0,t1,t2,t3,...) LogTag::t0,LogTag::t1,LogTag::t2,LogTag::t3
+#define LOG_TAGS(ARGS...) EXPAND_LOG_TAGS(ARGS,no_tag,no_tag,no_tag,no_tag)
 
 #define log_trace(ARGS...) LogStream::record<LogLevel::trace,LOG_TAGS(ARGS)>
 #define log_debug(ARGS...) LogStream::record<LogLevel::debug,LOG_TAGS(ARGS)>
@@ -53,6 +53,6 @@ enum class LogLevel : uint8_t {
 /**
  * 使用日志输出流
  */
-#define log_stream(level,ARGS...) LogStream log(LogLevel::level,ARGS)
+#define log_stream(level,ARGS...) LogStream log(LogLevel::level,LOG_TAGS(ARGS))
 
 #endif //LOGGING_LOG_HPP

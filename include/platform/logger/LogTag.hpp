@@ -6,7 +6,9 @@
 #define PLATFORM_LOG_TAG_HPP
 #include "platform/typedef.hpp"
 #define LOG_TAG_DECL(decl) \
-decl(platform)
+decl(platform)             \
+decl(safepoint)            \
+decl(daemon)
 
 
 
