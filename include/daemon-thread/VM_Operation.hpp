@@ -38,17 +38,21 @@ public:
     inline auto calling_thread() {
         return this->_calling_thread;
     };
-
+    /**
+     * 会被VMThread函数调用
+     */
     virtual void doit() = 0;
 
     /**
      * 返回true 才会调用doit
+     * 在当前线程中执行
      * @return
      */
     virtual bool doit_prologue() { return true; };
 
     /**
      * 调用doit完毕后再调用
+     * 在当前线程中执行
      */
     virtual void doit_epilogue() {};
 

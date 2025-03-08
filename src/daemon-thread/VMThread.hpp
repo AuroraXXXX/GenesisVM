@@ -16,6 +16,16 @@ class Monitor;
  * 提供全局的安全点
  */
 class VMThread : public DaemonThread {
+public:
+    enum class VMState{
+        creating,
+        //正在执行
+        running,
+        //应该被终止，会逐步终止
+        should_terminate,
+        //已经进入到终止状态
+        terminated
+    };
 private:
 
     /**
@@ -33,14 +43,18 @@ private:
     /**
      * 标记线程是否应该终止
      */
-    std::atomic<bool> _should_terminate;
+    std::atomic<VMState> _vm_state;
     /**
-     * 标记线程是否已经终止
+     * 当前正在执行的 operation
      */
-    std::atomic<bool> _is_terminate;
-    std::atomic<VM_Operation *> _cur_operation;
-    std::atomic<VM_Operation *> _next_operation;
-
+    std::atomic<VM_Operation *> _cur_execute_operation;
+    /**
+     * 等待执行的 operation
+     */
+    std::atomic<VM_Operation *> _wait_execute_operation;
+    inline auto should_terminate(){
+        return this->_vm_state.load() == VMState::should_terminate;
+    }
 
     explicit VMThread();
 
@@ -68,7 +82,7 @@ private:
      * @param operation
      * @return 操作是否成功
      */
-    bool set_next_operation(VM_Operation *operation);
+    bool set_wait_operation(VM_Operation *operation);
 
 
 public:
@@ -76,7 +90,9 @@ public:
     static inline VMThread *vm_thread() {
         return _vm_thread;
     };
-
+    /**
+     * 创建内核线程
+     */
     static void create();
 
     static void destroy();
