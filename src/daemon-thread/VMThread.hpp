@@ -60,10 +60,6 @@ private:
 
     void loop();
 
-    /**
-     * VMThread本身等待VM_Operation去执行
-     */
-    void wait_for_operation();
 
     /**
      * VM_Thread本身去执行VM_Operation

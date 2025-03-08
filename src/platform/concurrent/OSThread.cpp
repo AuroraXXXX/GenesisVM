@@ -116,6 +116,9 @@ void OSThread::attach_main_thread(OSThread *main_thread) {
     main_thread->_kernel_id = os::current_thread_id();
     main_thread->_plib_id = ::pthread_self();
     main_thread->tans_state(OSThread::STATE_RUNNING);
+    std::atomic_thread_fence(std::memory_order::seq_cst);
+    //将其放入电表中
+    main_thread->pre_run();
 }
 
 

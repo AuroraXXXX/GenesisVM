@@ -77,6 +77,7 @@ public:
     void add_to_head(T *t) {
         assert(t != nullptr, "must be");
         t->set_next(this->_head);
+        this->_head = t;
         if (this->_tail == nullptr) {
             this->_tail = t;
         }
@@ -88,6 +89,7 @@ public:
     void add_to_tail(T *t) {
         assert(t != nullptr, "must be");
         t->set_next(this->_tail);
+        this->_tail = t;
         if (this->_head == nullptr) {
             this->_head = t;
         }

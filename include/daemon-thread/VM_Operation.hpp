@@ -11,7 +11,7 @@
 class OSThread;
 
 /**
- * VM操作函数
+ * VM操作
  */
 class VM_Operation : public StackObject {
     friend class VMThread;
@@ -20,7 +20,7 @@ private:
     OSThread *_calling_thread;
 
     /**
-     * 被VMThread调用，内部会调用doit，不允许进行调用
+     * 被VMThread调用，内部会调用doit，doit不允许进行调用
      */
     void evaluate();
 
