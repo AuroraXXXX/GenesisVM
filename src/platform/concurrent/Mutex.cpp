@@ -7,6 +7,7 @@
 #include "platform/concurrent/ThreadStatusTrans.hpp"
 #include "platform/stream/CharOStream.hpp"
 #include "platform/utils/robust.hpp"
+
 Mutex::Mutex(
         const char *name,
         bool recursive) noexcept:
@@ -28,7 +29,7 @@ Mutex::~Mutex() {
 }
 
 bool Mutex::owned_by_self() const {
-    return OSThread::current() == this->owner() && this->owner() != nullptr;
+    return (OSThread::current() == this->owner()) && (this->owner() != nullptr);
 }
 
 bool Mutex::try_lock() {
@@ -38,7 +39,7 @@ bool Mutex::try_lock() {
     if (success) {
         assert(!this->is_locked() || this->owned_by_self(), "mutex owner设置错误");
         //is locked
-        if(!is_locked()){
+        if (!is_locked()) {
             this->set_owner(OSThread::current());
         }
     }
@@ -47,25 +48,26 @@ bool Mutex::try_lock() {
 
 void Mutex::lock() {
     //
-    int32_t status ;
+    int32_t status;
     {
         ThreadStatusBlockedTrans blocked;
         status = ::pthread_mutex_lock(&this->_mutex);
     }
     assert(status == 0, "pthread_mutex_lock");
-  //  assert(!this->is_locked() || this->owned_by_self(), "mutex owner设置错误 %x %x",this->owner(),OSThread::current());
-    if(!(!this->is_locked() || this->owned_by_self())){
-        guarantee(false,"??");
+    //  assert(!this->is_locked() || this->owned_by_self(), "mutex owner设置错误 %x %x",this->owner(),OSThread::current());
+    if (!(!this->is_locked() || this->owned_by_self())) {
+        guarantee(false, "??");
     }
     //is locked
-    if(!is_locked()){
+    if (!is_locked()) {
         this->set_owner(OSThread::current());
     }
 
 }
 
 void Mutex::unlock() {
-    assert(this->owned_by_self(), "check");
+    auto result = this->owned_by_self();
+    assert(result, "check");
     this->set_owner(nullptr);
     auto status = ::pthread_mutex_unlock(&this->_mutex);
     assert(status == 0, "pthread_mutex_unlock");

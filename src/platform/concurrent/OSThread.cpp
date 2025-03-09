@@ -150,14 +150,15 @@ void UserThread::post_run() {
     UserThread::_list.remove(this);
 }
 
-UserThread::UserThread() : _next(nullptr), OSThread() {
+UserThread::UserThread() :
+        _next(nullptr),
+        _stilling_next(nullptr),
+        OSThread() {
 }
 
 const char *UserThread::name() {
     return "UserThread";
 }
-
-
 
 
 /**

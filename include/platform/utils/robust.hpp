@@ -70,7 +70,7 @@ do{                                                                 \
     if(!(p)){                                                       \
         report_vm_error(__FILE__,                         \
                         __LINE__,                                   \
-                        "assert(" #p ")failed",                          \
+                        "assert(" #p ") failed ",                          \
                         msg,                                        \
                         ##args);                                    \
     }                                                               \
@@ -87,7 +87,7 @@ do{                                                                 \
     if(!(p)){                                                       \
         report_vm_error(__FILE__,                                   \
                         __LINE__,                                   \
-                        "guarantee(" #p ")failed",                          \
+                        "guarantee(" #p ") failed",                          \
                         msg,                                        \
                         ##args);                                    \
     }                                                               \

@@ -24,7 +24,7 @@ void Safepoint::begin() {
      * 调用 LangThreadList_lock
      * 我们确保从此刻到退出安全点期间没有LangThread被创建和销毁
      */
-    UserThread::locker()->unlock();
+    UserThread::locker()->lock();
     log_debug(safepoint)("正在使用%s wait barrier 初始化安全点(Safepoint)同步器.",
                       WaitBarrier::description());
 
