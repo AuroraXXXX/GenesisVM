@@ -225,7 +225,6 @@ protected:
 
 };
 
-class OSThreadClosure;
 
 /**
  * 表示用户线程 ，支持放入到用户线程链表中

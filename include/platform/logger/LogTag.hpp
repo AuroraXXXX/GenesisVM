@@ -8,8 +8,8 @@
 #define LOG_TAG_DECL(decl) \
 decl(platform)             \
 decl(safepoint)            \
-decl(daemon)
-
+decl(daemon)               \
+decl(robust)
 
 
 enum class LogTag:uint16_t {

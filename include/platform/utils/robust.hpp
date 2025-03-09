@@ -124,4 +124,25 @@ do{                                                                 \
         }while(0)
 
 
+/**
+ * ---------------------
+ *
+ * ---------------------
+ */
+class Mutex;
+#ifdef DEBUG_MODE_ONLY
+
+/**
+ * 断言该线程已经获取了锁
+ * @param mutex
+ */
+extern void assert_lock_strong(Mutex *lock);
+
+extern void assert_locked_or_safepoint(Mutex *lock);
+
+#else
+#define assert_lock_strong(lock)
+#define assert_locked_or_safepoint(lock)
+#endif
+
 #endif //PLATFORM_ROBUST_HPP

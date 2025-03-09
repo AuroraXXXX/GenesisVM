@@ -17,7 +17,7 @@ class Monitor;
  */
 class VMThread : public DaemonThread {
 public:
-    enum class VMState{
+    enum class VMState {
         creating,
         //正在执行
         running,
@@ -35,11 +35,11 @@ private:
     /**
      * 运行VMOperation所需的lock
      */
-    static  Monitor *VMOperation_lock;
+    static Monitor *VMOperation_lock;
     /**
      * 锁定,当线程释放时。会唤醒等待在该锁上的线程
      */
-    static Monitor * VMThreadTerminate_lock;
+    static Monitor *VMThreadTerminate_lock;
     /**
      * 标记线程是否应该终止
      */
@@ -52,12 +52,16 @@ private:
      * 等待执行的 operation
      */
     std::atomic<VM_Operation *> _wait_execute_operation;
-    inline auto should_terminate(){
+
+    inline auto should_terminate() {
         return this->_vm_state.load() == VMState::should_terminate;
     }
 
     explicit VMThread();
 
+    /**
+     * 实际循环执行operation
+     */
     void loop();
 
 
@@ -86,6 +90,7 @@ public:
     static inline VMThread *vm_thread() {
         return _vm_thread;
     };
+
     /**
      * 创建内核线程
      */

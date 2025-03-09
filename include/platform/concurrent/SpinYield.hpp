@@ -8,6 +8,7 @@
 #include "platform/allocation.hpp"
 #include "platform/constants.hpp"
 #include "platform/macro.hpp"
+
 /**
  * 自旋或者睡眠
  */
@@ -59,9 +60,9 @@ public:
      *                      0 表示不让出 CPU
      * @param sleep_ns 睡眠的时间(每次)
      */
-    explicit SpinYield(uint32_t spin_limit = SpinDefaultSpinLimit,
-                       uint32_t yield_limit = SpinDefaultYieldLimit,
-                       uint32_t per_sleep_ns = SpinDefaultSleepNs);
+    explicit SpinYield(uint32_t spin_limit = 4096,
+                       uint32_t yield_limit = 64,
+                       uint32_t per_sleep_ns = 1000);
 
     /**
      * 等待一次

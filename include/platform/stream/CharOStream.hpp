@@ -104,6 +104,15 @@ public:
      *          <0 表示出现了错误，状态码看本类中的定义
      */
     OSReturn print_cr(const char *format, ...);
+    /**
+     * 输出数据
+     * @param format
+     * @param args
+     * @return
+     */
+    inline OSReturn print_va_list_cr(const char *format, va_list args) {
+        return this->do_vsnprintf_with_buf(true, format, args);
+    }
 
     /**
      * 输出换行符

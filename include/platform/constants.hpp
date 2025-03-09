@@ -71,23 +71,7 @@ enum ThreadPriority: int16_t {
     TotalPriority = 11
 };
 
-/**
- * ---------------------
- * 自旋锁默认设置
- * ---------------------
- */
-/**
- * 默认自旋的次数
- */
-constexpr inline uint32_t SpinDefaultSpinLimit = 4096;
-/**
- * 超过自旋的次数 经执行让出CPU的操作
- */
-constexpr inline uint32_t SpinDefaultYieldLimit = 64;
-/**
- * 超出让出CPU次数后 进行睡眠
- */
-constexpr inline uint32_t SpinDefaultSleepNs = 1000;
+
 
 /**
  * iso8601 格式化所需的 最小缓冲区的大小

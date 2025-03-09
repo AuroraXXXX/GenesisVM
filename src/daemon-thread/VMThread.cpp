@@ -34,13 +34,13 @@ void VMThread::run() {
 
 void VMThread::create() {
     //1 创建线程对象
-    VMThread::_vm_thread =new VMThread();
+    VMThread::_vm_thread = new VMThread();
     //2 创建实际的os对象
     if (!os::create_thread(VMThread::_vm_thread)) {
         guarantee(false, "init failed");
-    }else{
+    } else {
         //
-        log_info(daemon)("%s:VMThread create is success!",VMThread::_vm_thread->name());
+        log_info(daemon)("%s:VMThread create is success!", VMThread::_vm_thread->name());
     }
 }
 
@@ -56,7 +56,7 @@ void VMThread::destroy() {
     }
     {
         //等待VMThread进行中止的相关操作。VMThrea执行完毕终止操作后，会自动唤醒本线程
-        MonitorLocker ml(VMOperation_lock);
+        MonitorLocker ml(VMThreadTerminate_lock);
         while (vm_thread->_vm_state.load() != VMState::terminated) {
             ml.wait();
         }
@@ -83,7 +83,6 @@ void VMThread::loop() {
             mo_lock.notify_all();
             while (!this->should_terminate()) {
                 if (this->_wait_execute_operation.load() != nullptr)
-
                     break;
                 assert(this->_cur_execute_operation.load() == nullptr, "must be");
                 assert(this->_wait_execute_operation.load() == nullptr, "must be");
@@ -101,7 +100,6 @@ void VMThread::loop() {
         this->_wait_execute_operation.store(nullptr);
     }
 }
-
 
 
 void VMThread::inner_execute(VM_Operation *operation) {
@@ -200,7 +198,8 @@ bool VMThread::set_wait_operation(VM_Operation *operation) {
         return false;
     }
     this->_wait_execute_operation.store(operation);
-    log_debug(daemon)("UserThread(%d):Adding VM operation: %s", os::current_thread_id(), this->_wait_execute_operation.load()->name());
+    log_debug(daemon)("UserThread(%d):Adding VM operation: %s", os::current_thread_id(),
+                      this->_wait_execute_operation.load()->name());
     assert(this->_wait_execute_operation.load() != nullptr, "must be");
     return true;
 }
