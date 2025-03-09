@@ -28,6 +28,8 @@ void report_vm_error(
         log.print_va_list_cr(detail_msg,args);
         va_end(args);
     }
+    //进行异常的退出
+    ::abort();
 }
 
 
@@ -48,6 +50,8 @@ void report_vm_error(
          log.print_va_list_cr(msg,args);
          va_end(args);
      }
+    //进行异常的退出
+     ::abort();
 }
 
 #ifdef DEBUG_MODE_ONLY
