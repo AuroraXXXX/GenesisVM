@@ -45,6 +45,8 @@ private:
 
     friend void platform_init();
 
+    friend void platform_destroy();
+
     typedef unsigned long thread_id_t;
 
     friend class os;

@@ -23,4 +23,5 @@ void platform_init() {
 void platform_destroy() {
     MemoryTracer::flush();
     FileCharOStream::flush_default_stream();
+    OSThread::main_thread()->post_run();
 }

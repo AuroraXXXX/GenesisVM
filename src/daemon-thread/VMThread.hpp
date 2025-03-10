@@ -112,7 +112,7 @@ public:
      * 判断调用者所在的线程对象是
      * @return
      */
-    static bool is_vm_thread_caller() {
+    static inline bool is_vm_thread_caller() {
         return VMThread::_vm_thread == OSThread::current();
     };
 protected:
