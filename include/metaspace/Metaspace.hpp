@@ -7,11 +7,15 @@
 
 #include "platform/mem/AllStatic.hpp"
 #include "platform/typedef.hpp"
+#include "platform/concurrent/Mutex.hpp"
 class CharOStream;
-
 class Metaspace : public AllStatic {
+private:
+    static Mutex Metaspace_lock;
 public:
-
+    inline static Mutex* locker(){
+        return &Metaspace_lock;
+    };
     /**
      * 用于设置元空间的参数
      */

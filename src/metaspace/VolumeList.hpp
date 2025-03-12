@@ -42,7 +42,7 @@ namespace metaspace {
          * @return
          */
         [[nodiscard]] inline size_t reserved_bytes() const {
-            return this->_reserved_bytes;
+            return this->_reserved_bytes.load();
         };
 
         /**
@@ -50,7 +50,7 @@ namespace metaspace {
          * @return
          */
         [[nodiscard]] inline size_t committed_bytes() const {
-            return this->_committed_bytes;
+            return this->_committed_bytes.load();
         };
 
 

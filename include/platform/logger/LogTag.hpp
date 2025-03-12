@@ -9,6 +9,7 @@
 decl(platform)             \
 decl(safepoint)            \
 decl(daemon)               \
+decl(metaspace)                           \
 decl(robust)
 
 

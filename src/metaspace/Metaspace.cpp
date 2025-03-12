@@ -4,7 +4,8 @@
 #include "metaspace/Metaspace.hpp"
 #include "platform/utils/align.hpp"
 #include "Setting.hpp"
+Mutex Metaspace::Metaspace_lock("Metaspace_lock");
 size_t Metaspace::get_meta_bytes_aligned(size_t requested_bytes) {
-    requested_bytes = MAX2<size_t>(requested_bytes,metaspacec::Setting::MinMetaBytes);
-    return align_up(requested_bytes,metaspacec::Setting::MetaAlignedBytes);
+    requested_bytes = MAX2<size_t>(requested_bytes,metaspace::Setting::MinMetaBytes);
+    return align_up(requested_bytes,metaspace::Setting::MetaAlignedBytes);
 }

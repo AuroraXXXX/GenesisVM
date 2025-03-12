@@ -6,7 +6,7 @@
 #define METASPACE_VOLUME_HPP
 
 #include "platform/allocation.hpp"
-#include "kernel/utils/Space.hpp"
+#include "platform/utils/Space.hpp"
 #include "CommittedBitMap.hpp"
 
 namespace metaspace {
@@ -14,7 +14,6 @@ namespace metaspace {
 
     class ContextHolder;
 
-    class Region;
     /**
      * 最粗力度的元空间内存管理单位
      * 仅仅保留进程地址空间 并不进行内存的分配
@@ -33,22 +32,22 @@ namespace metaspace {
         /**
          * 统计 整个映射区间的内存提交状态
          */
-        CommittedBitMap _commit_mask;
+        CommittedBitMap _commit_bitmap;
         /**
          * 根块的总共数量
          */
-        const uint16_t _total_region_num;
+        const uint32_t _total_region_num;
         /**
          * 下一次可分配的Region索引
          * 整个数值只会增加 即使之前的Region变成空闲的
          * 我们也无法进行统计到，视为使用完了
          */
-        uint16_t _next_region_index;
+        uint32_t _next_region_index;
         /**
          * 用于统计相应的内存情况
          */
         size_t *const _committed_statistics;
-        Region *_region;
+        Region _region[0];
 
         /**
          * 获取某一个 region 的地址
