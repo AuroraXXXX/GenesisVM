@@ -1,5 +1,6 @@
 #include "platform/allocation.hpp"
 #define SEGMENT_LV_FORMAT "lv%.02d"
+namespace metaspace{
 /**
  * 定义Segment的级别信息
  */
@@ -46,5 +47,5 @@ public:
     static size_t get_bytes(SegmentLevel_t level);
 };
 
-
+}
 
