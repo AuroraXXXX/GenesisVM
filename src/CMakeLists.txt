@@ -15,4 +15,4 @@ include_directories(platform/include)
 
 generate_dynamic_lib(platform)
 generate_dynamic_lib(daemon-thread)
-generate_dynamic_lib(metaspace)
+#generate_dynamic_lib(metaspace)

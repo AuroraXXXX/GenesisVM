@@ -6,7 +6,7 @@
 #define PLATFORM_ARENA_HPP
 
 #include "platform/allocation.hpp"
-#include "platform/utils/SingleLinkedList.hpp"
+#include "platform/utils/LinkStack.hpp"
 class ArenaChunk;
 
 /**
@@ -28,7 +28,7 @@ private:
      * 分别指向Chunk组成的链表头部和尾部
      * 新添加的内存块会放入到链表的头部
      */
-    SingleLinkedList<ArenaChunk> _list;
+    LinkStack<ArenaChunk> _list;
     /**
      * 在_hwm 到 _max之间的内存是 是没有被分配出去的
      */
@@ -55,11 +55,11 @@ private:
     void new_chunk(size_t chunk_bytes, bool exit_oom);
 
     /**
-     * 删除chunk节点和之后的所有节点
-     * @param chunk
+     * 删除栈顶到 old_stack_top 之间的内存块
+     * @param chunk null 表示全部删除
      * @return 删除的长度
      */
-    [[nodiscard]] size_t chop_list(ArenaChunk* chunk) const;
+     size_t chop_list(ArenaChunk* old_stack_top) ;
 
 public:
     /**
@@ -80,19 +80,29 @@ public:
     class SavedData {
         friend class Arena;
     private:
-        ArenaChunk *_tail;
+        /**
+         * 保存的Arena栈顶指针
+         */
+        ArenaChunk *_current_top;
         uintptr_t _top_literal;
         uintptr_t _end_literal;
         size_t _total_bytes;
     public:
+        /**
+         * 记录保存点
+         * @param arena
+         */
         explicit SavedData(Arena *arena);
-
+        /**
+         * 进行回滚操作
+         * @param arena
+         */
         void rollback_to(Arena *arena);
     };
 
     /**
-     * 遍历内存块
-     * @param func
+     * 遍历已经使用的内存块
+     * @param func 回调函数
      */
     void iter_chunk(ChunkClosure *closure);
 

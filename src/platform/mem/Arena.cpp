@@ -21,22 +21,34 @@ void Arena::new_chunk(size_t chunk_bytes,
     this->_total_bytes += chunk_bytes;
     this->_top_literal = chunk->bottom_literal();
     this->_end_literal = chunk->end_literal();
-    this->_list.add_to_head(chunk);
+    //将元素压入到栈中
+    this->_list.push(chunk);
 }
 
-size_t Arena:: chop_list(ArenaChunk* chunk) const {
+size_t Arena:: chop_list(ArenaChunk* old_stack_top)  {
     size_t total_free_bytes = 0;
-    auto free_func = [&](ArenaChunk* chunk,size_t index)  {
+    while (true) {
+        if(this->_list.peek() == old_stack_top){
+            //说明栈顶元素就是原本的栈顶元素 那么就说明我们要进行退出了，不要进行删除操作了
+            break;
+        }
+        if(this->_list.is_empty()){
+            //说明已经没有元素了 那么就退出吧
+            break;
+        }
+        //获取栈顶元素
+        auto  chunk =  this->_list.pop();
+        //计算释放的内存大小
         total_free_bytes += chunk->length();
+        //记录内存释放
         MemoryTracer::record( this->flag(),
                               MemoryTracer::OperationType::arena_free,
                               chunk,
                               chunk->length(),
                               caller_address);
+        //释放内存
         delete chunk;
-        return true;
-    };
-    SingleLinkedList<ArenaChunk>::iter(chunk,free_func);
+    }
     return total_free_bytes;
 }
 
@@ -108,7 +120,8 @@ bool Arena::free(void *ptr, size_t request) {
 }
 
 Arena::~Arena() {
-    this->_total_bytes = this->chop_list(this->_list.head());
+    //释放所有内存
+    this->_total_bytes = this->chop_list(nullptr);
     assert(this->_total_bytes == 0, "must be");
     /**
      * 将所持有的数据信息全部清空
@@ -125,7 +138,7 @@ Arena::Arena(MEMFLAG F) :
 void Arena::iter_chunk(Arena::ChunkClosure *closure) {
     const auto iter_func = [&](ArenaChunk* chunk,size_t index){
         if (index == 0){
-            //对于第1块 需要特殊的处理
+            //对于第1块 需要特殊的处理 因为的第一块并不是完全使用的
             closure->do_chunk((void *) chunk->bottom_literal(),
                               (void *) this->_top_literal);
         } else{
@@ -137,7 +150,8 @@ void Arena::iter_chunk(Arena::ChunkClosure *closure) {
         }
         return true;
     };
-    this->_list.iter(iter_func);
+    this->_list.iterate(iter_func);
+
 }
 
 void Arena::clean_pool() {
@@ -147,7 +161,7 @@ void Arena::clean_pool() {
 
 
 Arena::SavedData::SavedData(Arena *arena) :
-        _tail(arena->_list.tail()),
+        _current_top(arena->_list.peek()),
         _total_bytes(arena->_total_bytes),
         _end_literal(arena->_end_literal),
         _top_literal(arena->_top_literal) {
@@ -158,12 +172,9 @@ void Arena::SavedData::rollback_to(Arena *arena) {
     assert(arena != nullptr, "must be");
     arena->_top_literal = this->_top_literal;
     arena->_end_literal = this->_end_literal;
-    arena->_list.set_tail(this->_tail);
     auto need_free_bytes = arena->_total_bytes - this->_total_bytes;
     arena->_total_bytes = this->_total_bytes;
-    this->_tail->set_next(nullptr);
-    auto delete_node = this->_tail->next();
-    auto  total_bytes= arena->chop_list(delete_node);
+    auto  total_bytes= arena->chop_list(this->_current_top);
     assert(need_free_bytes == total_bytes,"check");
 }
 

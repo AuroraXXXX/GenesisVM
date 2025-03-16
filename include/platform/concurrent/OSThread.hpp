@@ -10,7 +10,7 @@
 #include "platform/utils/robust.hpp"
 #include "platform/mem/Arena.hpp"
 #include "platform/os.hpp"
-#include "platform/utils/SingleLinkedList.hpp"
+#include "platform/utils/LinkStack.hpp"
 /**
  * NAME 表示线程的一个状态
  * NAME##_TRANS 表示线程状态正在从NAME状态迁移到其他状态 一般在进入安全点检查的时候使用
@@ -232,11 +232,11 @@ protected:
  * 表示用户线程 ，支持放入到用户线程链表中
  */
 class UserThread : public OSThread {
-    friend class SingleLinkedList<UserThread>;
+    friend class LinkStack<UserThread>;
 
 private:
     static Mutex *_locker;
-    static SingleLinkedList<UserThread> _list;
+    static LinkStack<UserThread> _list;
     std::atomic<UserThread *> _next;
     /**
      * 用于检测用户线程是否存活（在检测进入安全点的时候使用）
@@ -318,14 +318,14 @@ protected:
  * 守护线程 支持放入到 链表中
  */
 class DaemonThread : public OSThread {
-    friend class SingleLinkedList<DaemonThread>;
+    friend class LinkStack<DaemonThread>;
 
 private:
     /**
      * 保证线程安全的锁
      */
     static Mutex *_locker;
-    static SingleLinkedList<DaemonThread> _list;
+    static LinkStack<DaemonThread> _list;
     std::atomic<DaemonThread *> _next;
 
     inline void set_next(DaemonThread *next) {

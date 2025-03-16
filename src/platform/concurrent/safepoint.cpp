@@ -85,7 +85,7 @@ int Safepoint::synchronize_threads(
     };
 
     //先遍历一遍
-    UserThread::list().iter(iter_still_running_thread_func);
+    UserThread::list().iterate(iter_still_running_thread_func);
 
     *init_running = still_list_num;
     //迭代的次数
@@ -108,7 +108,7 @@ int Safepoint::synchronize_threads(
         auto current_list = still_list;
         still_list = nullptr;
         //2. 再次进行遍历
-        UserThread::list().iter(iter_still_running_thread_func);
+        UserThread::list().iterate(iter_still_running_thread_func);
 
         if (still_list_num > 0) {
             //检查完毕 还是有正在运行的线程 那么我们睡眠一会进行等待
