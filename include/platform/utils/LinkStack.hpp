@@ -2,8 +2,8 @@
 // Created by aurora on 2025/3/16.
 //
 
-#ifndef GENESISVM_LINKSTACK_HPP
-#define GENESISVM_LINKSTACK_HPP
+#ifndef PLATFORM_LINK_STACK_HPP
+#define PLATFORM_LINK_STACK_HPP
 
 #include "platform/typedef.hpp"
 
@@ -80,7 +80,7 @@ public:
     };
 
     /**
-     * 遍历堆栈
+     * 遍历堆栈，不能执行删除函数，调整链表中节点的顺序
      * @tparam F void f(T *t,size_t index)
      *          t:当前节点
      *          index:当前节点在栈中的位置
@@ -121,4 +121,4 @@ public:
     }
 };
 
-#endif //GENESISVM_LINKSTACK_HPP
+#endif //PLATFORM_LINK_STACK_HPP

@@ -7,7 +7,7 @@
 
 #include "platform/allocation.hpp"
 #include "Segment.hpp"
-#include "platform/utils/LinkedList.hpp"
+#include "platform/utils/LinkList.hpp"
 
 namespace metaspace {
     /**

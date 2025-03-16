@@ -2,40 +2,41 @@
 // Created by aurora on 2024/1/31.
 //
 
-#ifndef NUCLEUSVM_LINKEDLIST_HPP
-#define NUCLEUSVM_LINKEDLIST_HPP
+#ifndef PLATFORM_LINK_LIST_HPP
+#define PLATFORM_LINK_LIST_HPP
 
 #include <concepts>
 
 /**
- * 链表节点的定义 需要存在这些函数
+ * 双向链表节点的定义 需要存在这些函数
  * @tparam T
  */
 template<typename T>
-//    concept LinkListNode = requires(T *t){
-//        std::is_same_v<decltype(t->prev()), T *>;
-//        std::is_same_v<decltype(t->next()), T *>;
-//        std::is_same_v<decltype(t->set_prev(t)), void>;
-//        std::is_same_v<decltype(t->set_next(t)), void>;
-//    };
-//
-//template<LinkListNode T>
 class LinkList {
+public:
+    class Node{
+        friend class LinkList<T>;
+    private:
+        T* _prev;
+        T* _next;
+    public:
+        explicit Node(): _prev(nullptr), _next(nullptr) {}
+
+    };
 private:
-    T *_head;
-    T *_tail;
+    /**
+     * 链表头节点
+     */
+    Node *_head;
+    /**
+     * 链表尾节点
+     */
+    Node *_tail;
 public:
     explicit LinkList() noexcept:
             _head(nullptr),
             _tail(nullptr) {};
 
-    inline T *head() const {
-        return this->_head;
-    };
-
-    inline T *tail() const {
-        return this->_tail;
-    };
 
     /**
      * 将节点从链表头部添加
@@ -297,4 +298,4 @@ bool LinkList<T>::contain(T *t) {
 }
 
 
-#endif //NUCLEUSVM_LINKEDLIST_HPP
+#endif //PLATFORM_LINK_LIST_HPP
