@@ -40,13 +40,14 @@ int main() {
 //    TestVM_Operation::execute(&testVmOperation);
 //    sleep(2000);
 
-    PeriodicThread::create();
-
-    TestPeriodicTask task(100);
-    task.activate();
-
-    sleep(5);
-    PeriodicThread::start();
-    sleep(20);
+//    PeriodicThread::create();
+//
+//    TestPeriodicTask task(100);
+//    task.activate();
+//
+//    sleep(5);
+//    PeriodicThread::start();
+//    sleep(20);
+    platform_destroy();
     return 0;
 }

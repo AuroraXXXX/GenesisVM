@@ -41,7 +41,6 @@ public:
     void push(T *t) {
         //
         if (t == nullptr) return;
-        t->set_next(nullptr);
         t->set_next(this->_top);
         this->_top = t;
         this->_num++;
@@ -56,6 +55,7 @@ public:
         T *t = this->_top;
         this->_top = t->next();
         this->_num--;
+        t->set_next(nullptr);
         return t;
     };
 
