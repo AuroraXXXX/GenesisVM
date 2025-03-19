@@ -111,18 +111,41 @@ public:
         return this->_head == nullptr;
     };
     /**
+     * 判断链表中是否包含t
+     * @param t 存储类型的实例
+     * @return
+     */
+    bool contain(T* t);
+
+    /**
      * 校验整个链表
      * @return
      */
     [[nodiscard]] bool verify() const;
+
 };
+
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
+bool LinkList<T, GetLinkListNodeFunc>::contain(T *t) {
+    if(t == nullptr) {
+        return false;
+    }
+    bool result ;
+    const auto lambda_func = [&](T* cur) ->  bool {
+        bool equals = t == cur;
+        result = equals;
+        return !equals;
+    };
+    this->head_do(lambda_func);
+    return result;
+}
 
 template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
 bool LinkList<T, GetLinkListNodeFunc>::verify() const {
     T* cur = this->_head;
     while (cur != nullptr) {
         //获取前驱 和 后继 存储节点
-        LinkListNode<T> cur_node = LinkList::get_adjacent_node(cur);
+        LinkListNode<T>* cur_node = LinkList::get_adjacent_node(cur);
         const auto prev = cur_node->prev();
         const auto next = cur_node->next();
         if (prev != nullptr) {
@@ -131,7 +154,8 @@ bool LinkList<T, GetLinkListNodeFunc>::verify() const {
                 return false;
             }
         } else {
-            if (prev != this->_head) {
+            //说明是头节点
+            if (cur != this->_head) {
                 return false;
             }
         }
@@ -141,11 +165,12 @@ bool LinkList<T, GetLinkListNodeFunc>::verify() const {
                 return false;
             }
         } else {
-            if (next != this->_tail) {
+            //说明是尾节点
+            if (cur != this->_tail) {
                 return false;
             }
         }
-        cur = cur_node->next();
+        cur = next;
     }
     return true;
 }
@@ -209,7 +234,10 @@ template<typename F>
 void LinkList<T, GetLinkListNodeFunc>::head_do(F func) {
     T *cur = this->_head;
     while (cur != nullptr) {
-        func(cur);
+        bool continue_next = func(cur);
+        if(!continue_next){
+            break;
+        }
         //获取 链表节点
         cur = LinkList::get_adjacent_node(cur)->next();
     }
@@ -220,7 +248,10 @@ template<typename F>
 void LinkList<T, GetLinkListNodeFunc>::tail_do(F func) {
     T *cur = this->_tail;
     while (cur != nullptr) {
-        func(cur);
+        bool continue_next = func(cur);
+        if(!continue_next){
+            break;
+        }
         //获取 链表节点
         cur = LinkList::get_adjacent_node(cur)->prev();
     }
