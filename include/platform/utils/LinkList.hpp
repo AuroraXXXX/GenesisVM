@@ -5,173 +5,129 @@
 #ifndef PLATFORM_LINK_LIST_HPP
 #define PLATFORM_LINK_LIST_HPP
 
-#include <concepts>
+#include "platform/utils/robust.hpp"
 
 /**
- * 双向链表节点的定义 需要存在这些函数
- * @tparam T
+ * 链表节点
  */
 template<typename T>
-class LinkList {
+class LinkListNode {
+private:
+    T *_prev;
+    T *_next;
 public:
-    class Node{
-        friend class LinkList<T>;
-    private:
-        T* _prev;
-        T* _next;
-    public:
-        explicit Node(): _prev(nullptr), _next(nullptr) {}
+    explicit LinkListNode() : _prev(nullptr), _next(nullptr) {}
 
-    };
+    void set_prev(T *prev) {
+        _prev = prev;
+    }
+
+    void set_next(T *next) {
+        _next = next;
+    }
+
+    T *prev() {
+        return _prev;
+    }
+
+    T *next() {
+        return _next;
+    }
+};
+
+template<typename T>
+using GetLinkListNodeFuncType = LinkListNode<T> *(T::*)();
+
+/**
+ * 概念介绍：
+ * 1. T 表示是一个存储类型
+ * 2. LinkListNode 表示的链表节点
+ * T 与 LinkListNode 关系是 1 对 多的关系。
+ * 即 T 可以继承 LinkListNode，那么T与 LinkListNode 是1 对 1 的关系，此时 GetLinkListNodeFunc 指定为null即可。
+ * 若 T 类型可以存储在多个链表中，那么T与 LinkListNode 是1 对 多 的关系,此时 GetLinkListNodeFunc 指定为 返回本链表所使用的节点地址的T的成员函数
+ * @tparam T 存储类型
+ * @tparam GetLinkListNodeFunc 获取链表节点的类成员函数
+ */
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc = nullptr>
+class LinkList {
 private:
     /**
-     * 链表头节点
+     * _head _tail
      */
-    Node *_head;
+    T *_head;
+    T *_tail;
+
     /**
-     * 链表尾节点
+     *
+     * @param t 存储类型的一个实例
+     * @return 返回其使用的 LinkListNode
      */
-    Node *_tail;
+    static inline LinkListNode<T> *get_adjacent_node(T *t) {
+        assert(t != nullptr, "must be not null");
+        LinkListNode<T> *node;
+        if constexpr (GetLinkListNodeFunc != nullptr) {
+            // 指定了获取节点的类成员函数，我们调用类成员函数，获取节点的地址
+            node(t->*GetLinkListNodeFunc)();
+        } else {
+            // 没有指定获取节点的类成员函数，说明存储类型本身就是可以转换成节点地址
+            node = static_cast<LinkListNode<T> *>(t);
+        }
+        assert(node != nullptr, "must be not null");
+        return node;
+    };
+
 public:
-    explicit LinkList() noexcept:
-            _head(nullptr),
-            _tail(nullptr) {};
+    explicit LinkList() : _head(nullptr), _tail(nullptr) {};
 
+    template<typename F>
+    void head_do(F func);
+
+    template<typename F>
+    void tail_do(F func);
 
     /**
-     * 将节点从链表头部添加
-     * @param node
+     * 将t放入链表的头部
+     * @param t 存储类型的实例
      */
-    void head_add_to_list(T *node);
+    void push_head(T *t);
 
     /**
-     * 将节点从链表尾部添加
-     * @param node
+     * 将t放入链表的尾部
+     * @param t 存储类型的实例
      */
-    void tail_add_to_list(T *node);
-
+    void push_tail(T *t);
     /**
-     * 将节点node添加到target附近,
-     * before为true时，添加到target之前，否则添加到target之后
-     * 但是如果target为null,
-     * before为true时添加到链表头部，否则添加到链表尾部
-     * @param target
-     * @param node
-     * @param before
-     */
-    void add_to_list_target(T *target, T *node, bool before = false);
-
-    /**
-     * 将节点从链表中删除
-     * @param node
-     */
-    void delete_from_list(T *node);
-
-    /**
-     * 从链表头部删除节点
-     * @return 删除的节点
-     */
-    T *delete_from_list_head();
-
-    /**
-     * 从链表为尾部删除节点
-     * @return 删除的节点
-     */
-    T *delete_from_list_tail();
-
-    /**
-     * 从链表头部开始遍历
-     * @param f
-     */
-    void node_head_do(bool f(T *));
-
-    template<class F>
-    void node_head_do(F f);
-
-    /**
-     * 从链表尾部开始遍历
-     * @param f
-     */
-    void node_tail_do(bool f(T *));
-
-    template<class F>
-    void node_tail_do(F f);
-
-    /**
-     * 验证链表指针关系
+     *  从链表头部取出一个元素
      * @return
      */
-    [[nodiscard]]  bool verify() const;
-
+    T *pop_head();
     /**
-     * 判断节点是否在链表中
-     * @param t
+     * 从链表尾部取出一个元素
      * @return
      */
-    bool contain(T *t);
+    T *pop_tail();
 
     inline bool is_empty() {
         return this->_head == nullptr;
     };
-
+    /**
+     * 校验整个链表
+     * @return
+     */
+    [[nodiscard]] bool verify() const;
 };
 
-
-template<typename T>
-void LinkList<T>::node_head_do(bool f(T *)) {
-    auto node = this->_head;
-    while (node != nullptr) {
-        if (!f(node)) {
-            break;
-        }
-        node = node->next();
-    }
-}
-
-template<typename T>
-template<class F>
-void LinkList<T>::node_head_do(F f) {
-    auto node = this->_head;
-    while (node != nullptr) {
-        if (!f(node)) {
-            break;
-        }
-        node = node->next();
-    }
-}
-
-template<typename T>
-void LinkList<T>::node_tail_do(bool f(T *)) {
-    auto node = this->_tail;
-    while (node != nullptr) {
-        if (!f(node)) {
-            break;
-        }
-        node = node->prev();
-    }
-}
-
-
-template<typename T>
-template<class F>
-void LinkList<T>::node_tail_do(F f) {
-    auto node = this->_tail;
-    while (node != nullptr) {
-        if (!f(node)) {
-            break;
-        }
-        node = node->prev();
-    }
-}
-
-template<typename T>
-bool LinkList<T>::verify() const {
-    auto cur = this->_head;
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
+bool LinkList<T, GetLinkListNodeFunc>::verify() const {
+    T* cur = this->_head;
     while (cur != nullptr) {
-        const auto prev = cur->prev();
-        const auto next = cur->next();
+        //获取前驱 和 后继 存储节点
+        LinkListNode<T> cur_node = LinkList::get_adjacent_node(cur);
+        const auto prev = cur_node->prev();
+        const auto next = cur_node->next();
         if (prev != nullptr) {
-            if (prev->next() != cur) {
+            T* prev_next = LinkList::get_adjacent_node(prev)->next();
+            if (prev_next != cur) {
                 return false;
             }
         } else {
@@ -180,7 +136,8 @@ bool LinkList<T>::verify() const {
             }
         }
         if (next != nullptr) {
-            if (next->prev() != cur) {
+            T* next_prev = LinkList::get_adjacent_node(next)->prev();
+            if (next_prev != cur) {
                 return false;
             }
         } else {
@@ -188,114 +145,131 @@ bool LinkList<T>::verify() const {
                 return false;
             }
         }
-        cur = cur->next();
+        cur = cur_node->next();
     }
     return true;
 }
 
-template<typename T>
-void LinkList<T>::head_add_to_list(T *node) {
-    node->set_prev(nullptr);
-    node->set_next(this->_head);
-    if (this->_head != nullptr) {
-        this->_head->set_prev(node);
-    }
-    this->_head = node;
-    if (this->_tail == nullptr) {
-        this->_tail = node;
-    }
-}
 
-template<typename T>
-void LinkList<T>::tail_add_to_list(T *node) {
-    node->set_prev(this->_tail);
-    node->set_next(nullptr);
-    if (this->_tail != nullptr) {
-        this->_tail->set_next(node);
-    }
-    this->_tail = node;
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
+T *LinkList<T, GetLinkListNodeFunc>::pop_head() {
     if (this->_head == nullptr) {
-        this->_head = node;
+        // 队列中空的
+        return nullptr;
     }
-}
+    // 要返回的节点
+    T* t = this->_head;
 
-template<typename T>
-void LinkList<T>::delete_from_list(T *node) {
-    assert(this->contain(node), "node is not be contained this list");
-    auto prev = node->prev();
-    auto next = node->next();
-    if (prev != nullptr) {
-        prev->set_next(next);
-    } else {
-        this->_head = next;
-    }
-    if (next != nullptr) {
-        next->set_prev(prev);
-    } else {
-        this->_tail = prev;
-    }
-
+    // 获取对应的链表节点
+    auto node = LinkList::get_adjacent_node(t);
     node->set_next(nullptr);
+    auto next = node->next();
+    if(next != nullptr) {
+        //说明next 也存储了类型 ，那么也要将其前驱 清空
+        node = LinkList::get_adjacent_node(next);
+        node->set_prev(nullptr);
+    }
+    //设置 next
+    this->_head = next;
+    if (this->_head == nullptr) {
+        this->_tail = nullptr;
+    }
+    return t;
+}
+
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
+T *LinkList<T, GetLinkListNodeFunc>::pop_tail() {
+    if (this->_tail == nullptr) {
+        // 队列中空的
+        return nullptr;
+    }
+    // 要返回的节点
+    T* t = this->_tail;
+    // 获取对应的链表节点
+    auto node = LinkList::get_adjacent_node(t);
     node->set_prev(nullptr);
+    auto prev = node->prev();
+    if(prev != nullptr) {
+        //说明prev 也存储了类型 ，那么也要将其后继 清空
+        node = LinkList::get_adjacent_node(prev);
+        node->set_next(nullptr);
+    }
+    //设置 prev
+    this->_tail = prev;
+    if (this->_tail == nullptr) {
+        //说明 当前删除后，链表是空的
+        this->_head = nullptr;
+    }
+    return t;
 }
 
-template<typename T>
-T *LinkList<T>::delete_from_list_head() {
-    auto head = this->_head;
-    if (head != nullptr) {
-        this->delete_from_list(head);
-    }
-    return head;
-}
 
-template<typename T>
-T *LinkList<T>::delete_from_list_tail() {
-    auto tail = this->_tail;
-    if (tail != nullptr) {
-        this->delete_from_list(tail);
-    }
-    return tail;
-}
-
-template<typename T>
-void LinkList<T>::add_to_list_target(T *target, T *node, bool before) {
-    if (before && (target == nullptr || target->prev() == nullptr)) {
-        //head insert
-        this->head_add_to_list(node);
-        return;
-    }
-    if (!before && (target == nullptr || target->next() == nullptr)) {
-        //tail insert
-        this->tail_add_to_list(node);
-        return;
-    }
-    T *prev;
-    T *next;
-    if (before) {
-        prev = target->prev();
-        next = target;
-    } else {
-        prev = target;
-        next = target->next();
-    }
-    prev->set_next(node);
-    next->set_prev(node);
-    node->set_prev(prev);
-    node->set_next(next);
-}
-
-template<typename T>
-bool LinkList<T>::contain(T *t) {
-    assert(t != nullptr, "must be not null");
-    auto cur = this->_head;
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
+template<typename F>
+void LinkList<T, GetLinkListNodeFunc>::head_do(F func) {
+    T *cur = this->_head;
     while (cur != nullptr) {
-        if (cur == t) {
-            return true;
-        }
-        cur = cur->next();
+        func(cur);
+        //获取 链表节点
+        cur = LinkList::get_adjacent_node(cur)->next();
     }
-    return false;
 }
 
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
+template<typename F>
+void LinkList<T, GetLinkListNodeFunc>::tail_do(F func) {
+    T *cur = this->_tail;
+    while (cur != nullptr) {
+        func(cur);
+        //获取 链表节点
+        cur = LinkList::get_adjacent_node(cur)->prev();
+    }
+}
+
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
+void LinkList<T, GetLinkListNodeFunc>::push_head(T *t) {
+    if (t == nullptr) {
+        // 如果 节点是空的
+        return;
+    }
+    auto link_node = LinkList::get_adjacent_node(t);
+    //设置所使用的 链表节点的 前驱和后继关系
+    link_node->set_prev(nullptr);
+    link_node->set_next(this->_head);
+
+    if (this->_head != nullptr) {
+        //说明head存储了 类型，那么 我们需要设置其关联的 链表节点的
+        link_node = LinkList::get_adjacent_node(this->_head);
+        //因为 上面已经将 head节点放到 t之后了，那么 就需要设置 head前驱为t
+        link_node->set_prev(t);
+    }
+    this->_head = t;
+    if (this->_tail == nullptr) {
+        this->_tail = t;
+    }
+}
+
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
+void LinkList<T, GetLinkListNodeFunc>::push_tail(T *t) {
+    if (t == nullptr) {
+        // 如果 节点是空的
+        return;
+    }
+    auto link_node = LinkList::get_adjacent_node(t);
+    //设置所使用的 链表节点的 前驱和后继关系
+    link_node->set_prev(this->_tail);
+    link_node->set_next(nullptr);
+
+    if (this->_tail != nullptr) {
+        //说明tail存储了 类型，那么 我们需要设置其关联的 链表节点的
+        link_node = LinkList::get_adjacent_node(this->_tail);
+        //因为 上面已经
+        link_node->set_next(t);
+    }
+    this->_tail = t;
+    if (this->_head == nullptr) {
+        this->_head = t;
+    }
+}
 
 #endif //PLATFORM_LINK_LIST_HPP
