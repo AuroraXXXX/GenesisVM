@@ -79,9 +79,19 @@ private:
 public:
     explicit LinkList() : _head(nullptr), _tail(nullptr) {};
 
+    /**
+     * 从头部开始向后遍历
+     * @tparam F bool func(T* cur); 返回值表示是否继续遍历下一个
+     * @param func 函数实例
+     */
     template<typename F>
     void head_do(F func);
 
+    /**
+     *  从尾节点节点向前进行遍历
+     * @tparam F bool func(T* cur); 返回值表示是否继续遍历下一个
+     * @param func 函数实例
+     */
     template<typename F>
     void tail_do(F func);
 
@@ -96,11 +106,13 @@ public:
      * @param t 存储类型的实例
      */
     void push_tail(T *t);
+
     /**
      *  从链表头部取出一个元素
      * @return
      */
     T *pop_head();
+
     /**
      * 从链表尾部取出一个元素
      * @return
@@ -110,12 +122,13 @@ public:
     inline bool is_empty() {
         return this->_head == nullptr;
     };
+
     /**
      * 判断链表中是否包含t
      * @param t 存储类型的实例
      * @return
      */
-    bool contain(T* t);
+    bool contain(T *t);
 
     /**
      * 校验整个链表
@@ -127,11 +140,11 @@ public:
 
 template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
 bool LinkList<T, GetLinkListNodeFunc>::contain(T *t) {
-    if(t == nullptr) {
+    if (t == nullptr) {
         return false;
     }
-    bool result ;
-    const auto lambda_func = [&](T* cur) ->  bool {
+    bool result;
+    const auto lambda_func = [&](T *cur) -> bool {
         bool equals = t == cur;
         result = equals;
         return !equals;
@@ -142,14 +155,14 @@ bool LinkList<T, GetLinkListNodeFunc>::contain(T *t) {
 
 template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
 bool LinkList<T, GetLinkListNodeFunc>::verify() const {
-    T* cur = this->_head;
+    T *cur = this->_head;
     while (cur != nullptr) {
         //获取前驱 和 后继 存储节点
-        LinkListNode<T>* cur_node = LinkList::get_adjacent_node(cur);
+        LinkListNode<T> *cur_node = LinkList::get_adjacent_node(cur);
         const auto prev = cur_node->prev();
         const auto next = cur_node->next();
         if (prev != nullptr) {
-            T* prev_next = LinkList::get_adjacent_node(prev)->next();
+            T *prev_next = LinkList::get_adjacent_node(prev)->next();
             if (prev_next != cur) {
                 return false;
             }
@@ -160,7 +173,7 @@ bool LinkList<T, GetLinkListNodeFunc>::verify() const {
             }
         }
         if (next != nullptr) {
-            T* next_prev = LinkList::get_adjacent_node(next)->prev();
+            T *next_prev = LinkList::get_adjacent_node(next)->prev();
             if (next_prev != cur) {
                 return false;
             }
@@ -183,13 +196,13 @@ T *LinkList<T, GetLinkListNodeFunc>::pop_head() {
         return nullptr;
     }
     // 要返回的节点
-    T* t = this->_head;
+    T *t = this->_head;
 
     // 获取对应的链表节点
     auto node = LinkList::get_adjacent_node(t);
     node->set_next(nullptr);
     auto next = node->next();
-    if(next != nullptr) {
+    if (next != nullptr) {
         //说明next 也存储了类型 ，那么也要将其前驱 清空
         node = LinkList::get_adjacent_node(next);
         node->set_prev(nullptr);
@@ -209,12 +222,12 @@ T *LinkList<T, GetLinkListNodeFunc>::pop_tail() {
         return nullptr;
     }
     // 要返回的节点
-    T* t = this->_tail;
+    T *t = this->_tail;
     // 获取对应的链表节点
     auto node = LinkList::get_adjacent_node(t);
     node->set_prev(nullptr);
     auto prev = node->prev();
-    if(prev != nullptr) {
+    if (prev != nullptr) {
         //说明prev 也存储了类型 ，那么也要将其后继 清空
         node = LinkList::get_adjacent_node(prev);
         node->set_next(nullptr);
@@ -235,7 +248,7 @@ void LinkList<T, GetLinkListNodeFunc>::head_do(F func) {
     T *cur = this->_head;
     while (cur != nullptr) {
         bool continue_next = func(cur);
-        if(!continue_next){
+        if (!continue_next) {
             break;
         }
         //获取 链表节点
@@ -249,7 +262,7 @@ void LinkList<T, GetLinkListNodeFunc>::tail_do(F func) {
     T *cur = this->_tail;
     while (cur != nullptr) {
         bool continue_next = func(cur);
-        if(!continue_next){
+        if (!continue_next) {
             break;
         }
         //获取 链表节点
