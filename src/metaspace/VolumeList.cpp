@@ -2,95 +2,98 @@
 // Created by aurora on 2022/12/16.
 //
 #include "platform/os.hpp"
+#include "platform/concurrent/Mutex.hpp"
+#include "metaspace/Metaspace.hpp"
 #include "VolumeList.hpp"
 #include "Volume.hpp"
 #include "meta_log.hpp"
+#include "Setting.hpp"
 
 #define LOG_FMT "VolumeList @" PTR_FORMAT
 #define LOG_FMT_ARGS this
 namespace metaspace {
 
     VolumeList::VolumeList() :
-            _list_length(0),
+            _list(),
             _reserved_bytes(0),
-            _committed_bytes(0),
-            _list_head(nullptr) {
+            _committed_bytes(0) {
         meta_log(debug, "出生(born)");
     }
 
     void VolumeList::create_new_volume() {
-        assert_lock_strong(Metaspace_lock);
+        //获取锁
+        assert_lock_strong(Metaspace::locker());
+        //获取默认的虚拟节点大小
+        const auto volume_bytes = Setting::VolumeDefaultBytes;
         //创建虚拟节点
-        auto ptr = os::reserve_memory_aligned(MEMFLAG::Metaspace, VolumeDefaultBytes,VolumeDefaultBytes);
+        auto ptr = os::reserve_memory_aligned(MEMFLAG::Metaspace,
+                                              volume_bytes,
+                                              volume_bytes);
+        //如果创建失败，抛出异常
         if (ptr == nullptr) {
             vm_exit_out_of_memory(VMErrorType::OOM_MMAP_ERROR,
-                                  VolumeDefaultBytes,
+                                  volume_bytes,
                                   "reserved volume bytes failed.");
         }
-        Space space(ptr, VolumeDefaultBytes);
+        //创建空间
+        Space space(ptr, volume_bytes);
+        //增加已分配的字节数
         this->_reserved_bytes += space.capacity_bytes();
+        //创建虚拟节点
         auto volume = new Volume(space, &this->_committed_bytes);
-        volume->set_next(this->_list_head);
-        this->_list_head = volume;
-        //更新信息
-        ++this->_list_length;
+        //将虚拟节点加入列表
+        this->_list.push(volume);
     }
 
     VolumeList::~VolumeList() {
-        assert_lock_strong(Metaspace_lock);
-        auto vsn = this->_list_head;
-        Volume *vsn_next;
-        while (vsn) {
-            vsn_next = vsn->next();
-            this->_reserved_bytes -= vsn->reserved_bytes();
+        assert_lock_strong(Metaspace::locker());
+        while (true) {
+            auto vsn = this->_list.pop();
+            if (vsn == nullptr) {
+                break;
+            }
+            this->_reserved_bytes.fetch_sub(vsn->reserved_bytes());
             delete vsn;
-            vsn = vsn_next;
         }
         meta_log(debug, "死亡(dies)");
     }
 
-    Segment *VolumeList::allocate_root_segment() {
-        if (this->_list_head == nullptr ||
-            !this->_list_head->has_unused_region()) {
-            this->create_new_volume();
-            meta_log2(debug, "已添加新的虚拟节点(now:%d)", this->_list_length);
-        }
-        auto segment = this->_list_head->allocate_root_segment();
-        assert(segment != nullptr, "必须不为空");
-        return segment;
-    }
-
-
 
     void VolumeList::print_on(CharOStream *out) const {
-        MutexLocker fcl(Metaspace_lock);
+        MutexLocker fcl(Metaspace::locker());
         out->print_cr(LOG_FMT ":", LOG_FMT_ARGS);
-        auto vsn = this->_list_head;
         int n = 0;
-        while (vsn) {
+        const auto iter_func = [&](Volume *volume) {
             out->print(" -node #%d:", n);
-            vsn->print_on(out);
-            vsn = vsn->next();
+            volume->print_on(out);
             ++n;
-        }
+            return true;
+        };
+        this->_list.iterate(iter_func);
+
         out->print_cr(" - 总计 %d 节点,reserved(保留):" SIZE_FORMAT
                       " bytes,committed(提交):" SIZE_FORMAT " bytes.",
                       n, this->reserved_bytes(), this->committed_bytes());
     }
 
-    bool VolumeList::contains(void* p) const {
-        for (auto cur = this->_list_head; cur != nullptr; cur = cur->next()) {
-            if (cur->contain(p)) {
-                return true;
-            }
-        }
-        return false;
+    bool VolumeList::contains(void *p) const {
+        bool result = false;
+        auto iter_func = [&](Volume *volume) {
+            result = volume->contain(p);
+            //如果是包含的 就说明不需要继续往下寻找了
+            return !result;
+        };
+        this->_list.iterate(iter_func);
+        return result;
     }
-#ifdef DIAGNOSE
+
+#ifdef DEBUG_MODE_ONLY
     void VolumeList::verify() {
-        for (auto cur = this->_list_head; cur != nullptr; cur = cur->next()) {
-            cur->verify();
-        }
+        auto iter_func = [&](Volume *volume) {
+            volume->verify();
+            return true;
+        };
+        this->_list.iterate(iter_func);
     }
 #endif
 

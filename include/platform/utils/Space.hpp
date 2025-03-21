@@ -12,8 +12,8 @@
  */
 class Space {
 protected:
-    uintptr_t _start;
-    uintptr_t _end;
+    uintptr_t _end;    uintptr_t _start;
+
 
     inline Space(void *start, void *end) noexcept:
             _start((uintptr_t) start),

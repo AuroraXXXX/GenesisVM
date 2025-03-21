@@ -7,117 +7,22 @@
 
 #include "platform/typedef.hpp"
 #include "SegmentLevel.hpp"
+#include "platform/utils/LinkList.hpp"
 #include "platform/utils/robust.hpp"
 #include "platform/utils/align.hpp"
 namespace metaspace {
     class Volume;
 
     /**
-     * 内存块的有效负载(即覆盖的内存)可能已提交 部分提交 完全未提交
-     *        +--------------+ <- end    -----------+ ----------+
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        | -----------  | <- committed_top  -- +           |
-     *        |              |                      |           |
-     *        |              |                      | "free"    |
-     *        |              |                      |           | size
-     *        |              |     "free_below_     |           |
-     *        |              |        committed"    |           |
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        | -----------  | <- top     --------- + --------  |
-     *        |              |                      |           |
-     *        |              |     "used"           |           |
-     *        |              |                      |           |
-     *        +--------------+ <- start   ----------+ ----------+
+     * 表示内存块非实际管理地址指针部分
      */
-    template<typename T>
     class SegmentBase {
-    private:
-        /**
-         * 通过前驱节点和后继节点将
-         */
-        T *_next;
-        T *_prev;
-        /**
-         * 这两个指针是固定的
-         * 指向地址空间分配时候 虚拟节点中MetaChunk的关系
-         * 用于内存块的合并和切分
-         */
-        T *_prev_buddy;
-        T *_next_buddy;
-        /**
-         * 隶属于的虚拟节点
-         */
-        Volume *_container;
-    protected:
-        inline void set_container(Volume *container) {
-            this->_container = container;
-        };
-    public:
-        explicit SegmentBase() :
-                _next_buddy(nullptr),
-                _prev_buddy(nullptr),
-                _next(nullptr),
-                _prev(nullptr),
-                _container(nullptr) {};
-
-        /**
-         * --------------------------------
-         * buddy node
-         */
-        inline T *prev_buddy() {
-            return this->_prev_buddy;
-        };
-
-        inline T *next_buddy() {
-            return this->_next_buddy;
-        };
-
-        inline void set_prev_buddy(T *segment) {
-            this->_prev_buddy = segment;
-        };
-
-        inline void set_next_buddy(T *segment) {
-            this->_next_buddy = segment;
-        };
-
-        /**
-         * -------------------------
-         *
-         * @return
-         */
-        [[nodiscard]] inline T *next() const {
-            return this->_next;
-        };
-
-        [[nodiscard]] inline T *prev() const {
-            return this->_prev;
-        };
-
-        inline void set_next(T *segment) {
-            this->_next = segment;
-        };
-
-        inline void set_prev(T *segment) {
-            this->_prev = segment;
-        };
-
-        [[nodiscard]] inline Volume *container() const {
-            return this->_container;
-        };
-    };
-
-    class Segment : public SegmentBase<Segment> {
     public:
         /**
          * 表示当前块的状态
-         * InUse表示当前块在使用 已经分配或者部分被分配出去
-         * Free 表示当前块被SpaceManager管理
-         * Dead 表示被ChunkHeaderPool所管理，但是没有持有任何的内存
+         * InUse 表示当前内存块 正在被用户使用
+         * Free 表示当前内存块 空闲的，仍持有其管理的内存块
+         * Dead 表示当前内存块已经被释放，
          *
          */
         enum class State : uint8_t {
@@ -125,138 +30,79 @@ namespace metaspace {
             Free,
             Dead
         };
+    protected:
+        /**
+        * 内存块等级
+        */
+        SegmentLevel_t _level;
+        /**
+         * 内存块状态
+         */
+        State _state;
+        /**
+         * 隶属于的虚拟节点
+         */
+        Volume *_container;
     private:
         /**
-         * 管理的内存首地址
+         * 通过前驱节点和后继节点将
          */
-        uintptr_t _base;
+        LinkListNode<SegmentBase> _link_node;
         /**
-         * 提交的内存大小
+         * 这两个指针是固定的
+         * 指向地址空间分配时候 虚拟节点中MetaChunk的关系
+         * 用于内存块的合并和切分
          */
-        size_t _committed_bytes;
-        /**
-         * 已经使用的内存大小
-         */
-        size_t _used_bytes;
-        /**
-         * 内存块等级
-         */
-        SegmentLevel_t _level;
-
-        State _state;
-
-        /**
-         * 将内存边界向上调整
-         * @param new_commit_bytes 新的提交内存边界
-         * @return false 表示达到了限制
-         */
-        bool commit_up_to(size_t new_commit_bytes);
-
-        /**
-         * 确保[base,base + bytes)这个区间内存被提交
-         * 若这个区间小于提交粒度 会向两侧对齐 满足提交粒度的大小
-         * 然后进行提交 若这个内存粒度已经被提交完毕 那么不会有任何影响
-         *
-         * 若这个区间大于是提交粒度的N倍 那么由于不与其他内存块共享粒度
-         * 对于其他内存块不会有影响
-         * @param base 区间的首地址
-         * @param bytes 区间的长度
-         * @return
-         */
-        bool ensure_range_is_committed(void *base, size_t bytes);
+        LinkListNode<SegmentBase> _buddy_link_node;
 
     public:
         /**
-         * 将所有数据进行擦除 除了状态字段
+         * 构造函数
+         * 都给予默认值（并非能正常使用的）
          */
-        void clear();
-
+        explicit SegmentBase() :
+                _link_node(),
+                _buddy_link_node(),
+                _container(nullptr),
+                _state(State::Dead),
+                _level(SegmentLevel::LV_INVALID){};
         /**
-         * 提供给ChunkHeaderPool
+         * 获取链表节点地址
+         * @return
          */
-        explicit Segment();
-
-
-
+        inline  LinkListNode<SegmentBase> * link_list_node(){
+            return &this->_link_node;
+        };
+        /**
+         * 获取buddy链表节点地址
+         * @return
+         */
+        inline LinkListNode<SegmentBase> * buddy_link_list_node(){
+            return &this->_buddy_link_node;
+        };
+        /**
+         * 获取当前内存块所属的虚拟节点
+         * @return
+         */
+        [[nodiscard]] inline Volume *container() const {
+            return this->_container;
+        };
+        /**
+         * 获取内存块管理的字节数
+         * @return
+         */
         [[nodiscard]] inline size_t total_bytes() const {
             return SegmentLevel::get_bytes(this->_level);
         };
-
-        [[nodiscard]] inline void * base() const {
-            return (void *)(this->_base);
-        };
-
-        [[nodiscard]] inline auto used_top() const {
-            return (void *)(this->_base + this->_used_bytes);
-        };
-
-        [[nodiscard]] inline void *committed_top() const {
-            return (void *)(this->_base + this->_committed_bytes);
-        };
-
-        [[nodiscard]] void *end() const {
-            return (void *)(this->_base + this->total_bytes());
-        };
-
         /**
-         * 重置已使用的内存
-         */
-        inline void reset_used_top() {
-            this->_used_bytes = 0;
-        };
-
-
-        /**
-         * 已经使用的内存 不包括内存块的开销
+         * 获取内存块的状态
          * @return
-         */
-        [[nodiscard]] inline size_t used_bytes() const {
-            return this->_used_bytes;
-        };
-        /**
-         * 获取已经使用的内存
-         * @return
-         */
-        [[nodiscard]] inline size_t committed_bytes() const {
-            return this->_committed_bytes;
-        };
-
-        inline void set_committed_bytes(size_t committed_bytes) {
-            this->_committed_bytes = committed_bytes;
-        };
-
-        [[nodiscard]] size_t free_bytes() const {
-            return this->total_bytes() - this->used_bytes();
-        };
-
-        /**
-         * 判断已经提交的内存中 剩余可用的内存
-         * @return
-         */
-        [[nodiscard]] inline size_t free_below_committed_bytes() const {
-            return this->_committed_bytes - this->_used_bytes;
-        };
-
-        /**
-         * -------------
-         * 对当前内存块MetaChunk状态的设置和获取
          */
         [[nodiscard]] inline auto state(){
             return this->_state;
         };
 
-        inline void set_state(State state) {
-            this->_state = state;
-        }
 
-        /**
-         * 获取状态对应的字符
-         * 死亡状态(Dead)   使用 D
-         * 空闲状态(Free)   使用 F
-         * 使用状态(InUse)  使用 U
-         * @return
-         */
-        [[nodiscard]]  char get_state_char() const;
 
         /**
          * 增加 内存块等级
@@ -283,6 +129,119 @@ namespace metaspace {
         [[nodiscard]] inline bool is_root_segment() const {
             return this->_level == SegmentLevel::LV_ROOT;
         };
+    };
+    /**
+     * 内存块的有效负载(即覆盖的内存)可能已提交 部分提交 完全未提交
+     *        +--------------+ <- end    -----------+ ----------+
+     *        |              |                      |           |
+     *        |              |                      |           |
+     *        |              |                      |           |
+     *        |              |                      |           |
+     *        |              |                      |           |
+     *        | -----------  | <- committed_top  -- +           |
+     *        |              |                      |           |
+     *        |              |                      | "free"    |
+     *        |              |                      |           | size
+     *        |              |     "free_below_     |           |
+     *        |              |        committed"    |           |
+     *        |              |                      |           |
+     *        |              |                      |           |
+     *        | -----------  | <- top     --------- + --------  |
+     *        |              |                      |           |
+     *        |              |     "used"           |           |
+     *        |              |                      |           |
+     *        +--------------+ <- start   ----------+ ----------+
+     */
+    class Segment : public SegmentBase {
+    private:
+        /**
+         * 管理的内存首地址
+         */
+        uintptr_t _base;
+
+        /**
+         * 已经使用的内存大小
+         */
+        size_t _used_bytes;
+
+        /**
+         * 提交的内存大小
+         */
+        size_t _committed_bytes;
+        /**
+         * 将内存边界向上调整
+         * @param new_commit_bytes 新的提交内存边界
+         * @return false 表示达到了限制,提交失败了
+         */
+        bool commit_up_to(size_t new_commit_bytes);
+
+        /**
+         * 确保[base,base + bytes)这个区间内存被提交
+         * 若这个区间小于提交粒度 会向两侧对齐 满足提交粒度的大小
+         * 然后进行提交 若这个内存粒度已经被提交完毕 那么不会有任何影响
+         *
+         * 若这个区间大于是提交粒度的N倍 那么由于不与其他内存块共享粒度
+         * 对于其他内存块不会有影响
+         * @param base 区间的首地址
+         * @param bytes 区间的长度
+         * @return
+         */
+
+
+    public:
+        /**
+         * 将所有数据进行擦除 除了状态字段
+         */
+        void clear();
+
+        /**
+         * 提供给ChunkHeaderPool
+         */
+        explicit Segment();
+
+
+        /**
+         * 获取状态对应的字符
+         * 死亡状态(Dead)   使用 D
+         * 空闲状态(Free)   使用 F
+         * 使用状态(InUse)  使用 U
+         * @return
+         */
+        [[nodiscard]]  char get_state_char() const;
+
+
+        /**
+         * 已经使用的内存 不包括内存块的开销
+         * @return
+         */
+        [[nodiscard]] inline size_t used_bytes() const {
+            return this->_used_bytes;
+        };
+        /**
+         * 获取已经提交的内存
+         * @return
+         */
+        [[nodiscard]] inline size_t committed_bytes() const {
+            return this->_committed_bytes;
+        };
+
+        /**
+         * 获取当前
+         * @return
+         */
+        [[nodiscard]] size_t free_bytes() const {
+            return this->total_bytes() - this->used_bytes();
+        };
+
+        /**
+         * 判断已经提交的内存中 剩余可用的内存
+         * @return
+         */
+        [[nodiscard]] inline size_t free_below_committed_bytes() const {
+            return this->_committed_bytes - this->_used_bytes;
+        };
+
+
 
         /**
          * 如果这个segment是它的buddy对中的leader，则返回true，否则返回false。不要调用根块。
@@ -291,7 +250,7 @@ namespace metaspace {
         [[nodiscard]] bool is_leader() const {
             assert(!this->is_root_segment(), "root segment does not have partner ");
             return is_aligned(
-                    (size_t) this->base(),
+                    this->_base,
                     SegmentLevel::get_bytes(this->_level));
         };
 
@@ -332,19 +291,6 @@ namespace metaspace {
     };
 }
 
-#define SEGMENT_FORMAT               \
-    "Segment@" PTR_FORMAT   ","  SEGMENT_LV_FORMAT "%c,base " PTR_FORMAT
 
-#define SEGMENT_FORMAT_ARGS(segment)   \
-    segment,(segment)->level(),(segment)->get_state_char(),(segment)->base()
-
-#define SEGMENT_FULL_FORMAT         \
-    SEGMENT_FORMAT "(" SIZE_FORMAT " byte),used:" SIZE_FORMAT " byte,committed:" \
-    SIZE_FORMAT  " byte,committed-free:" SIZE_FORMAT " byte"
-
-#define SEGMENT_FULL_FORMAT_ARGS(segment)     \
-    SEGMENT_FORMAT_ARGS(segment),(segment)->total_bytes(), \
-    (segment)->used_bytes(),(segment)->committed_bytes(),     \
-    (segment)->free_below_committed_bytes()
 
 #endif //METASPACE_SEGMENT_HPP

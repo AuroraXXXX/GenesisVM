@@ -7,6 +7,22 @@
 #include "Volume.hpp"
 #include "platform/stream/CharOStream.hpp"
 #include "meta_log.hpp"
+
+#define SEGMENT_FORMAT               \
+    "Segment@" PTR_FORMAT   ","  SEGMENT_LV_FORMAT "%c,base " PTR_FORMAT
+
+#define SEGMENT_FORMAT_ARGS(segment)   \
+    segment,(segment)->level(),(segment)->get_state_char(),(segment)->_base
+
+#define SEGMENT_FULL_FORMAT         \
+    SEGMENT_FORMAT "(" SIZE_FORMAT " byte),used:" SIZE_FORMAT " byte,committed:" \
+    SIZE_FORMAT  " byte,committed-free:" SIZE_FORMAT " byte"
+
+#define SEGMENT_FULL_FORMAT_ARGS(segment)     \
+    SEGMENT_FORMAT_ARGS(segment),(segment)->total_bytes(), \
+    (segment)->used_bytes(),(segment)->committed_bytes(),     \
+    (segment)->free_below_committed_bytes()
+
 namespace metaspace {
     char Segment::get_state_char() const {
         switch (this->_state) {
@@ -22,31 +38,30 @@ namespace metaspace {
     }
 
     Segment::Segment() :
-            _state(State::Dead),
-            _level(SegmentLevel::LV_ROOT),
+            SegmentBase(),
             _committed_bytes(0),
             _used_bytes(0),
-            _base(0),
-            SegmentBase<Segment>() {
+            _base(0) {
 
     }
 
     void Segment::clear() {
         this->_base = 0;
         this->_committed_bytes = this->_used_bytes = 0;
-        this->_level = SegmentLevel::LV_ROOT;
+        this->_level = SegmentLevel::LV_INVALID;
+        this->_container = nullptr;
+        this->_state = State::Dead;
     }
 
     void *Segment::allocate(size_t request_bytes) {
         assert(this->free_below_committed_bytes() >= request_bytes,
                "未确保当前已分配内存中空闲内存" SIZE_FORMAT"，可以满足用户需求" SIZE_FORMAT,
                this->free_below_committed_bytes(), request_bytes);
-        auto used_top = this->used_top();
+        auto used_top = this->_base + this->_used_bytes;
         this->_used_bytes += request_bytes;
-        return used_top;
-
+        return (void *) used_top;
     }
-    
+
 
     bool Segment::commit_up_to(size_t new_commit_bytes) {
         assert_lock_strong(Metaspace::locker());
@@ -77,18 +92,20 @@ namespace metaspace {
          * 得到我们希望的新的提交边界
          */
         const auto commit_to = MIN2(align_up(new_commit_bytes, commit_granule),
-                this->total_bytes());
+                                    this->total_bytes());
         assert(commit_from >= this->used_bytes(), "健全");
         assert(commit_to <= this->total_bytes(), "健全");
         log_debug(metaspace)(SEGMENT_FORMAT ":尝试将已提交内存:" SIZE_FORMAT
                              " bytes => " SIZE_FORMAT " bytes",
                              SEGMENT_FORMAT_ARGS(this), commit_from, commit_to);
-        auto res =  this->ensure_range_is_committed((void *)(this->_base + commit_from),
-                                               commit_to - commit_from);
-        if(res){
-            this->set_committed_bytes(commit_to);
-        }
-        return true;
+
+        uintptr_t range_base = align_down(this->_base + commit_from, commit_granule);
+        uintptr_t range_end = align_up(this->_base + commit_to, commit_granule);
+//        const auto commit_result = this->container()->commit_range((void *) range_base, range_end - range_base);
+//        if (commit_result)
+//            this->_committed_bytes = commit_to;
+//        return commit_result;
+        return false;
     }
 
     bool Segment::ensure_committed_enough_and_acquire_lock(size_t bytes) {
@@ -100,6 +117,7 @@ namespace metaspace {
         }
         return result;
     }
+
     bool Segment::ensure_committed_enough(size_t bytes) {
         bool result = true;
         assert(this->free_bytes() >= bytes, "溢出");
@@ -109,6 +127,7 @@ namespace metaspace {
         }
         return result;
     }
+
     void Segment::uncommit() {
         assert_lock_strong(Metaspace::locker());
         assert(this->state() == State::Free &&
@@ -117,25 +136,13 @@ namespace metaspace {
                "仅仅空闲块且尺寸大于提交粒度才允许撤销提交");
         const auto total_bytes = this->total_bytes();
         if (total_bytes >= Setting::CommitGranuleBytes) {
-            this->container()->uncommit_range(this->base(), total_bytes);
+//            this->container()->uncommit_range((void*)this->_base, total_bytes);
             this->_committed_bytes = 0;
         }
     }
 
     void Segment::print_on(CharOStream *out) const {
         out->print(SEGMENT_FULL_FORMAT, SEGMENT_FULL_FORMAT_ARGS(this));
-    }
-
-
-
-    bool Segment::ensure_range_is_committed( void* base, size_t bytes) {
-        assert_lock_strong(Metaspace::locker());
-        assert(base && bytes > 0, "健全");
-        auto commit_granule =Setting:: CommitGranuleBytes;
-        uintptr_t range_base = align_down((size_t)base,commit_granule);
-        uintptr_t range_end = align_up((size_t)base + bytes,commit_granule);
-        assert(bytes > 0 && is_aligned(bytes,commit_granule),"内存大小错误");
-        return this->container()->commit_range((void *)range_base,range_end - range_base);
     }
 
 

@@ -1,3 +1,6 @@
+#ifndef METASPACE_SEGMENT_LEVEL_HPP
+#define METASPACE_SEGMENT_LEVEL_HPP
+
 #include "platform/allocation.hpp"
 
 #define SEGMENT_LV_FORMAT "lv%.02d"
@@ -61,3 +64,4 @@ namespace metaspace {
 
 }
 
+#endif //METASPACE_SEGMENT_LEVEL_HPP

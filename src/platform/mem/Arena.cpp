@@ -136,11 +136,14 @@ Arena::Arena(MEMFLAG F) :
 }
 
 void Arena::iter_chunk(Arena::ChunkClosure *closure) {
-    const auto iter_func = [&](ArenaChunk* chunk,size_t index){
-        if (index == 0){
+    bool is_first = true;
+    const auto iter_func = [&](ArenaChunk* chunk){
+        if (is_first){
             //对于第1块 需要特殊的处理 因为的第一块并不是完全使用的
             closure->do_chunk((void *) chunk->bottom_literal(),
                               (void *) this->_top_literal);
+            //说明下面的不是第一个
+            is_first = false;
         } else{
             /**
              * 之后的全部视为使用完毕，进行遍历

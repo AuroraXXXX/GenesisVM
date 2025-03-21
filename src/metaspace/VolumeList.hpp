@@ -6,7 +6,7 @@
 #define METASPACE_VOLUME_LIST_HPP
 
 #include "platform/allocation.hpp"
-#include "platform/utils/SingleLinkedList.hpp"
+#include "platform/utils/LinkStack.hpp"
 #include <atomic>
 
 namespace metaspace {
@@ -19,7 +19,7 @@ namespace metaspace {
      */
     class VolumeList : public CHeapObject<MEMFLAG::Metaspace> {
     private:
-        SingleLinkedList<Volume> _list;
+        LinkStack<Volume> _list;
         /**
          * 整个虚拟空间节点链表 保留下来的虚拟空间大小
          */
@@ -67,12 +67,6 @@ namespace metaspace {
         ~VolumeList();
 
         /**
-         * 分配一个根块
-         * @return 失败 nullptr
-         */
-        Segment *allocate_root_segment();
-
-        /**
          * 打印本链表的信息
          * 内部应该先获取锁
          * @param out
@@ -85,7 +79,7 @@ namespace metaspace {
          * @return
          */
         bool contains(void* p) const;
-#ifdef DIAGNOSE
+#ifdef DEBUG_MODE_ONLY
         void verify();
 #endif
     };

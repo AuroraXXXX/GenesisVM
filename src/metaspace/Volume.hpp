@@ -8,12 +8,11 @@
 #include "platform/allocation.hpp"
 #include "platform/utils/Space.hpp"
 #include "CommittedBitMap.hpp"
-
+#include <atomic>
 namespace metaspace {
     class Segment;
 
-    class ContextHolder;
-
+    class RootArea;
     /**
      * 最粗力度的元空间内存管理单位
      * 仅仅保留进程地址空间 并不进行内存的分配
@@ -33,39 +32,11 @@ namespace metaspace {
          * 统计 整个映射区间的内存提交状态
          */
         CommittedBitMap _commit_bitmap;
-        /**
-         * 根块的总共数量
-         */
-        const uint32_t _total_region_num;
-        /**
-         * 下一次可分配的Region索引
-         * 整个数值只会增加 即使之前的Region变成空闲的
-         * 我们也无法进行统计到，视为使用完了
-         */
-        uint32_t _next_region_index;
+
         /**
          * 用于统计相应的内存情况
          */
-        size_t *const _committed_statistics;
-        Region _region[0];
-
-        /**
-         * 获取某一个 region 的地址
-         * 编号介于[0,_total_region_num)之间
-         * @param index region 索引
-         * @return
-         */
-        inline Region *region_by_index(uint16_t index) {
-            assert(index < this->_total_region_num, "out of region index");
-            return this->_region + index;
-        };
-
-
-        /**
-         * 判断整个 region 是否全部是空闲的
-         * @return
-         */
-        bool total_region_is_free();
+        std::atomic<size_t> *const _committed_statistics;
 
 
     public:
@@ -77,7 +48,7 @@ namespace metaspace {
          * @param committed_statistics 用于统计的内存提交情况
          */
         explicit Volume(Space &virtual_space,
-                        size_t *committed_statistics);
+                        std::atomic<size_t> *committed_statistics);
 
         /**
          * 析构函数
@@ -104,7 +75,7 @@ namespace metaspace {
          * @return
          */
         [[nodiscard]] size_t committed_bytes() const {
-            return this->_commit_mask.get_committed_bytes();
+            return this->_commit_bitmap.get_committed_bytes();
         };
 
         /**
@@ -116,57 +87,6 @@ namespace metaspace {
         };
 
         /**
-         * 表示分配出去的虚拟空间大小
-         * @return
-         */
-        [[nodiscard]] size_t used_bytes() const {
-            return this->_next_region_index * RegionBytes;
-        };
-
-
-        /**
-         * 分配一个root segment
-         * 必须在获取元空间锁的情况下 才可以调用这个函数
-         * @return
-         */
-        Segment *allocate_root_segment();
-
-        /**
-         * 是否还存在空闲的region
-         * @return
-         */
-        [[nodiscard]] inline bool has_unused_region() const {
-            return this->_next_region_index < this->_total_region_num;
-        };
-
-        /**
-         * 通过指针 获取覆盖这个region
-         * @param p 指针
-         * @return
-         */
-        Region *region_by_pointer(void* p);
-
-        /**
-         * 如果当前当前区间已经完全提交 不存在未提交的部分 我们是不会进行提交的
-         *
-         * 但是如果当前区间存在可提交的部分 我们会对整个区间进行提交
-         * 即使用一个新的映射来替换现有的映射
-         * 因此之前已提交部分的现有内存将会被擦除
-         *
-         * @param p 提交内存的首地址 与提交粒度(CommitGranuleBytes)对齐
-         * @param bytes 提交的大小 与提交粒度(CommitGranuleBytes)对齐
-         * @return 提交是否成功
-         */
-        bool commit_range(void* p, size_t bytes);
-
-        /**
-         * 将[p,p+bytes)区间的内存释放掉
-         * @param p
-         * @param bytes
-         */
-        void uncommit_range(void* p, size_t bytes);
-
-        /**
          * 是否包含指定的虚拟地址
          * @param p
          * @return
@@ -175,7 +95,7 @@ namespace metaspace {
             return this->_reserved.contains(p);
         };
 
-#ifdef DIAGNOSE
+#ifdef DEBUG_MODE_ONLY
         void verify() const;
 #endif
 

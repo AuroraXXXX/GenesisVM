@@ -81,16 +81,20 @@ public:
 
     /**
      * 遍历堆栈，不能执行删除函数，调整链表中节点的顺序
-     * @tparam F void f(T *t,size_t index)
+     * @tparam F bool f(T *t,size_t index)
      *          t:当前节点
-     *          index:当前节点在栈中的位置
+     *         return 是否继续遍历下一个
      * @param f 具体的回调函数
      */
     template<typename F>
-    void iterate(F f) {
-        size_t index = 0;
+    void iterate(F f)const {
+        // 遍历堆栈，从栈顶开始
         for (T *t = this->_top; t != nullptr; t = t->next()) {
-            f(t, index++);
+            // 调用回调函数，传入当前节点和节点在栈中的位置
+           bool continue_next =  f(t);
+           if(!continue_next){
+               break;
+           }
         }
     };
     /**

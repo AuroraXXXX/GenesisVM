@@ -1,4 +1,7 @@
 
+#ifndef METASPACE_SETTING_HPP
+#define METASPACE_SETTING_HPP
+
 #include "platform/constants.hpp"
 
 namespace metaspace {
@@ -35,3 +38,4 @@ namespace metaspace {
 
 
 }
+#endif //METASPACE_SETTING_HPP

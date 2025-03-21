@@ -65,7 +65,6 @@ namespace metaspace {
         * @param range_length
         */
         explicit CommittedBitMap(void *range_start, size_t range_length);
-
         /**
          * 获取被映射区间啊[range_start,range_start + range_bytes) 的内存提交情况
          * @param range_start

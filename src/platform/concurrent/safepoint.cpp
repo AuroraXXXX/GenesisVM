@@ -73,7 +73,7 @@ int Safepoint::synchronize_threads(
         size_t *init_running) {
     UserThread* still_list = nullptr;
     size_t still_list_num = 0;
-    auto iter_still_running_thread_func = [&still_list,&still_list_num](UserThread* current,size_t index){
+    auto iter_still_running_thread_func = [&still_list,&still_list_num](UserThread* current){
         if(current->is_running_state()){
             //将其存放到仍然存货的链表中
             current->set_stilling_next(still_list);
