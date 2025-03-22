@@ -15,7 +15,7 @@ class Monitor;
 /**
  * 提供全局的安全点
  */
-class VMThread : public DaemonThread {
+class VMThread : public NonUserThread {
 public:
     enum class VMState {
         creating,

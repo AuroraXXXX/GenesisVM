@@ -9,6 +9,8 @@
 #include <pthread.h>
 #include "platform/concurrent/Mutex.hpp"
 
+#include "platform/concurrent/Monitor.hpp"
+
 thread_local OSThread *OSThread::_current = nullptr;
 OSThread *OSThread::_main_thread = nullptr;
 
@@ -137,18 +139,33 @@ ResourceArenaMark::~ResourceArenaMark() {
  * UserThread
  * ----------------
  */
-Mutex *UserThread::_locker = new Mutex("user-concurrent-list");
+Monitor *UserThread::_locker = new Monitor("user-concurrent-list");
 LinkStack<UserThread> UserThread::_list;
+size_t UserThread::_non_daemon_of_user_thread_count = 0;
 
 void UserThread::pre_run() {
     MutexLocker locker(UserThread::_locker);
     UserThread::_list.push(this);
+    if (!this->is_daemon_thread()) {
+        UserThread::_non_daemon_of_user_thread_count++;
+    }
+
+
 }
 
 void UserThread::post_run() {
-    MutexLocker locker(UserThread::_locker);
-    //
+    MonitorLocker locker(UserThread::_locker);
+    //1. 从链表中删除
     UserThread::_list.remove(this);
+    //2. 判断是不是守护线程 如果不是要减少相应的计数
+    if (!this->is_daemon_thread()) {
+        UserThread::_non_daemon_of_user_thread_count--;
+    }
+    //3. 当UserThread中最后一个非守护线程，需要唤醒可能的等待在 UserThread::_locker上的线程。
+    if (UserThread::_non_daemon_of_user_thread_count <= 1) {
+        locker.notify_all();
+    }
+
 }
 
 UserThread::UserThread() :
@@ -167,26 +184,26 @@ const char *UserThread::name() {
  * DaemonThread
  * ----------------
  */
-Mutex *DaemonThread::_locker = new Mutex("daemon-concurrent-list");
-LinkStack<DaemonThread> DaemonThread::_list;
+Mutex *NonUserThread::_locker = new Mutex("daemon-concurrent-list");
+LinkStack<NonUserThread> NonUserThread::_list;
 
-void DaemonThread::pre_run() {
-    MutexLocker locker(DaemonThread::_locker);
-    DaemonThread::_list.push(this);
+void NonUserThread::pre_run() {
+    MutexLocker locker(NonUserThread::_locker);
+    NonUserThread::_list.push(this);
 }
 
-void DaemonThread::post_run() {
-    MutexLocker locker(DaemonThread::_locker);
-    DaemonThread::_list.remove(this);
+void NonUserThread::post_run() {
+    MutexLocker locker(NonUserThread::_locker);
+    NonUserThread::_list.remove(this);
 }
 
-DaemonThread::DaemonThread() :
+NonUserThread::NonUserThread() :
         _next(nullptr) {
 
 }
 
-const char *DaemonThread::name() {
-    return "DaemonThread";
+const char *NonUserThread::name() {
+    return "NonUserThread";
 }
 
 

@@ -35,10 +35,9 @@ public:
 int main() {
     platform_init();
     log_error(platform)("adv");
-//    VMThread::create();
-//    TestVM_Operation testVmOperation;
-//    TestVM_Operation::execute(&testVmOperation);
-//    sleep(2000);
+    VMThread::create();
+    TestVM_Operation testVmOperation;
+    TestVM_Operation::execute(&testVmOperation);
 
 //    PeriodicThread::create();
 //

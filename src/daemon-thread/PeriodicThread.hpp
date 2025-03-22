@@ -10,7 +10,7 @@
 /**
  * 负责执行周期性的任务
  */
-class PeriodicThread : public DaemonThread {
+class PeriodicThread : public NonUserThread {
 private:
     static PeriodicThread *  _periodic_thread;
     enum class PeriodicState{

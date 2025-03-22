@@ -20,12 +20,17 @@
 
 
 class Arena;
-
+class Monitor;
 class Mutex;
 
 /**
  * 对应于系统的线程
  * 并且是对其进行抽象
+ *
+ * 只有2个子类：
+ * - UserThread 用户线程
+ * - NonUserThread 内核线程(虚拟机内部线程)，注意一定是用户线程
+ *
  */
 class OSThread : public CHeapObject<MEMFLAG::Thread> {
 public:
@@ -235,8 +240,16 @@ class UserThread : public OSThread {
     friend class LinkStack<UserThread>;
 
 private:
-    static Mutex *_locker;
+    /**
+     * 保证线程安全的锁
+     */
+    static Monitor *_locker;
     static LinkStack<UserThread> _list;
+    /**
+     * 用户线程中守护线程的数量
+     */
+    static size_t _non_daemon_of_user_thread_count;
+
     std::atomic<UserThread *> _next;
     /**
      * 用于检测用户线程是否存活（在检测进入安全点的时候使用）
@@ -254,7 +267,9 @@ private:
 protected:
     void pre_run() override;
 
-
+    /**
+     * 执行完毕后执行该函数
+     */
     void post_run() override;
 
 public:
@@ -262,7 +277,7 @@ public:
      * 表示用户线程
      * @return
      */
-    bool is_user_thread() override {
+    bool is_user_thread()  final{
         return true;
     };
 
@@ -277,7 +292,7 @@ public:
     /**
      * 锁定链表，不允许新创建的线程对象添加到链表，那么就不会执行用户的run函数中的代码
      */
-    static inline Mutex *locker() {
+    static inline Monitor *locker() {
         return UserThread::_locker;
     };
 
@@ -304,6 +319,10 @@ public:
     inline auto stilling_next() {
         return this->_stilling_next;
     };
+
+   static inline auto non_daemon_of_user_thread_count(){
+       return UserThread::_non_daemon_of_user_thread_count;
+    };
 };
 
 /**
@@ -315,20 +334,21 @@ protected:
 };
 
 /**
- * 守护线程 支持放入到 链表中
+ * 非用户线程 支持放入到 链表中
+ * 非用户线程一定是 守护线程
  */
-class DaemonThread : public OSThread {
-    friend class LinkStack<DaemonThread>;
+class NonUserThread : public OSThread {
+    friend class LinkStack<NonUserThread>;
 
 private:
     /**
      * 保证线程安全的锁
      */
     static Mutex *_locker;
-    static LinkStack<DaemonThread> _list;
-    std::atomic<DaemonThread *> _next;
+    static LinkStack<NonUserThread> _list;
+    std::atomic<NonUserThread *> _next;
 
-    inline void set_next(DaemonThread *next) {
+    inline void set_next(NonUserThread *next) {
         this->_next.store(next);
     };
 
@@ -344,17 +364,24 @@ protected:
     void post_run() override;
 
 public:
-    bool is_user_thread() override {
+    /**
+     *  表示非用户线程，并且所有子类都不应该重新的覆盖
+     * @return
+     */
+    bool is_user_thread() final {
         return false;
     };
-
-    bool is_daemon_thread() override {
+    /**
+     * 表示是守护线程，但是
+     * @return
+     */
+    bool is_daemon_thread() final {
         return true;
     };
 
     const char *name() override;
 
-    explicit DaemonThread();
+    explicit NonUserThread();
 
 };
 

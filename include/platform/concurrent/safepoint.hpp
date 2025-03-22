@@ -11,7 +11,7 @@
 
 /**
  * 安全点控制
- * 用于控制所有语言层面的线程 在安全点的启停
+ * 用于控制所有语言层面的线程（即所有UserThread） 在安全点的启停
  */
 class Safepoint : public AllStatic {
     friend class LangThread;

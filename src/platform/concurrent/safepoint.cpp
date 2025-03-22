@@ -5,7 +5,7 @@
 #include "platform/concurrent/safepoint.hpp"
 #include "platform/log.hpp"
 #include "platform/os.hpp"
-#include "platform/concurrent/Mutex.hpp"
+#include "platform/concurrent/Monitor.hpp"
 #include "platform/utils/robust.hpp"
 #include "platform/concurrent/OSThread.hpp"
 #include "platform/concurrent/SpinYield.hpp"
@@ -105,7 +105,6 @@ int Safepoint::synchronize_threads(
     do {
         //1. 清空设置
         still_list_num = 0;
-        auto current_list = still_list;
         still_list = nullptr;
         //2. 再次进行遍历
         UserThread::list().iterate(iter_still_running_thread_func);
