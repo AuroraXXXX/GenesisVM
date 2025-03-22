@@ -2,13 +2,13 @@
 // Created by aurora on 2024/2/27.
 //
 
-#include "daemon-thread/VM_Operation.hpp"
+#include "platform/concurrent/VM_Operation.hpp"
 #include "platform/concurrent/OSThread.hpp"
 #include "platform/log.hpp"
 #include "VMThread.hpp"
 void VM_Operation::evaluate() {
     ResourceArenaMark mark;
-    log_stream(debug,daemon);
+    log_stream(debug,nonuserthread);
     if(log.is_enable()){
         log.print("VM_Operation begin ");
         this->print_on(&log);

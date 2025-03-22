@@ -3,7 +3,7 @@
 //
 
 #include "PeriodicThread.hpp"
-#include "daemon-thread/PeriodicTask.hpp"
+#include "platform/concurrent/PeriodicTask.hpp"
 #include "platform/concurrent/Monitor.hpp"
 #include "platform/log.hpp"
 
@@ -20,7 +20,7 @@ void PeriodicThread::create() {
     assert(PeriodicThread::_periodic_thread == nullptr, "must be");
     PeriodicThread::_periodic_thread = new PeriodicThread();
     if (os::create_thread(PeriodicThread::_periodic_thread)) {
-        log_info(daemon)("%s:PeriodicThread created is success");
+        log_info(nonuserthread)("%s:PeriodicThread created is success");
     } else {
         delete PeriodicThread::_periodic_thread;
         PeriodicThread::_periodic_thread = nullptr;

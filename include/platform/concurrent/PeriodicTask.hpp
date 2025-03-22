@@ -2,8 +2,8 @@
 // Created by aurora on 2024/4/21.
 //
 
-#ifndef DAEMON_THREAD_PERIODIC_TASK_HPP
-#define DAEMON_THREAD_PERIODIC_TASK_HPP
+#ifndef PLATFORM_PERIODIC_TASK_HPP
+#define PLATFORM_PERIODIC_TASK_HPP
 
 #include "platform/allocation.hpp"
 #include "platform/constants.hpp"
@@ -104,4 +104,4 @@ public:
 };
 
 
-#endif //DAEMON_THREAD_PERIODIC_TASK_HPP
+#endif //PLATFORM_PERIODIC_TASK_HPP

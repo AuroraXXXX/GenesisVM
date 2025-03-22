@@ -8,7 +8,7 @@
 #define LOG_TAG_DECL(decl) \
 decl(platform)             \
 decl(safepoint)            \
-decl(daemon)               \
+decl(nonuserthread)               \
 decl(metaspace)                           \
 decl(robust)
 

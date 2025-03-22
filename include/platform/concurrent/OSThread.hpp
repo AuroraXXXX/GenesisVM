@@ -48,9 +48,7 @@ public:
     };
 private:
 
-    friend void platform_init();
-
-    friend void platform_destroy();
+    friend class Platform;
 
     typedef unsigned long thread_id_t;
 
@@ -98,6 +96,9 @@ private:
      * 内部的资源区域
      */
     Arena *_resource_arena;
+    /**
+     * 存储当前线程对应的线程对象
+     */
     thread_local static OSThread *_current;
     NONCOPYABLE(OSThread);
 

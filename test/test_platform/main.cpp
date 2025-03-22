@@ -6,11 +6,10 @@
 #include "platform/main/init.hpp"
 #include "platform/log.hpp"
 #include "platform/concurrent/OSThread.hpp"
-#include "../src/daemon-thread/VMThread.hpp"
-#include "daemon-thread/VM_Operation.hpp"
+#include "platform/concurrent/VM_Operation.hpp"
 #include "unistd.h"
-#include "daemon-thread/PeriodicTask.hpp"
-#include "../../src/daemon-thread/PeriodicThread.hpp"
+#include "platform/concurrent/PeriodicTask.hpp"
+
 class TestVM_Operation:public VM_Operation{
 public:
     void doit() override {
@@ -33,9 +32,8 @@ public:
 
 };
 int main() {
-    platform_init();
-    log_error(platform)("adv");
-    VMThread::create();
+    Platform::pre_initialize();
+    Platform::global_initialize();
     TestVM_Operation testVmOperation;
     TestVM_Operation::execute(&testVmOperation);
 
@@ -47,6 +45,7 @@ int main() {
 //    sleep(5);
 //    PeriodicThread::start();
 //    sleep(20);
-    platform_destroy();
+    Platform::before_destroy();
+    Platform::destroy();
     return 0;
 }

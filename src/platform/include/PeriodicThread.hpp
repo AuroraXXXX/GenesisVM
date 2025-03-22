@@ -2,8 +2,8 @@
 // Created by aurora on 2024/4/21.
 //
 
-#ifndef DAEMON_THREAD_PERIODIC_THREAD_HPP
-#define DAEMON_THREAD_PERIODIC_THREAD_HPP
+#ifndef PLATFORM_PERIODIC_THREAD_HPP
+#define PLATFORM_PERIODIC_THREAD_HPP
 
 #include "platform/concurrent/OSThread.hpp"
 
@@ -78,4 +78,4 @@ public:
 };
 
 
-#endif //DAEMON_THREAD_PERIODIC_THREAD_HPP
+#endif //PLATFORM_PERIODIC_THREAD_HPP

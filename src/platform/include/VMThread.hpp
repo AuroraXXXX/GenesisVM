@@ -2,11 +2,11 @@
 // Created by aurora on 2024/2/25.
 //
 
-#ifndef KERNEL_THREAD_VM_THREAD_HPP
-#define KERNEL_THREAD_VM_THREAD_HPP
+#ifndef PLATFORM_VM_THREAD_HPP
+#define PLATFORM_VM_THREAD_HPP
 
 #include "platform/concurrent/OSThread.hpp"
-#include "daemon-thread/VM_Operation.hpp"
+#include "platform/concurrent/VM_Operation.hpp"
 #include <atomic>
 
 class Monitor;
@@ -120,4 +120,4 @@ protected:
 };
 
 
-#endif //KERNEL_THREAD_VM_THREAD_HPP
+#endif //PLATFORM_VM_THREAD_HPP

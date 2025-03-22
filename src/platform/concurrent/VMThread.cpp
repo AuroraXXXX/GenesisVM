@@ -6,7 +6,7 @@
 #include "platform/concurrent/Monitor.hpp"
 #include "platform/concurrent/safepoint.hpp"
 #include "platform/log.hpp"
-#include "daemon-thread/VM_Operation.hpp"
+#include "platform/concurrent/VM_Operation.hpp"
 
 VMThread *VMThread::_vm_thread = nullptr;
 /**
@@ -20,14 +20,14 @@ Monitor *VMThread::VMThreadTerminate_lock = new Monitor("VMThreadTerminate_lock"
 
 void VMThread::run() {
     this->loop();
-    log_warn(daemon)("%s,Exiting ...", this->name());
+    log_warn(nonuserthread)("%s,Exiting ...", this->name());
     //在安全点退出
     Safepoint::begin();
     {
         //通知其他线程 VMThread退出成功
         MonitorLocker ml(VMThreadTerminate_lock);
         this->_vm_state.store(VMState::terminated);
-        log_warn(daemon)("%s,Exited.", this->name());
+        log_warn(nonuserthread)("%s,Exited.", this->name());
         ml.notify();
     }
 }
@@ -37,10 +37,11 @@ void VMThread::create() {
     VMThread::_vm_thread = new VMThread();
     //2 创建实际的os对象
     if (!os::create_thread(VMThread::_vm_thread)) {
-        guarantee(false, "init failed");
+        vm_exit_during_initialization("Cannot create VM thread. "
+                                      "Out of system resources.");
     } else {
         //
-        log_info(daemon)("%s:VMThread create is success!", VMThread::_vm_thread->name());
+        log_info(nonuserthread)("%s:VMThread create is success!", VMThread::_vm_thread->name());
     }
 }
 
@@ -119,7 +120,7 @@ void VMThread::inner_execute(VM_Operation *operation) {
 
     // 将目前需要执行的operation 存储的 全局对象上
     this->_cur_execute_operation.store(operation);
-    log_debug(daemon)("%s:Evaluating %s %s VM operation: %s",
+    log_debug(nonuserthread)("%s:Evaluating %s %s VM operation: %s",
                       this->name(),
                       prev_operation != nullptr ? "nested" : "",
                       operation->evaluate_at_safepoint() ? "safepoint" : "non-safepoint",
@@ -164,7 +165,7 @@ void VMThread::wait_until_executed(VM_Operation *operation) {
     MonitorLocker ml(VMThread::VMOperation_lock);
     {
 
-        log_trace(daemon)("UserThread(%d):Installing VM operation,cur timestamp:" SIZE_FORMAT,
+        log_trace(nonuserthread)("UserThread(%d):Installing VM operation,cur timestamp:" SIZE_FORMAT,
                           os::current_thread_id(),
                           os::current_stamp());
         while (true) {
@@ -177,14 +178,14 @@ void VMThread::wait_until_executed(VM_Operation *operation) {
             //此处的顺序绝对不可以进行调整
             std::atomic_thread_fence(std::memory_order::seq_cst);
             //调用者本身 需要睡眠在这个在此处 由于
-            log_trace(daemon)("UserThread(%d):A VM operation already set, waiting", os::current_thread_id());
+            log_trace(nonuserthread)("UserThread(%d):A VM operation already set, waiting", os::current_thread_id());
             // 说明没有 放入成功，有其他线程的operation待执行。本线程就睡眠在此处，等待其他线程待执行的operation执行完毕，重新放入
             ml.wait();
         }
     }
     //到这里说明 _next_operation一定是operation（即本operation已经放入到VMThread待执行中），所以本线程需要继续等待VMThread执行完毕
     {
-        log_trace(daemon)("UserThread(%d):Waiting for VM operation to be completed", os::current_thread_id());
+        log_trace(nonuserthread)("UserThread(%d):Waiting for VM operation to be completed", os::current_thread_id());
         // 等待其被执行完毕
         while (this->_wait_execute_operation.load() == operation) {
             //被唤醒了，说明线程执行完毕了
@@ -198,7 +199,7 @@ bool VMThread::set_wait_operation(VM_Operation *operation) {
         return false;
     }
     this->_wait_execute_operation.store(operation);
-    log_debug(daemon)("UserThread(%d):Adding VM operation: %s", os::current_thread_id(),
+    log_debug(nonuserthread)("UserThread(%d):Adding VM operation: %s", os::current_thread_id(),
                       this->_wait_execute_operation.load()->name());
     assert(this->_wait_execute_operation.load() != nullptr, "must be");
     return true;

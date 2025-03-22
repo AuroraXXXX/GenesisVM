@@ -7,7 +7,7 @@
 class OSThread;
 
 class os : public AllStatic {
-    friend void platform_init();
+    friend class Platform;
     /**
      * ---------------
      * 时间类型

@@ -2,8 +2,8 @@
 // Created by aurora on 2024/2/27.
 //
 
-#ifndef DAEMON_VM_OPERATION_HPP
-#define DAEMON_VM_OPERATION_HPP
+#ifndef PLATFORM_VM_OPERATION_HPP
+#define PLATFORM_VM_OPERATION_HPP
 
 #include "platform/allocation.hpp"
 
@@ -96,4 +96,4 @@ public:
 };
 
 
-#endif //DAEMON_VM_OPERATION_HPP
+#endif //PLATFORM_VM_OPERATION_HPP

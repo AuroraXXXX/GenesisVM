@@ -13,6 +13,7 @@
  * 自旋或者睡眠
  */
 class SpinYield : public StackObject {
+    friend class Safepoint;
 private:
     /**
      * 睡眠的纳秒数
