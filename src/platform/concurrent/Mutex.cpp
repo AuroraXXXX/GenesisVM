@@ -33,8 +33,12 @@ bool Mutex::owned_by_self() const {
 }
 
 bool Mutex::try_lock() {
-    auto status = ::pthread_mutex_trylock(&this->_mutex);
-    const auto success = status == 0;
+    int32_t status;
+    {
+        ThreadStatusBlockedTrans blocked;
+        status = ::pthread_mutex_trylock(&this->_mutex) == 0;
+    }
+    bool success = status == 0;
     assert(success || status == EBUSY, "pthread_mutex_trylock");
     if (success) {
         assert(!this->is_locked() || this->owned_by_self(), "mutex owner设置错误");

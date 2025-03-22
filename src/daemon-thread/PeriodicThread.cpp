@@ -6,7 +6,6 @@
 #include "daemon-thread/PeriodicTask.hpp"
 #include "platform/concurrent/Monitor.hpp"
 #include "platform/log.hpp"
-#include "VMThread.hpp"
 
 PeriodicThread *PeriodicThread::_periodic_thread = nullptr;
 

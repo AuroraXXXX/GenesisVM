@@ -7,18 +7,18 @@
 #include "platform/utils/robust.hpp"
 #include <sched.h>
 #include <ctime>
-
+#include "platform/concurrent/ThreadStatusTrans.hpp"
 int SpinYield::spin_pause() {
     return -1;
 }
 
-void SpinYield::yield_or_sleep() {
+void SpinYield::only_yield_or_sleep() {
     if (this->_yields < this->_yield_limit) {
         ++this->_yields;
         //让出CPU
         ::sched_yield();
     } else {
-        this->_sleep_ticks += SpinYield::sleep(this->_per_sleep_ns);;
+        this->_sleep_ticks += SpinYield::only_sleep(this->_per_sleep_ns);;
     }
 }
 
@@ -32,11 +32,15 @@ SpinYield::SpinYield(uint32_t spin_limit, uint32_t yield_limit, uint32_t per_sle
 }
 
 void SpinYield::wait() {
+    /**
+     * 首先判断是不是要进入阻塞状态
+     */
+    ThreadStatusBlockedTrans trans;
     if (this->_spins < this->_spin_limit) {
         ++this->_spins;
         SpinYield::spin_pause();
     } else {
-        this->yield_or_sleep();
+        this->only_yield_or_sleep();
     }
 }
 
@@ -59,7 +63,7 @@ void SpinYield::report(CharOStream *out) const {
     }
 }
 
-ticks_t SpinYield::sleep(uint32_t ns) {
+ticks_t SpinYield::only_sleep(uint32_t ns) {
     assert(ns < TicksPerS, "The spin sleep time is too long, up to 1s");
     const auto start_ticks = os::current_stamp();
     struct timespec spec{

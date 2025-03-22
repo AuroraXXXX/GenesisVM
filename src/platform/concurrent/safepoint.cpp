@@ -132,8 +132,8 @@ void Safepoint::back_off(ticks_t start_time) {
     constexpr auto ns_per_ms = TicksPerMS / TicksPerNS;
     constexpr auto ns_per_us = TicksPerUS / TicksPerNS;
     if (os::current_stamp() - start_time < ns_per_ms) {
-        SpinYield::sleep(10 * ns_per_us);
+        SpinYield::only_sleep(10 * ns_per_us);
     } else {
-        SpinYield::sleep(ns_per_ms);
+        SpinYield::only_sleep(ns_per_ms);
     }
 }

@@ -211,7 +211,10 @@ public:
      * @param to 目标的状态，但是不能是中间态
      */
     void tans_state(uint8_t to);
-
+    /**
+     * 打印线程信息
+     * @param out
+     */
     virtual void print_on(CharOStream *out) const;
 
 protected:

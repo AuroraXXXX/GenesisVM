@@ -40,8 +40,13 @@ private:
      * 让出CPU或者睡眠
      * 取决于 _yield_limit
      */
-    void yield_or_sleep();
-
+    void only_yield_or_sleep();
+    /**
+     * 仅仅进行睡眠，不设计其他任何状态什么的切换
+     * @param ns 睡眠的时间 最多1s
+     * @return 实际的睡眠时间
+     */
+    static ticks_t only_sleep(uint32_t ns);
 public:
 
 
@@ -68,13 +73,6 @@ public:
      * 等待一次
      */
     void wait();
-
-    /**
-     * 睡眠 最多1s
-     * @param ns 睡眠的时间
-     * @return 实际的睡眠时间
-     */
-    static ticks_t sleep(uint32_t ns);
 
     /**
      * 报告信息
