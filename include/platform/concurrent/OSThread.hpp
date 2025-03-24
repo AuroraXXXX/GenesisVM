@@ -113,13 +113,7 @@ protected:
             uint8_t to_state) {};
 
 
-    /**
-     * 直接设置是阻止的
-     * 用于在state_transitioning_callback
-     */
-    inline void set_blocked_direct() {
-        this->_os_state.store(OSThread::STATE_BLOCKED);
-    }
+
 
 public:
     static inline OSThread *current() {
@@ -267,6 +261,14 @@ private:
     inline UserThread *next() {
         return this->_next;
     }
+
+protected:
+    /**
+     * 用户线程需要进行等待
+     * @param from_state
+     * @param to_state
+     */
+    void state_transitioning_callback(uint8_t from_state, uint8_t to_state) override;
 
 protected:
     void pre_run() override;

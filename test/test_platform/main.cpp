@@ -37,15 +37,11 @@ int main() {
     TestVM_Operation testVmOperation;
     TestVM_Operation::execute(&testVmOperation);
 
-//    PeriodicThread::create();
-//
+
 //    TestPeriodicTask task(100);
 //    task.activate();
-//
-//    sleep(5);
-//    PeriodicThread::start();
-//    sleep(20);
-    Platform::before_destroy();
+//    sleep(10);
+
     Platform::destroy();
     return 0;
 }

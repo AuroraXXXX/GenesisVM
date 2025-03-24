@@ -8,9 +8,9 @@
 #include "platform/os.hpp"
 #include <pthread.h>
 #include "platform/concurrent/Mutex.hpp"
-
+#include "platform/concurrent/safepoint.hpp"
 #include "platform/concurrent/Monitor.hpp"
-
+#include "platform/log.hpp"
 thread_local OSThread *OSThread::_current = nullptr;
 OSThread *OSThread::_main_thread = nullptr;
 
@@ -92,7 +92,7 @@ void *OSThread::native_call(void *params) {
     OSThread::_current = osThread;
     osThread->_kernel_id = os::current_thread_id();
     osThread->_plib_id = ::pthread_self();
-
+    std::atomic_thread_fence(std::memory_order::seq_cst);
     osThread->tans_state(OSThread::STATE_RUNNING);
     std::atomic_thread_fence(std::memory_order::seq_cst);
     osThread->pre_run();
@@ -100,8 +100,8 @@ void *OSThread::native_call(void *params) {
     osThread->run();
     std::atomic_thread_fence(std::memory_order::seq_cst);
     osThread->post_run();
+    osThread->_os_state.store(OSThread::STATE_ZOMBIE);
     std::atomic_thread_fence(std::memory_order::seq_cst);
-    osThread->tans_state(OSThread::STATE_ZOMBIE);
     return nullptr;
 }
 
@@ -117,10 +117,12 @@ void OSThread::attach_main_thread(OSThread *main_thread) {
     OSThread::_current = main_thread;
     main_thread->_kernel_id = os::current_thread_id();
     main_thread->_plib_id = ::pthread_self();
+    std::atomic_thread_fence(std::memory_order::seq_cst);
     main_thread->tans_state(OSThread::STATE_RUNNING);
     std::atomic_thread_fence(std::memory_order::seq_cst);
     //将其放入电表中
     main_thread->pre_run();
+
 }
 
 
@@ -149,8 +151,6 @@ void UserThread::pre_run() {
     if (!this->is_daemon_thread()) {
         UserThread::_non_daemon_of_user_thread_count++;
     }
-
-
 }
 
 void UserThread::post_run() {
@@ -176,6 +176,13 @@ UserThread::UserThread() :
 
 const char *UserThread::name() {
     return "UserThread";
+}
+
+void UserThread::state_transitioning_callback(uint8_t from_state, uint8_t to_state) {
+    if (Safepoint::is_synchronizing()){
+        log_info(safepoint)("%d is at safepoint", this->get_kernel_id());
+        Safepoint::wait_on_barrier();
+    }
 }
 
 

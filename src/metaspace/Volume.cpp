@@ -44,12 +44,6 @@ namespace metaspace {
         InternalStats::inc_num_volumes_deaths();
     }
 
-
-
-
-
-
-
     void Volume::print_on(CharOStream *out) {
         assert_lock_strong(Metaspace::locker());
         out->print(LOG_FMT, LOG_FMT_ARGS);

@@ -23,7 +23,7 @@ void Platform::pre_initialize()  {
 
 void Platform::destroy() {
     //1. 判断当前线程是否是daemon线程 ,如果是那么就需要等待所有非守护线程执行完毕， 否则可以剩下我们
-   const   auto survive_num = OSThread::current()->is_daemon_thread()? 0 : 1;
+    const   auto survive_num = OSThread::current()->is_daemon_thread()? 0 : 1;
     {
         MonitorLocker lock(UserThread::locker());
         //2. 等待所有非守护线程执行完毕
@@ -31,29 +31,28 @@ void Platform::destroy() {
             lock.wait();
         }
     }
+    //2. 停止定时任务
+    //PeriodicThread::stop();
+    //1. 停止VMThread
+    VMThread::destroy();
     //3 执行后续销毁操作
 
     MemoryTracer::flush();
     FileCharOStream::flush_default_stream();
-    OSThread::main_thread()->post_run();
+
     log_info(platform)("main thread is exited.");
 }
 void Platform::global_initialize() {
     //2. 创建表示MAIN 的线程
     auto os_thread = new MainThread();
     OSThread::attach_main_thread(os_thread);
-    //3. 启动定时任务
-    PeriodicThread::create();
-    //4. 启动定时任务
-    PeriodicThread::start();
+//    //3. 启动定时任务
+//    PeriodicThread::create();
+//    //4. 启动定时任务
+//    PeriodicThread::start();
     //5 启动VMThread
     VMThread::create();
 }
-void Platform::before_destroy() {
-    //1. 停止VMThread
-    VMThread::destroy();
-    //2. 停止定时任务
-    PeriodicThread::stop();
-}
+
 
 

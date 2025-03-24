@@ -21,10 +21,6 @@ public:
      */
     static void global_initialize();
     /**
-     * 停止虚拟机所使用的线程
-     */
-    static void before_destroy();
-    /**
      * 进行销毁
      */
     static void destroy();

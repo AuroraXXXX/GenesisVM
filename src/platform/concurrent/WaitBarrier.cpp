@@ -9,9 +9,7 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 #include <atomic>
-WaitBarrier::~WaitBarrier() {
-    assert(this->_futex_barrier == 0, "存在线程未唤醒");
-}
+
 
 void WaitBarrier::arm(int barrier_num) {
     assert(this->_futex_barrier == 0, "已经设置了 无法再次设置");

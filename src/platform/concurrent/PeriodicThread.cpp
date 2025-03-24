@@ -20,7 +20,7 @@ void PeriodicThread::create() {
     assert(PeriodicThread::_periodic_thread == nullptr, "must be");
     PeriodicThread::_periodic_thread = new PeriodicThread();
     if (os::create_thread(PeriodicThread::_periodic_thread)) {
-        log_info(nonuserthread)("%s:PeriodicThread created is success");
+        log_info(nonuserthread)("PeriodicThread created is success");
     } else {
         delete PeriodicThread::_periodic_thread;
         PeriodicThread::_periodic_thread = nullptr;
@@ -38,6 +38,7 @@ void PeriodicThread::start() {
 void PeriodicThread::stop() {
     {
         MonitorLocker lock(PeriodicTask::locker());
+        log_info(nonuserthread)("PeriodicThread stopping...");
         /**
          * 表示要中止线程
          */
@@ -48,6 +49,7 @@ void PeriodicThread::stop() {
         std::atomic_thread_fence(std::memory_order::seq_cst);
         //当前线程需要等待 PeriodicThread 进行唤醒
         lock.wait();
+        log_info(nonuserthread)("PeriodicThread stopped...");
     }
 
 }

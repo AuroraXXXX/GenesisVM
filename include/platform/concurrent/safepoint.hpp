@@ -14,7 +14,7 @@
  * 用于控制所有语言层面的线程（即所有UserThread） 在安全点的启停
  */
 class Safepoint : public AllStatic {
-    friend class LangThread;
+    friend class OSThread;
 
 public:
     enum SynchronizeState : int32_t {
@@ -78,8 +78,30 @@ public:
     static inline bool is_at_safepoint() {
         return Safepoint::_state.load() == SynchronizeState::synchronized;
     };
+    /**
+     * 当前是否正在同步
+     * @return
+     */
+    static inline bool is_synchronizing(){
+        return Safepoint::_state.load() == SynchronizeState::synchronizing;
+    };
 
+    /**
+     * 线程休眠在此处
+     *
+     */
+    static void wait_on_barrier() {
+         // 等待屏障，直到_safe_point_check的值为true
+         _wait_barrier.wait(_safe_point_check.load());
+    };
 
+    /**
+     * 当前线程是否已经同步
+     * @return
+     */
+    static inline bool is_synchronized() {
+        return Safepoint::_state.load() == SynchronizeState::synchronized;
+    }
 };
 
 

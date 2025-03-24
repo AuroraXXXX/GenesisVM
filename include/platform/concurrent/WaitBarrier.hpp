@@ -20,7 +20,7 @@ public:
 
     explicit WaitBarrier() noexcept: _futex_barrier(0) {};
 
-    ~WaitBarrier();
+    ~WaitBarrier()= default;
 
     /**
      * 设置 栅栏标签
