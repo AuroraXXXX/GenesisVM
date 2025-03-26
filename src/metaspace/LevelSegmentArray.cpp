@@ -132,12 +132,12 @@ namespace metaspace {
             return true;
         };
         list->head_do(find_func);
-        list->add(insert_target, segment, false);
+        list->add( segment,insert_target, false);
     }
 
     void LevelSegmentArray::remove(Segment *segment) {
         auto list = this->list_for_level(segment->level());
-        list->delete_from_list(segment);
+        list->remove(segment);
     }
 
     bool LevelSegmentArray::contain(Segment *segment) {

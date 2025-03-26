@@ -141,8 +141,85 @@ public:
      * @return
      */
     [[nodiscard]] bool verify() const;
-
+    /**
+     * 将节点t插入到target附近，具体target的之前还是之后，由 is_prev 控制
+     * @param t
+     * @param target
+     * @param is_prev true 插入到target之前； false 表示之后
+     */
+    void add(T* t,T* target,bool is_prev);
+    /**
+     * 删除 节点t
+     * @param t
+     */
+    void remove(T* t);
 };
+
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
+void LinkList<T, GetLinkListNodeFunc>::remove(T *t) {
+    if (t == nullptr) {
+        return;
+    }
+    //进行实际的删除操作
+    auto node = LinkList::get_adjacent_node(t);
+    T* prev = node->prev();
+    T* next = node->next();
+    if (prev != nullptr) {
+        // 说明不是 第一个节点
+        LinkList::get_adjacent_node(prev)->set_next(next);
+    } else {
+        //第一个直接修改节点
+        this->_head = next;
+    }
+    if (next != nullptr) {
+        LinkList::get_adjacent_node(next)->set_prev(prev);
+    } else {
+        this->_tail = prev;
+    }
+    //清空取下的节点的 前驱和后继节点信息 防止污染
+    node->set_prev(nullptr);
+    node->set_next(nullptr);
+}
+
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
+void LinkList<T, GetLinkListNodeFunc>::add(T *t, T *target, bool is_prev) {
+    if (t == nullptr || target == nullptr) {
+        return;
+    }
+    //获取前驱 和 后继 存储节点
+    auto node = LinkList::get_adjacent_node(t);
+    auto target_node = LinkList::get_adjacent_node(target);
+    if (is_prev) {
+        //插入到target之前
+       T* prev = target_node->prev();
+        if (prev){
+            //说明不是第一个节点
+            LinkList::get_adjacent_node(prev)->set_next(t);
+        } else{
+            //说明是第一个节点
+            this->_head = t;
+        }
+        target_node->set_prev(t);
+        //设置node节点的前后的信息
+        node->set_prev(prev);
+        node->set_next(target);
+    } else {
+        //插入到target之后
+        T* next = target_node->next();
+        if (next){
+            //说明不是最后一个节点
+            LinkList::get_adjacent_node(next)->set_prev(t);
+        } else{
+            //说明是最后一个节点
+            this->_tail = t;
+        }
+        target_node->set_next(t);
+        //设置node节点的前后的信息
+        node->set_prev(target);
+        node->set_next(next);
+    }
+
+}
 
 template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
 bool LinkList<T, GetLinkListNodeFunc>::contain(T *t) {
