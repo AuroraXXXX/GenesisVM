@@ -10,13 +10,33 @@
 #include "platform/utils/LinkList.hpp"
 #include "platform/utils/robust.hpp"
 #include "platform/utils/align.hpp"
+
 namespace metaspace {
     class Volume;
 
     /**
-     * 表示内存块非实际管理地址指针部分
+     * 内存块的有效负载(即覆盖的内存)可能已提交 部分提交 完全未提交
+     *        +--------------+ <- end    -----------+ ----------+
+     *        |              |                      |           |
+     *        |              |                      |           |
+     *        |              |                      |           |
+     *        |              |                      |           |
+     *        |              |                      |           |
+     *        | -----------  | <- committed_top  -- +           |
+     *        |              |                      |           |
+     *        |              |                      | "free"    |
+     *        |              |                      |           | size
+     *        |              |     "free_below_     |           |
+     *        |              |        committed"    |           |
+     *        |              |                      |           |
+     *        |              |                      |           |
+     *        | -----------  | <- top     --------- + --------  |
+     *        |              |                      |           |
+     *        |              |     "used"           |           |
+     *        |              |                      |           |
+     *        +--------------+ <- start   ----------+ ----------+
      */
-    class SegmentBase {
+    class Segment {
     public:
         /**
          * 表示当前块的状态
@@ -30,10 +50,10 @@ namespace metaspace {
             Free,
             Dead
         };
-    protected:
+    private:
         /**
-        * 内存块等级
-        */
+         * 内存块等级
+         */
         SegmentLevel_t _level;
         /**
          * 内存块状态
@@ -43,43 +63,34 @@ namespace metaspace {
          * 隶属于的虚拟节点
          */
         Volume *_container;
-    private:
         /**
          * 通过前驱节点和后继节点将
          */
-        LinkListNode<SegmentBase> _link_node;
+        LinkListNode<Segment> _link_node;
         /**
          * 这两个指针是固定的
          * 指向地址空间分配时候 虚拟节点中MetaChunk的关系
          * 用于内存块的合并和切分
          */
-        LinkListNode<SegmentBase> _buddy_link_node;
+        LinkListNode<Segment> _buddy_link_node;
 
     public:
-        /**
-         * 构造函数
-         * 都给予默认值（并非能正常使用的）
-         */
-        explicit SegmentBase() :
-                _link_node(),
-                _buddy_link_node(),
-                _container(nullptr),
-                _state(State::Dead),
-                _level(SegmentLevel::LV_INVALID){};
         /**
          * 获取链表节点地址
          * @return
          */
-        inline  LinkListNode<SegmentBase> * link_list_node(){
+        inline LinkListNode<Segment> *link_list_node() {
             return &this->_link_node;
         };
+
         /**
          * 获取buddy链表节点地址
          * @return
          */
-        inline LinkListNode<SegmentBase> * buddy_link_list_node(){
+        inline LinkListNode<Segment> *buddy_link_list_node() {
             return &this->_buddy_link_node;
         };
+
         /**
          * 获取当前内存块所属的虚拟节点
          * @return
@@ -87,6 +98,7 @@ namespace metaspace {
         [[nodiscard]] inline Volume *container() const {
             return this->_container;
         };
+
         /**
          * 获取内存块管理的字节数
          * @return
@@ -94,15 +106,6 @@ namespace metaspace {
         [[nodiscard]] inline size_t total_bytes() const {
             return SegmentLevel::get_bytes(this->_level);
         };
-        /**
-         * 获取内存块的状态
-         * @return
-         */
-        [[nodiscard]] inline auto state(){
-            return this->_state;
-        };
-
-
 
         /**
          * 增加 内存块等级
@@ -129,30 +132,6 @@ namespace metaspace {
         [[nodiscard]] inline bool is_root_segment() const {
             return this->_level == SegmentLevel::LV_ROOT;
         };
-    };
-    /**
-     * 内存块的有效负载(即覆盖的内存)可能已提交 部分提交 完全未提交
-     *        +--------------+ <- end    -----------+ ----------+
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        | -----------  | <- committed_top  -- +           |
-     *        |              |                      |           |
-     *        |              |                      | "free"    |
-     *        |              |                      |           | size
-     *        |              |     "free_below_     |           |
-     *        |              |        committed"    |           |
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        | -----------  | <- top     --------- + --------  |
-     *        |              |                      |           |
-     *        |              |     "used"           |           |
-     *        |              |                      |           |
-     *        +--------------+ <- start   ----------+ ----------+
-     */
-    class Segment : public SegmentBase {
     private:
         /**
          * 管理的内存首地址
@@ -168,6 +147,7 @@ namespace metaspace {
          * 提交的内存大小
          */
         size_t _committed_bytes;
+
         /**
          * 将内存边界向上调整
          * @param new_commit_bytes 新的提交内存边界
@@ -175,24 +155,9 @@ namespace metaspace {
          */
         bool commit_up_to(size_t new_commit_bytes);
 
-        /**
-         * 确保[base,base + bytes)这个区间内存被提交
-         * 若这个区间小于提交粒度 会向两侧对齐 满足提交粒度的大小
-         * 然后进行提交 若这个内存粒度已经被提交完毕 那么不会有任何影响
-         *
-         * 若这个区间大于是提交粒度的N倍 那么由于不与其他内存块共享粒度
-         * 对于其他内存块不会有影响
-         * @param base 区间的首地址
-         * @param bytes 区间的长度
-         * @return
-         */
-
 
     public:
-        /**
-         * 将所有数据进行擦除 除了状态字段
-         */
-        void clear();
+
 
         /**
          * 提供给ChunkHeaderPool
@@ -217,6 +182,7 @@ namespace metaspace {
         [[nodiscard]] inline size_t used_bytes() const {
             return this->_used_bytes;
         };
+
         /**
          * 获取已经提交的内存
          * @return
@@ -242,12 +208,11 @@ namespace metaspace {
         };
 
 
-
         /**
          * 如果这个segment是它的buddy对中的leader，则返回true，否则返回false。不要调用根块。
          * @return
          */
-        [[nodiscard]] bool is_leader() const {
+        [[nodiscard]] inline bool is_leader() const {
             assert(!this->is_root_segment(), "root segment does not have partner ");
             return is_aligned(
                     this->_base,
@@ -265,17 +230,11 @@ namespace metaspace {
          * 确保已提交内存中 未被分配出去内存，满足需求
          * 当不足时 会获取元空间锁  进行新的提交
          * 共
-         * @param bytes 需求的内存
+         * @param new_commit_bytes 需求的内存
          * @return
          */
-        bool ensure_committed_enough_and_acquire_lock(size_t bytes);
 
-        /**
-         * 调用者在已经获取元空间锁的情况下才可以调用
-         * @param bytes
-         * @return
-         */
-        bool ensure_committed_enough(size_t bytes);
+        bool ensure_committed_enough(size_t new_commit_bytes);
 
         /**
          * 将整个内存块的内存撤销提交
@@ -290,7 +249,6 @@ namespace metaspace {
         void print_on(CharOStream *out) const;
     };
 }
-
 
 
 #endif //METASPACE_SEGMENT_HPP

@@ -29,15 +29,15 @@ namespace metaspace {
     }
 
     Volume::~Volume() {
-        auto committed_bytes = this->committed_bytes();
+
         auto reserved_bytes = this->reserved_bytes();
         meta_log2(debug, "死亡(dies),size " SIZE_FORMAT " K", reserved_bytes / K);
-
+        auto committed_bytes = this->committed_bytes_slow_path();
 
        /**
          * 修改虚拟链表 内存提交的统计信息
          */
-        *this->_committed_statistics -= committed_bytes;
+        this->_committed_statistics->fetch_sub(committed_bytes);
         /**
          * 修改内部运行状态的统计信息 用户检测
          */
@@ -50,7 +50,7 @@ namespace metaspace {
         out->print("reserved=");
         out->print_human_bytes(this->reserved_bytes());
         out->print(",committed=");
-        out->print_human_bytes(this->committed_bytes());
+        out->print_human_bytes(this->committed_bytes_slow_path());
         out->print(",used=");
 
         /**

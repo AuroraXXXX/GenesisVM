@@ -19,6 +19,8 @@ namespace metaspace {
      * 基于伙伴分配算法 应该是Root Segment的整数倍
      */
     class Volume : public CHeapObject<MEMFLAG::Metaspace> {
+        friend class RootArea;
+
     private:
         /**
          * 指向下一个 虚拟节点，用于维持链表
@@ -74,7 +76,7 @@ namespace metaspace {
          * 获取整个Volume内存提交的情况 单位字节
          * @return
          */
-        [[nodiscard]] size_t committed_bytes() const {
+        [[nodiscard]] size_t committed_bytes_slow_path() const {
             return this->_commit_bitmap.get_committed_bytes();
         };
 

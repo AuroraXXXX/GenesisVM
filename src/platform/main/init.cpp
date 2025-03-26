@@ -32,7 +32,7 @@ void Platform::destroy() {
         }
     }
     //2. 停止定时任务
-    //PeriodicThread::stop();
+    PeriodicThread::stop();
     //1. 停止VMThread
     VMThread::destroy();
     //3 执行后续销毁操作
@@ -47,9 +47,9 @@ void Platform::global_initialize() {
     auto os_thread = new MainThread();
     OSThread::attach_main_thread(os_thread);
 //    //3. 启动定时任务
-//    PeriodicThread::create();
-//    //4. 启动定时任务
-//    PeriodicThread::start();
+    PeriodicThread::create();
+    //4. 启动定时任务
+    PeriodicThread::start();
     //5 启动VMThread
     VMThread::create();
 }

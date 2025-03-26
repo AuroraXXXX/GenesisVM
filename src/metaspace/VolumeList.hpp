@@ -79,6 +79,7 @@ namespace metaspace {
          * @return
          */
         bool contains(void* p) const;
+
 #ifdef DEBUG_MODE_ONLY
         void verify();
 #endif

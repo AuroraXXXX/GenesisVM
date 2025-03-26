@@ -12,7 +12,7 @@
     "Segment@" PTR_FORMAT   ","  SEGMENT_LV_FORMAT "%c,base " PTR_FORMAT
 
 #define SEGMENT_FORMAT_ARGS(segment)   \
-    segment,(segment)->level(),(segment)->get_state_char(),(segment)->_base
+    segment,(segment)->_level,(segment)->get_state_char(),(segment)->_base
 
 #define SEGMENT_FULL_FORMAT         \
     SEGMENT_FORMAT "(" SIZE_FORMAT " byte),used:" SIZE_FORMAT " byte,committed:" \
@@ -38,7 +38,11 @@ namespace metaspace {
     }
 
     Segment::Segment() :
-            SegmentBase(),
+            _link_node(),
+            _buddy_link_node(),
+            _container(nullptr),
+            _state(State::Dead),
+            _level(SegmentLevel::LV_INVALID),
             _committed_bytes(0),
             _used_bytes(0),
             _base(0) {
@@ -65,7 +69,7 @@ namespace metaspace {
 
     bool Segment::commit_up_to(size_t new_commit_bytes) {
         assert_lock_strong(Metaspace::locker());
-        assert(new_commit_bytes > this->committed_bytes(), "无法缩小提交内存边界");
+        assert(is_clamp(new_commit_bytes,this->committed_bytes(),), "无法缩小提交内存边界");
         /**
          * 在包含提交部分和未提交区间调用VirtualSpace::commit_range时，
          * 会将现有内容擦除，因此我们需要确保 我们不会在活动数据范围内调用
@@ -98,7 +102,14 @@ namespace metaspace {
         log_debug(metaspace)(SEGMENT_FORMAT ":尝试将已提交内存:" SIZE_FORMAT
                              " bytes => " SIZE_FORMAT " bytes",
                              SEGMENT_FORMAT_ARGS(this), commit_from, commit_to);
-
+        /**
+         * 确保[base,base + bytes)这个区间内存被提交
+         * 若这个区间小于提交粒度 会向两侧对齐 满足提交粒度的大小
+         * 然后进行提交 若这个内存粒度已经被提交完毕 那么不会有任何影响
+         *
+         * 若这个区间大于是提交粒度的N倍 那么由于不与其他内存块共享粒度
+         * 对于其他内存块不会有影响
+         */
         uintptr_t range_base = align_down(this->_base + commit_from, commit_granule);
         uintptr_t range_end = align_up(this->_base + commit_to, commit_granule);
 //        const auto commit_result = this->container()->commit_range((void *) range_base, range_end - range_base);
@@ -108,29 +119,21 @@ namespace metaspace {
         return false;
     }
 
-    bool Segment::ensure_committed_enough_and_acquire_lock(size_t bytes) {
-        bool result = true;
-        assert(this->free_bytes() >= bytes, "溢出");
-        if (bytes >= this->free_below_committed_bytes()) {
-            MutexLocker fcl(Metaspace::locker());
-            result = this->commit_up_to(bytes);
-        }
-        return result;
-    }
 
     bool Segment::ensure_committed_enough(size_t bytes) {
         bool result = true;
         assert(this->free_bytes() >= bytes, "溢出");
-        assert_lock_strong(Metaspace::locker());
         if (bytes >= this->free_below_committed_bytes()) {
-            result = this->commit_up_to(bytes);
+
+                result = this->commit_up_to(bytes);
+
         }
         return result;
     }
 
     void Segment::uncommit() {
         assert_lock_strong(Metaspace::locker());
-        assert(this->state() == State::Free &&
+        assert(this->_state == State::Free &&
                this->used_bytes() == 0 &&
                this->total_bytes() >= Setting::CommitGranuleBytes,
                "仅仅空闲块且尺寸大于提交粒度才允许撤销提交");

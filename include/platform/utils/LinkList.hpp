@@ -5,6 +5,7 @@
 #ifndef PLATFORM_LINK_LIST_HPP
 #define PLATFORM_LINK_LIST_HPP
 
+#include <type_traits>
 #include "platform/utils/robust.hpp"
 
 /**
@@ -67,10 +68,12 @@ private:
         LinkListNode<T> *node;
         if constexpr (GetLinkListNodeFunc != nullptr) {
             // 指定了获取节点的类成员函数，我们调用类成员函数，获取节点的地址
-            node(t->*GetLinkListNodeFunc)();
+            node = (t->*GetLinkListNodeFunc)();
         } else {
+            static_assert(GetLinkListNodeFunc != nullptr || std::is_base_of_v<LinkListNode<T>, T>,
+                          "当 GetLinkListNodeFunc 为 nullptr 时，T 必须继承自 LinkListNode<T>");
             // 没有指定获取节点的类成员函数，说明存储类型本身就是可以转换成节点地址
-            node = static_cast<LinkListNode<T> *>(t);
+            node = t;
         }
         assert(node != nullptr, "must be not null");
         return node;
@@ -118,7 +121,10 @@ public:
      * @return
      */
     T *pop_tail();
-
+    /**
+     * 判断链表是否为空
+     * @return
+     */
     inline bool is_empty() {
         return this->_head == nullptr;
     };
@@ -215,6 +221,54 @@ T *LinkList<T, GetLinkListNodeFunc>::pop_head() {
     return t;
 }
 
+
+
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
+void LinkList<T, GetLinkListNodeFunc>::push_head(T *t) {
+    if (t == nullptr) {
+        // 如果 节点是空的
+        return;
+    }
+    auto link_node = LinkList::get_adjacent_node(t);
+    //设置所使用的 链表节点的 前驱和后继关系
+    link_node->set_prev(nullptr);
+    link_node->set_next(this->_head);
+
+    if (this->_head != nullptr) {
+        //说明head存储了 类型，那么 我们需要设置其关联的 链表节点的
+        link_node = LinkList::get_adjacent_node(this->_head);
+        //因为 上面已经将 head节点放到 t之后了，那么 就需要设置 head前驱为t
+        link_node->set_prev(t);
+    }
+    this->_head = t;
+    if (this->_tail == nullptr) {
+        this->_tail = t;
+    }
+}
+
+template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
+void LinkList<T, GetLinkListNodeFunc>::push_tail(T *t) {
+    if (t == nullptr) {
+        // 如果 节点是空的
+        return;
+    }
+    auto link_node = LinkList::get_adjacent_node(t);
+    //设置所使用的 链表节点的 前驱和后继关系
+    link_node->set_prev(this->_tail);
+    link_node->set_next(nullptr);
+
+    if (this->_tail != nullptr) {
+        //说明tail存储了 类型，那么 我们需要设置其关联的 链表节点的
+        link_node = LinkList::get_adjacent_node(this->_tail);
+        //因为 上面已经
+        link_node->set_next(t);
+    }
+    this->_tail = t;
+    if (this->_head == nullptr) {
+        this->_head = t;
+    }
+}
+
 template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
 T *LinkList<T, GetLinkListNodeFunc>::pop_tail() {
     if (this->_tail == nullptr) {
@@ -267,52 +321,6 @@ void LinkList<T, GetLinkListNodeFunc>::tail_do(F func) {
         }
         //获取 链表节点
         cur = LinkList::get_adjacent_node(cur)->prev();
-    }
-}
-
-template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
-void LinkList<T, GetLinkListNodeFunc>::push_head(T *t) {
-    if (t == nullptr) {
-        // 如果 节点是空的
-        return;
-    }
-    auto link_node = LinkList::get_adjacent_node(t);
-    //设置所使用的 链表节点的 前驱和后继关系
-    link_node->set_prev(nullptr);
-    link_node->set_next(this->_head);
-
-    if (this->_head != nullptr) {
-        //说明head存储了 类型，那么 我们需要设置其关联的 链表节点的
-        link_node = LinkList::get_adjacent_node(this->_head);
-        //因为 上面已经将 head节点放到 t之后了，那么 就需要设置 head前驱为t
-        link_node->set_prev(t);
-    }
-    this->_head = t;
-    if (this->_tail == nullptr) {
-        this->_tail = t;
-    }
-}
-
-template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
-void LinkList<T, GetLinkListNodeFunc>::push_tail(T *t) {
-    if (t == nullptr) {
-        // 如果 节点是空的
-        return;
-    }
-    auto link_node = LinkList::get_adjacent_node(t);
-    //设置所使用的 链表节点的 前驱和后继关系
-    link_node->set_prev(this->_tail);
-    link_node->set_next(nullptr);
-
-    if (this->_tail != nullptr) {
-        //说明tail存储了 类型，那么 我们需要设置其关联的 链表节点的
-        link_node = LinkList::get_adjacent_node(this->_tail);
-        //因为 上面已经
-        link_node->set_next(t);
-    }
-    this->_tail = t;
-    if (this->_head == nullptr) {
-        this->_head = t;
     }
 }
 
