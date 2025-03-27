@@ -4,13 +4,15 @@
 
 #ifndef GENESISVM_CONTEXTHOLDER_HPP
 #define GENESISVM_CONTEXTHOLDER_HPP
-
+#include "platform/mem/AllStatic.hpp"
 
 namespace metaspace{
     class VolumeList;
-    class ContextHolder {
+    class LevelSegmentArray;
+    class ContextHolder :public AllStatic{
     private:
         VolumeList* _volume_list;
+        LevelSegmentArray* _level_segment_array;
     public:
 
     };

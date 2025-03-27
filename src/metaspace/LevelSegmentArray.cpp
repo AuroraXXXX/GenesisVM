@@ -87,8 +87,10 @@ namespace metaspace {
         assert(SegmentLevel::is_valid(level), "segment level is invalid");
         size_t committed_bytes = 0;
         auto calcu_func = [&](Segment *segment) {
-            committed_bytes += segment->committed_bytes();
-            return true;
+            auto cur_committed_bytes =  segment->committed_bytes();
+            committed_bytes +=cur_committed_bytes;
+            //如果是0 那么说明之后也不存在已提交的内存
+            return cur_committed_bytes != 0;
         };
         auto value = this->list_for_level(level);
         value->head_do(calcu_func);

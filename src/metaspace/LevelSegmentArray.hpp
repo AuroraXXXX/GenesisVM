@@ -72,7 +72,7 @@ namespace metaspace {
         [[nodiscard]] size_t total_bytes() const;
 
         /**
-         * 统计在固定等级上的内存块已提交的大小
+         * 统计在固定等级上的内存块所有已提交的大小
          * @param level
          * @return
          */
@@ -105,7 +105,11 @@ namespace metaspace {
          * @param out
          */
         void print_on(CharOStream *out) const;
-
+        /**
+         * 判断当前块是不是被包含
+         * @param segment
+         * @return
+         */
         bool contain(Segment *segment);
     };
 }
