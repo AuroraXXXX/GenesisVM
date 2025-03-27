@@ -49,13 +49,7 @@ namespace metaspace {
 
     }
 
-    void Segment::clear() {
-        this->_base = 0;
-        this->_committed_bytes = this->_used_bytes = 0;
-        this->_level = SegmentLevel::LV_INVALID;
-        this->_container = nullptr;
-        this->_state = State::Dead;
-    }
+
 
     void *Segment::allocate(size_t request_bytes) {
         assert(this->free_below_committed_bytes() >= request_bytes,
@@ -69,7 +63,7 @@ namespace metaspace {
 
     bool Segment::commit_up_to(size_t new_commit_bytes) {
         assert_lock_strong(Metaspace::locker());
-        assert(is_clamp(new_commit_bytes,this->committed_bytes(),), "无法缩小提交内存边界");
+        assert(is_clamp(new_commit_bytes,this->committed_bytes(), this->total_bytes()), "无法缩小提交内存边界");
         /**
          * 在包含提交部分和未提交区间调用VirtualSpace::commit_range时，
          * 会将现有内容擦除，因此我们需要确保 我们不会在活动数据范围内调用

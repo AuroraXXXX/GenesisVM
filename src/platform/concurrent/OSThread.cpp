@@ -126,15 +126,6 @@ void OSThread::attach_main_thread(OSThread *main_thread) {
 }
 
 
-ResourceArenaMark::ResourceArenaMark() :
-        _arena(OSThread::current()->resource_arena()),
-        _saved(_arena) {
-    assert(this->_arena != nullptr, "must be not null");
-}
-
-ResourceArenaMark::~ResourceArenaMark() {
-    this->_saved.rollback_to(this->_arena);
-}
 
 /**
  * ----------------

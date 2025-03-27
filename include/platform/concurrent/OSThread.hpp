@@ -391,17 +391,5 @@ public:
 
 };
 
-/**
- * OSThread 的 resource mem
- */
-class ResourceArenaMark : public StackObject {
-private:
-    Arena *_arena;
-    Arena::SavedData _saved;
-public:
-    explicit ResourceArenaMark();
-
-    ~ResourceArenaMark();
-};
 
 #endif //PLATFORM_OS_THREAD_HPP

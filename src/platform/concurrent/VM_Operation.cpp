@@ -3,7 +3,7 @@
 //
 
 #include "platform/concurrent/VM_Operation.hpp"
-#include "platform/concurrent/OSThread.hpp"
+#include "platform/mem/ResourceArenaMark.hpp"
 #include "platform/log.hpp"
 #include "VMThread.hpp"
 void VM_Operation::evaluate() {

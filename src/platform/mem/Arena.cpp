@@ -160,24 +160,3 @@ void Arena::iter_chunk(Arena::ChunkClosure *closure) {
 void Arena::clean_pool() {
     ArenaChunkPool::clean();
 }
-
-
-
-Arena::SavedData::SavedData(Arena *arena) :
-        _current_top(arena->_list.peek()),
-        _total_bytes(arena->_total_bytes),
-        _end_literal(arena->_end_literal),
-        _top_literal(arena->_top_literal) {
-    assert(arena != nullptr, "must be");
-}
-
-void Arena::SavedData::rollback_to(Arena *arena) {
-    assert(arena != nullptr, "must be");
-    arena->_top_literal = this->_top_literal;
-    arena->_end_literal = this->_end_literal;
-    auto need_free_bytes = arena->_total_bytes - this->_total_bytes;
-    arena->_total_bytes = this->_total_bytes;
-    auto  total_bytes= arena->chop_list(this->_current_top);
-    assert(need_free_bytes == total_bytes,"check");
-}
-

@@ -9,12 +9,21 @@
 namespace metaspace{
     class VolumeList;
     class LevelSegmentArray;
+    class Segment;
+
+    /**
+     * 上下文管理类
+     */
     class ContextHolder :public AllStatic{
     private:
-        VolumeList* _volume_list;
-        LevelSegmentArray* _level_segment_array;
+      static  VolumeList* _volume_list;
+        static LevelSegmentArray* _level_segment_array;
     public:
-
+        /**
+         * 归还 segment
+         * @param segment
+         */
+        static void return_segment(Segment* segment);
     };
 }
 

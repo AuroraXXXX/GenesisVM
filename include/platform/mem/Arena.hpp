@@ -74,31 +74,6 @@ public:
          */
         virtual void do_chunk(void *base, void *top) = 0;
     };
-    /**
-     * 用于保存数据
-     */
-    class SavedData {
-        friend class Arena;
-    private:
-        /**
-         * 保存的Arena栈顶指针
-         */
-        ArenaChunk *_current_top;
-        uintptr_t _top_literal;
-        uintptr_t _end_literal;
-        size_t _total_bytes;
-    public:
-        /**
-         * 记录保存点
-         * @param arena
-         */
-        explicit SavedData(Arena *arena);
-        /**
-         * 进行回滚操作
-         * @param arena
-         */
-        void rollback_to(Arena *arena);
-    };
 
     /**
      * 遍历已经使用的内存块

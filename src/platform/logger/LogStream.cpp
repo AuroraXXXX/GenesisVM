@@ -7,7 +7,7 @@
 #include "platform/logger/LogLayoutFollower.hpp"
 #include "platform/logger/LogOutput.hpp"
 #include "platform/logger/LogStream.hpp"
-#include "platform/concurrent/OSThread.hpp"
+#include "platform/mem/ResourceArenaMark.hpp"
 #include "platform/logger/LogTagSet.hpp"
 
 void LogStream::record(LogLevel level, LogTagSet &tag_set, const char *format, va_list args) {

@@ -4,7 +4,7 @@
 #include "platform/utils/robust.hpp"
 #include <cstdarg>
 #include "platform/log.hpp"
-#include "platform/concurrent/OSThread.hpp"
+#include "platform/mem/ResourceArenaMark.hpp"
 #include "platform/concurrent/Mutex.hpp"
 #include "platform/concurrent/safepoint.hpp"
 static const char * VMErrorTypeName[] =  {
