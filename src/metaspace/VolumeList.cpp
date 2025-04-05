@@ -3,7 +3,7 @@
 //
 #include "platform/os.hpp"
 #include "platform/concurrent/Mutex.hpp"
-#include "metaspace/Metaspace.hpp"
+#include "ContextHolder.hpp"
 #include "VolumeList.hpp"
 #include "Volume.hpp"
 #include "meta_log.hpp"
@@ -22,7 +22,7 @@ namespace metaspace {
 
     void VolumeList::create_new_volume() {
         //获取锁
-        assert_lock_strong(Metaspace::locker());
+        assert_lock_strong(ContextHolder::global_locker());
         //获取默认的虚拟节点大小
         const auto volume_bytes = Setting::VolumeDefaultBytes;
         //创建虚拟节点
@@ -46,7 +46,7 @@ namespace metaspace {
     }
 
     VolumeList::~VolumeList() {
-        assert_lock_strong(Metaspace::locker());
+        assert_lock_strong(ContextHolder::global_locker());
         while (true) {
             auto vsn = this->_list.pop();
             if (vsn == nullptr) {
@@ -60,7 +60,6 @@ namespace metaspace {
 
 
     void VolumeList::print_on(CharOStream *out) const {
-        MutexLocker fcl(Metaspace::locker());
         out->print_cr(LOG_FMT ":", LOG_FMT_ARGS);
         int n = 0;
         const auto iter_func = [&](Volume *volume) {

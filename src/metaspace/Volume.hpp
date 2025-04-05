@@ -96,7 +96,14 @@ namespace metaspace {
         inline bool contain(void* p) {
             return this->_reserved.contains(p);
         };
+        /**
+         * 撤销内存的提交
+         * @param base 要撤销内存的首地址
+         * @param bytes 要撤销的内存大小 单位
+         */
+        void uncommit_range(void *base, size_t bytes);
 
+        void commit_range(void *base, size_t bytes);
 #ifdef DEBUG_MODE_ONLY
         void verify() const;
 #endif

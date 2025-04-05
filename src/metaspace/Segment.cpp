@@ -3,7 +3,7 @@
 //
 
 #include "Segment.hpp"
-#include "metaspace/Metaspace.hpp"
+#include "ContextHolder.hpp"
 #include "Volume.hpp"
 #include "platform/stream/CharOStream.hpp"
 #include "meta_log.hpp"
@@ -62,7 +62,7 @@ namespace metaspace {
 
 
     bool Segment::commit_up_to(size_t new_commit_bytes) {
-        assert_lock_strong(Metaspace::locker());
+        assert_lock_strong(ContextHolder::global_locker());
         assert(is_clamp(new_commit_bytes,this->committed_bytes(), this->total_bytes()), "无法缩小提交内存边界");
         /**
          * 在包含提交部分和未提交区间调用VirtualSpace::commit_range时，
@@ -125,8 +125,8 @@ namespace metaspace {
         return result;
     }
 
-    void Segment::uncommit() {
-        assert_lock_strong(Metaspace::locker());
+    void Segment::clear_committed() {
+        assert_lock_strong(ContextHolder::global_locker());
         assert(this->_state == State::Free &&
                this->used_bytes() == 0 &&
                this->total_bytes() >= Setting::CommitGranuleBytes,

@@ -19,21 +19,30 @@ private:
 public:
     explicit LinkListNode() : _prev(nullptr), _next(nullptr) {}
 
-    void set_prev(T *prev) {
+    inline void set_prev(T *prev) {
         _prev = prev;
     }
 
-    void set_next(T *next) {
+    inline void set_next(T *next) {
         _next = next;
     }
 
-    T *prev() {
+    inline T *prev() {
         return _prev;
     }
 
-    T *next() {
+    inline T *next() {
         return _next;
     }
+
+    bool is_clear() {
+        return this->_next == nullptr && this->_prev == nullptr;
+    };
+
+    void clear(){
+        this->_prev = nullptr;
+        this->_next = nullptr;
+    };
 };
 
 template<typename T>
@@ -121,6 +130,7 @@ public:
      * @return
      */
     T *pop_tail();
+
     /**
      * 判断链表是否为空
      * @return
@@ -141,18 +151,20 @@ public:
      * @return
      */
     [[nodiscard]] bool verify() const;
+
     /**
      * 将节点t插入到target附近，具体target的之前还是之后，由 is_prev 控制
      * @param t
      * @param target
      * @param is_prev true 插入到target之前； false 表示之后
      */
-    void add(T* t,T* target,bool is_prev);
+    void add(T *t, T *target, bool is_prev);
+
     /**
      * 删除 节点t
      * @param t
      */
-    void remove(T* t);
+    void remove(T *t);
 };
 
 template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
@@ -162,8 +174,8 @@ void LinkList<T, GetLinkListNodeFunc>::remove(T *t) {
     }
     //进行实际的删除操作
     auto node = LinkList::get_adjacent_node(t);
-    T* prev = node->prev();
-    T* next = node->next();
+    T *prev = node->prev();
+    T *next = node->next();
     if (prev != nullptr) {
         // 说明不是 第一个节点
         LinkList::get_adjacent_node(prev)->set_next(next);
@@ -177,8 +189,7 @@ void LinkList<T, GetLinkListNodeFunc>::remove(T *t) {
         this->_tail = prev;
     }
     //清空取下的节点的 前驱和后继节点信息 防止污染
-    node->set_prev(nullptr);
-    node->set_next(nullptr);
+    node->clear();
 }
 
 template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
@@ -191,11 +202,11 @@ void LinkList<T, GetLinkListNodeFunc>::add(T *t, T *target, bool is_prev) {
     auto target_node = LinkList::get_adjacent_node(target);
     if (is_prev) {
         //插入到target之前
-       T* prev = target_node->prev();
-        if (prev){
+        T *prev = target_node->prev();
+        if (prev) {
             //说明不是第一个节点
             LinkList::get_adjacent_node(prev)->set_next(t);
-        } else{
+        } else {
             //说明是第一个节点
             this->_head = t;
         }
@@ -205,11 +216,11 @@ void LinkList<T, GetLinkListNodeFunc>::add(T *t, T *target, bool is_prev) {
         node->set_next(target);
     } else {
         //插入到target之后
-        T* next = target_node->next();
-        if (next){
+        T *next = target_node->next();
+        if (next) {
             //说明不是最后一个节点
             LinkList::get_adjacent_node(next)->set_prev(t);
-        } else{
+        } else {
             //说明是最后一个节点
             this->_tail = t;
         }
@@ -282,22 +293,21 @@ T *LinkList<T, GetLinkListNodeFunc>::pop_head() {
     T *t = this->_head;
 
     // 获取对应的链表节点
-    auto node = LinkList::get_adjacent_node(t);
-    node->set_next(nullptr);
+    const auto node = LinkList::get_adjacent_node(t);
     auto next = node->next();
     if (next != nullptr) {
         //说明next 也存储了类型 ，那么也要将其前驱 清空
-        node = LinkList::get_adjacent_node(next);
-        node->set_prev(nullptr);
+        auto next_node = LinkList::get_adjacent_node(next);
+        next_node->set_prev(nullptr);
     }
     //设置 next
     this->_head = next;
     if (this->_head == nullptr) {
         this->_tail = nullptr;
     }
+    node->clear();
     return t;
 }
-
 
 
 template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
@@ -355,13 +365,12 @@ T *LinkList<T, GetLinkListNodeFunc>::pop_tail() {
     // 要返回的节点
     T *t = this->_tail;
     // 获取对应的链表节点
-    auto node = LinkList::get_adjacent_node(t);
-    node->set_prev(nullptr);
+    const  auto node = LinkList::get_adjacent_node(t);
     auto prev = node->prev();
     if (prev != nullptr) {
         //说明prev 也存储了类型 ，那么也要将其后继 清空
-        node = LinkList::get_adjacent_node(prev);
-        node->set_next(nullptr);
+        auto prev_node = LinkList::get_adjacent_node(prev);
+        prev_node->set_next(nullptr);
     }
     //设置 prev
     this->_tail = prev;
@@ -369,6 +378,7 @@ T *LinkList<T, GetLinkListNodeFunc>::pop_tail() {
         //说明 当前删除后，链表是空的
         this->_head = nullptr;
     }
+    node->clear();
     return t;
 }
 

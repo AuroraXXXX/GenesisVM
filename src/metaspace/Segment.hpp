@@ -16,27 +16,33 @@ namespace metaspace {
 
     /**
      * 内存块的有效负载(即覆盖的内存)可能已提交 部分提交 完全未提交
-     *        +--------------+ <- end    -----------+ ----------+
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        | -----------  | <- committed_top  -- +           |
-     *        |              |                      |           |
-     *        |              |                      | "free"    |
-     *        |              |                      |           | size
-     *        |              |     "free_below_     |           |
-     *        |              |        committed"    |           |
-     *        |              |                      |           |
-     *        |              |                      |           |
-     *        | -----------  | <- top     --------- + --------  |
-     *        |              |                      |           |
-     *        |              |     "used"           |           |
-     *        |              |                      |           |
-     *        +--------------+ <- start   ----------+ ----------+
+     *              +--------------+ <- end    -----------+ ----------+
+     *              |              |                      |           |
+     *              |              |                      |           |
+     *              |              |                      |           |
+     *              |              |                      |           |
+     *              |              |                      |           |
+     *         ---- | -----------  | <- committed_top  -- +           |
+     *              |              |                      |           |
+     *              |              |                      | "free"    |
+     *              |              |                      |           | size
+     *              |              |    "已提交但未使用"    |           |
+     *  committed   |              |                      |           |
+     *              |              |                      |           |
+     *              | -----------  | <- top     --------- + --------  |
+     *              |              |                      |           |
+     *              |              |     "已使用"          |           |
+     *              |              |                      |           |
+     *         ---- +--------------+ <- start   ----------+ ----------+
      */
-    class Segment {
+     class SegmentBase{
+     private:
+
+
+     };
+
+    class Segment :public LinkListNode<Segment> {
+        friend class RootArea;
     public:
         /**
          * 表示当前块的状态
@@ -64,10 +70,6 @@ namespace metaspace {
          */
         Volume *_container;
         /**
-         * 通过前驱节点和后继节点将
-         */
-        LinkListNode<Segment> _link_node;
-        /**
          * 这两个指针是固定的
          * 指向地址空间分配时候 虚拟节点中MetaChunk的关系
          * 用于内存块的合并和切分
@@ -75,20 +77,8 @@ namespace metaspace {
         LinkListNode<Segment> _buddy_link_node;
 
     public:
-        /**
-         * 获取链表节点地址
-         * @return
-         */
-        inline LinkListNode<Segment> *link_list_node() {
-            return &this->_link_node;
-        };
-
-        /**
-         * 获取buddy链表节点地址
-         * @return
-         */
-        inline LinkListNode<Segment> *buddy_link_list_node() {
-            return &this->_buddy_link_node;
+        inline auto state(){
+            return this->_state;
         };
 
         /**
@@ -105,20 +95,6 @@ namespace metaspace {
          */
         [[nodiscard]] inline size_t total_bytes() const {
             return SegmentLevel::get_bytes(this->_level);
-        };
-
-        /**
-         * 增加 内存块等级
-         * 即内存块大小缩小两倍
-         */
-        inline void inc_level() {
-            this->_level += 1;
-            assert(SegmentLevel::is_valid(this->_level), "segment level is invalid");
-        };
-
-        inline void dec_level() {
-            this->_level -= 1;
-            assert(SegmentLevel::is_valid(this->_level), "segment level is invalid");
         };
 
         [[nodiscard]] inline auto level() const {
@@ -240,7 +216,7 @@ namespace metaspace {
          * 将整个内存块的内存撤销提交
          * 这个必须已经获取元空间锁才可以调用
          */
-        void uncommit();
+        void clear_committed();
 
         /**
          * 打印当前节点的信息

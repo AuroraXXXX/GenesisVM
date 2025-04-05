@@ -98,7 +98,6 @@ namespace metaspace {
     }
 
     void LevelSegmentArray::print_on(CharOStream *out) const {
-        MutexLocker fcl(Metaspace::locker());
         out->print_cr(LOG_FMT ": 总计: %d Segment," SIZE_FORMAT " bytes.",
                       LOG_FMT_ARGS,
                       this->num_segments(),

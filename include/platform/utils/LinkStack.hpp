@@ -7,6 +7,22 @@
 
 #include "platform/typedef.hpp"
 
+template<typename T>
+class LinkStackNode {
+public:
+    T *_next;
+
+    LinkStackNode() : _next(nullptr) {};
+
+    inline T *next() const {
+        return this->_next;
+    };
+
+    inline void set_next(T *next) {
+        this->_next = next;
+    };
+};
+
 /**
  * 使用单链表形成的堆栈
  */
@@ -87,16 +103,17 @@ public:
      * @param f 具体的回调函数
      */
     template<typename F>
-    void iterate(F f)const {
+    void iterate(F f) const {
         // 遍历堆栈，从栈顶开始
         for (T *t = this->_top; t != nullptr; t = t->next()) {
             // 调用回调函数，传入当前节点和节点在栈中的位置
-           bool continue_next =  f(t);
-           if(!continue_next){
-               break;
-           }
+            bool continue_next = f(t);
+            if (!continue_next) {
+                break;
+            }
         }
     };
+
     /**
      * 在堆栈中删除指定节点t
      * @param t 要被删除节点
@@ -104,8 +121,8 @@ public:
      */
     bool remove(T *t) {
         if (t == nullptr) return false;
-        T* prev = nullptr;
-        T* cur = this->_top;
+        T *prev = nullptr;
+        T *cur = this->_top;
         while (cur != nullptr) {
             if (cur == t) {
                 if (prev == nullptr) {
