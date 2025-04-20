@@ -40,7 +40,9 @@ namespace metaspace {
          */
         std::atomic<size_t> *const _committed_statistics;
 
-
+        uint32_t _top_area;
+        uint32_t _total_area;
+        Segment** _area_first_segment;
     public:
         /**
          * 构造函数
@@ -103,7 +105,9 @@ namespace metaspace {
          */
         void uncommit_range(void *base, size_t bytes);
 
-        void commit_range(void *base, size_t bytes);
+        bool commit_range(void *base, size_t bytes);
+
+        Segment* allocate_root_segment();
 #ifdef DEBUG_MODE_ONLY
         void verify() const;
 #endif

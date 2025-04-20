@@ -17,7 +17,7 @@ namespace metaspace {
             _list(),
             _reserved_bytes(0),
             _committed_bytes(0) {
-        meta_log(debug, "出生(born)");
+        meta_log(info, "born");
     }
 
     void VolumeList::create_new_volume() {
@@ -55,7 +55,7 @@ namespace metaspace {
             this->_reserved_bytes.fetch_sub(vsn->reserved_bytes());
             delete vsn;
         }
-        meta_log(debug, "死亡(dies)");
+        meta_log(info, "dies");
     }
 
 
@@ -70,8 +70,8 @@ namespace metaspace {
         };
         this->_list.iterate(iter_func);
 
-        out->print_cr(" - 总计 %d 节点,reserved(保留):" SIZE_FORMAT
-                      " bytes,committed(提交):" SIZE_FORMAT " bytes.",
+        out->print_cr(" - 总计 %d 节点,reserved:" SIZE_FORMAT
+                      " bytes,committed:" SIZE_FORMAT " bytes.",
                       n, this->reserved_bytes(), this->committed_bytes());
     }
 
@@ -85,7 +85,9 @@ namespace metaspace {
         this->_list.iterate(iter_func);
         return result;
     }
-
+    Segment *VolumeList::allocate_root_segment() {
+        return nullptr;
+    }
 #ifdef DEBUG_MODE_ONLY
     void VolumeList::verify() {
         auto iter_func = [&](Volume *volume) {
@@ -94,6 +96,9 @@ namespace metaspace {
         };
         this->_list.iterate(iter_func);
     }
+
+
+
 #endif
 
 }

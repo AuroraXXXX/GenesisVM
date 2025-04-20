@@ -15,6 +15,6 @@ metaspace::SegmentLevel_t metaspace::SegmentLevel::get_optimal_level(size_t byte
 }
 
 size_t metaspace::SegmentLevel::get_bytes(metaspace::SegmentLevel_t level){
-    assert(level >= SegmentLevel::LV_LOWEST && level <= SegmentLevel::LV_HIGHEST,"check");
+    assert(SegmentLevel::is_valid(level),"check");
     return metaspace::Setting::RegionBytes >> level;
 }

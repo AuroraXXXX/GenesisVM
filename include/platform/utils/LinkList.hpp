@@ -35,11 +35,11 @@ public:
         return _next;
     }
 
-    bool is_clear() {
+    bool is_clear_node() {
         return this->_next == nullptr && this->_prev == nullptr;
     };
 
-    void clear(){
+    void clear_node(){
         this->_prev = nullptr;
         this->_next = nullptr;
     };
@@ -189,11 +189,12 @@ void LinkList<T, GetLinkListNodeFunc>::remove(T *t) {
         this->_tail = prev;
     }
     //清空取下的节点的 前驱和后继节点信息 防止污染
-    node->clear();
+    node->clear_node();
 }
 
 template<typename T, GetLinkListNodeFuncType<T> GetLinkListNodeFunc>
 void LinkList<T, GetLinkListNodeFunc>::add(T *t, T *target, bool is_prev) {
+    assert(target != nullptr,"must be");
     if (t == nullptr || target == nullptr) {
         return;
     }
@@ -305,7 +306,7 @@ T *LinkList<T, GetLinkListNodeFunc>::pop_head() {
     if (this->_head == nullptr) {
         this->_tail = nullptr;
     }
-    node->clear();
+    node->clear_node();
     return t;
 }
 
@@ -378,7 +379,7 @@ T *LinkList<T, GetLinkListNodeFunc>::pop_tail() {
         //说明 当前删除后，链表是空的
         this->_head = nullptr;
     }
-    node->clear();
+    node->clear_node();
     return t;
 }
 

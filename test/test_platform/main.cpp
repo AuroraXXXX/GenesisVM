@@ -34,13 +34,13 @@ public:
 int main() {
     Platform::pre_initialize();
     Platform::global_initialize();
-    TestVM_Operation testVmOperation;
-    TestVM_Operation::execute(&testVmOperation);
-
-
-//    TestPeriodicTask task(100);
-//    task.activate();
-//    sleep(10);
+//    TestVM_Operation testVmOperation;
+//    TestVM_Operation::execute(&testVmOperation);
+//
+//
+////    TestPeriodicTask task(100);
+////    task.activate();
+////    sleep(10);
 
     Platform::destroy();
     return 0;

@@ -4,9 +4,7 @@
 #include "Segment.hpp"
 #include "meta_log.hpp"
 #include "LevelSegmentArray.hpp"
-#include "platform/concurrent/Mutex.hpp"
-#include "metaspace/Metaspace.hpp"
-#define LOG_FMT         "SegmentMgr @" PTR_FORMAT
+#define LOG_FMT         "LevelSegmentArray @" PTR_FORMAT
 #define LOG_FMT_ARGS    this
 namespace metaspace {
     /**
@@ -65,6 +63,7 @@ namespace metaspace {
         for (size_t &a: this->_num_segments_at_level) {
             a = 0;
         }
+        meta_log(info,"born");
     }
 
     size_t LevelSegmentArray::num_segments() const {
@@ -126,14 +125,19 @@ namespace metaspace {
         auto list = this->list_for_level(segment->level());
         Segment *insert_target = nullptr;
         auto find_func = [&](Segment *node) {
-            if (node->committed_bytes() >= segment->committed_bytes()) {
+            if (node->committed_bytes() <= segment->committed_bytes()) {
+                //寻找第一个
                 insert_target = node;
                 return false;
             }
             return true;
         };
         list->head_do(find_func);
-        list->add( segment,insert_target, false);
+        if(insert_target != nullptr) {
+            list->add( segment,insert_target, true);
+        }else{
+            list->push_head(segment);
+        }
     }
 
     void LevelSegmentArray::remove(Segment *segment) {

@@ -79,7 +79,7 @@ namespace metaspace {
          * @return
          */
         bool contains(void* p) const;
-
+        Segment * allocate_root_segment();
 #ifdef DEBUG_MODE_ONLY
         void verify();
 #endif

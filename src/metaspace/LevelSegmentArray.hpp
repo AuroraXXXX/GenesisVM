@@ -16,14 +16,14 @@ namespace metaspace {
      */
     class LevelSegmentArray {
     public:
-        using Node = LinkList<Segment,&Segment::link_list_node>;
+        using Node = LinkList<Segment>;
     private:
         /**
          * 管理整个空闲内存块的链表
          * 用于把增加 删除的逻辑抽象出来
          *
-         * 存在提交内存的 插入到头部
-         * 不存在的 插入到尾部
+         * 每个等级中插入顺序
+         * 按照提交内存从大到小
          */
         Node _list_array[SegmentLevel::LV_NUM];
         size_t _num_segments_at_level[SegmentLevel::LV_NUM];

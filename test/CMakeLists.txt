@@ -17,3 +17,8 @@ add_test(NAME test_platform COMMAND test_platform)
 add_executable(test_platform_utils test_platform/test_utils.cpp)
 target_link_libraries(test_platform_utils PUBLIC ${PROJECT_NAME})
 add_test(NAME test_platform_utils COMMAND test_platform_utils)
+
+
+add_executable(test_metaspace test_metaspace/main.cpp)
+target_link_libraries(test_metaspace PUBLIC ${PROJECT_NAME})
+add_test(NAME test_metaspace COMMAND test_metaspace)
