@@ -27,13 +27,13 @@ metaspace::RootArea *metaspace::RootArea::create(metaspace::Volume *volume, uint
 
 metaspace::Segment *metaspace::RootArea::merge(metaspace::Segment *segment, metaspace::LevelSegmentArray *array) {
     assert(!segment->is_root_segment(), "root segment is not merge again");
-    assert(segment->_state == Segment::State::Free && segment->_used_bytes == 0, "segment must be free");
+    assert(segment->state() == Segment::State::Free && segment->used_bytes() == 0, "segment must be free");
 
     ResourceArenaMark mark;
     Segment *result_segment = nullptr;
     do {
         const bool is_leader = segment->is_leader();
-        const auto buddy_node = &segment->_buddy_link_node;
+        const auto buddy_node = segment->buddy_link_node();
         //获取其伙伴的地址
         const auto buddy = is_leader ? buddy_node->next() : buddy_node->prev();
         /**
@@ -42,7 +42,7 @@ metaspace::Segment *metaspace::RootArea::merge(metaspace::Segment *segment, meta
          * 即伙伴块等级大于或者等于当前块的
          */
         assert(buddy->level() >= segment->level(), "健全");
-        if (buddy->level() != segment->level() || buddy->_state != Segment::State::Free) {
+        if (buddy->level() != segment->level() || buddy->state() != Segment::State::Free) {
             //只要伙伴块与原内存块等级不相同或者伙伴块只要不是空闲的 那么无法合并
             meta_log_stream(trace);
             log.print("buddy segment cannot merge,buddy:");
@@ -55,7 +55,7 @@ metaspace::Segment *metaspace::RootArea::merge(metaspace::Segment *segment, meta
             segment->print_on(&log);
         }
         //从空闲块管理器中移除 伙伴块
-        assert(buddy->_state == Segment::State::Free, "程序错误");
+        assert(buddy->state() == Segment::State::Free, "程序错误");
         array->remove(buddy);
 
         //确定当前块的领导者和跟随者
@@ -74,10 +74,9 @@ metaspace::Segment *metaspace::RootArea::merge(metaspace::Segment *segment, meta
          * 且虚拟地址空间连接在一起
          * 并且二者都是空闲的
          */
-        assert(leader->_base + leader->total_bytes() == follower->_base &&
-               leader->_level == follower->_level &&
-               leader->_state == Segment::State::Free &&
-               follower->_state == Segment::State::Free, "check");
+        assert(leader->is_continuous(follower) &&
+               leader->state() == Segment::State::Free &&
+               follower->state() == Segment::State::Free, "check");
 
         /**
          * 统计 合并后的内存块的提交内存大小
@@ -93,15 +92,15 @@ metaspace::Segment *metaspace::RootArea::merge(metaspace::Segment *segment, meta
          * 删除follower节点
          */
         {
-            auto leader_node = &leader->_buddy_link_node;
-            auto follower_node = &follower->_buddy_link_node;
+            auto leader_node = leader->buddy_link_node();
+            auto follower_node = follower->buddy_link_node();
             auto follower_next = follower_node->next();
             leader_node->set_next(follower_next);
             if (follower_next != nullptr) {
-                auto follower_next_node = &follower_next->_buddy_link_node;
+                auto follower_next_node = follower_next->buddy_link_node();
                 follower_next_node->set_prev(leader);
             }
-            follower_node->clear();
+            follower_node->clear_node();
         }
 
         //合并后 将跟随者的内存块头部放入池中

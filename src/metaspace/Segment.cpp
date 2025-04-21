@@ -16,7 +16,7 @@
     segment->_level,segment->get_state_char(),segment,segment->_base_ptr,segment->_base_ptr + segment->total_bytes()
 
 #define SEGMENT_FULL_FORMAT         \
-    SEGMENT_FORMAT "used=" SIZE_FORMAT "b,committed=" SIZE_FORMAT "b"
+    SEGMENT_FORMAT "used=" SIZE_FORMAT "b,committed=" SIZE_FORMAT "b."
 
 #define SEGMENT_FULL_FORMAT_ARGS(segment)     \
     SEGMENT_FORMAT_ARGS(segment),segment->_used_bytes,segment->_committed_bytes
@@ -162,6 +162,14 @@ namespace metaspace {
         auto segment_start = segment->_base_ptr;
         auto segment_end = segment->_base_ptr + segment->_used_bytes;
         return (this_start == segment_end) || (this_end == segment_start);
+    }
+
+    void Segment::set_dead() {
+        this->_state = State::Dead;
+        this->_base_ptr = 0;
+        this->_committed_bytes = 0;
+
+
     }
 
 

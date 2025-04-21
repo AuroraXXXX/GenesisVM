@@ -35,7 +35,7 @@ namespace metaspace {
      *        +--------------+ <- start   ----------+ ----------+
      */
     template<typename T>
-    class SegmentBase : public LinkListNode<SegmentBase<T>> {
+    class SegmentBase : public LinkListNode<T> {
     private:
         /**
          * 这两个指针是固定的
@@ -53,13 +53,17 @@ namespace metaspace {
         };
     public:
         explicit SegmentBase() :
-                LinkListNode<SegmentBase<T>>(),
+                LinkListNode<T>(),
                 _buddy_link_node(),
                 _container(nullptr) {};
 
 
         [[nodiscard]] inline Volume *container() const {
             return this->_container;
+        };
+
+        inline auto buddy_link_node() {
+            return &this->_buddy_link_node;
         };
     };
 
@@ -187,9 +191,7 @@ namespace metaspace {
             return this->_state;
         }
 
-        inline void set_state(State state) {
-            this->_state = state;
-        }
+        void set_dead();
 
 
 
